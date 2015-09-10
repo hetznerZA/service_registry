@@ -1,24 +1,31 @@
 = Servicy registry
 
-The service registry provides
-{file:features/dss.feature decision support} when mapping services
-{file:features/list_domain_perspectives.feature listing domain perspectives} when provisioning service components and mapping service components to domain perspectives
-{file:features/list_service_components.feature listing service components} when provisioning service components and mapping service components to domain perspectives
-{file:features/register_domain_perspective.feature registering domain perspectives} when new domain perspectives become relevant
-{file:features/register_service_component.feature registering service components} when new service components are added
-{file:features/deregister_service_component.feature deregistering service components} when service components should no longer be accessible
-{file:features/register_service.feature registering services with their definition} when associating services with service components
-{file:features/deregister_service.feature deregistering service components and their definitions} when service and service component associations should no longer be made
-{file:features/service_search.feature finding a list of services in domain perspectives} matching service search criteria
-{file:features/service_definition.feature obtaining a service definition} given a service identifier
+The service registry provides:
+* {decision support}[file:features/dss.feature] when mapping services
+* {listing domain perspectives}[file:features/list_domain_perspectives.feature] when provisioning service components and mapping service components to domain perspectives
+* {listing service components}[file:features/list_service_components.feature] when provisioning service components and mapping service components to domain perspectives
+* {registering domain perspectives}[file:features/register_domain_perspective.feature] when new domain perspectives become relevant
+* {registering service components}[file:features/register_service_component.feature] when new service components are added
+* {deregistering service components}[file:features/deregister_service_component.feature] when service components should no longer be accessible
+* {registering services with their definition}[file:features/register_service.feature] when associating services with service components
+* {deregistering service components and their definitions}[file:features/deregister_service.feature] when service and service component associations should no longer be made
+* {finding a list of services in domain perspectives}[file:features/service_search.feature] matching service search criteria
+* {obtaining a service definition}[file:features/service_definition.feature] given a service identifier
 
-The service registry and / or any clients may support
-{file:features/service_status.feature querying service status} when deciding which service from a pool of candidate services are best to use
+The service registry and / or any clients may support:
+* {querying service status}[file:features/service_status.feature] when deciding which service from a pool of candidate services are best to use
 
-The service requires {file:features/bootstrap_with_configuration_service.feature bootstrapping with a configuration service} and {file:features/bootstrap_identifier.feature bootstrapping with a globally unique identifier}
-The service supports {file:features/configuration.feature configuration} of the registry.
+The service requires:
+* {bootstrapping with a configuration service}[file:features/bootstrap_with_configuration_service.feature]
+* {bootstrapping with a globally unique identifier}[file:features/bootstrap_identifier.feature]
 
-The service registry depends on {file:features/configure_with_directory.feature a directory configuration} for UDDI and inetOrgPerson support, as well as {file:features/discover_domain_perspectives.feature discovery of domain perspectives} and {file:features/discover_service_components.feature discovery of service components} using a directory.
+The service supports:
+* {configuration}[file:features/configuration.feature] of the registry.
+
+The service registry depends on:
+* {a directory configuration}[file:features/configure_with_directory.feature] for UDDI and inetOrgPerson support
+* {discovery of domain perspectives}[file:features/discover_domain_perspectives.feature]
+* {discovery of service components}[file:features/discover_service_components.feature] using a UDDI directory.
 
 A pluggable Ruby API is provided in {ServiceRegistry::Base}.
 
