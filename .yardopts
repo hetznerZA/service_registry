@@ -1,0 +1,5 @@
+--no-private
+--exclude README.md
+--readme README.rdoc
+-
+features/*.feature

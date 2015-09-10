@@ -1,0 +1,76 @@
+= Servicy registry
+
+The service registry provides
+{file:features/dss.feature decision support} when mapping services
+{file:features/list_domain_perspectives.feature listing domain perspectives} when provisioning service components and mapping service components to domain perspectives
+{file:features/list_service_components.feature listing service components} when provisioning service components and mapping service components to domain perspectives
+{file:features/register_domain_perspective.feature registering domain perspectives} when new domain perspectives become relevant
+{file:features/register_service_component.feature registering service components} when new service components are added
+{file:features/deregister_service_component.feature deregistering service components} when service components should no longer be accessible
+{file:features/register_service.feature registering services with their definition} when associating services with service components
+{file:features/deregister_service.feature deregistering service components and their definitions} when service and service component associations should no longer be made
+{file:features/service_search.feature finding a list of services in domain perspectives} matching service search criteria
+{file:features/service_definition.feature obtaining a service definition} given a service identifier
+
+The service registry and / or any clients may support
+{file:features/service_status.feature querying service status} when deciding which service from a pool of candidate services are best to use
+
+The service requires {file:features/bootstrap_with_configuration_service.feature bootstrapping with a configuration service} and {file:features/bootstrap_identifier.feature bootstrapping with a globally unique identifier}
+The service supports {file:features/configuration.feature configuration} of the registry.
+
+The service registry depends on {file:features/configure_with_directory.feature a directory configuration} for UDDI and inetOrgPerson support, as well as {file:features/discover_domain_perspectives.feature discovery of domain perspectives} and {file:features/discover_service_components.feature discovery of service components} using a directory.
+
+A pluggable Ruby API is provided in {ServiceRegistry::Base}.
+
+The declarative specification of the service is implemented with cucumber, using pluggable imperative orchestration providers.
+This allows for implementations that are not providers to the Ruby API.
+See {ServiceRegistry::Test}.
+
+A stub service provider is provided in {ServiceRegistry::Provider::Stub}.
+This is used to validate the test framework architecture, and may be used as a stub configuration service in tests.
+{https://rubygems.org/search?query=service_registry-provider Other providers} are available as gems.
+
+Service providers are registered against the {ServiceRegistry::ProviderRegistry}.
+
+Factories for creating and configuring service instances are provided in {ServiceRegistry::Factory}.
+
+== Usage
+
+The recommended approach to creating a service registry client is to use a Factory
+
+For example, we can use the EnvironmentContext factory to create and configure
+a configuration service client backed by the vault provider as below.
+
+We could also use a ConfigurationContext factory to retrieve service registry details from a configuration service.
+
+Our +main.rb+ is simple:
+
+  require 'bundler'
+  Bundler.require(:default)
+
+  registry = ServiceRegistry::Factory::EnvironmentContext.create
+  billing_scs, base_url = registry.find_service_component_by_domain_perspective("billing")
+
+This relies on a bundler Gemfile to load the gem that contains whatever
+service provider we configure in the environment:
+
+  source 'https://rubygems.org'
+
+  gem 'service_registry-provider-juddi'
+  gem 'acme_application'
+
+Now we use the process environment to configure the EnvironmentContext factory:
+
+  SERVICE_REGISTRY_IDENTIFIER="acme" \
+  SERVICE_REGISTRY_TOKEN="0b2a80f4-54ce-45f4-8267-f6558fee64af" \
+  SERVICE_REGISTRY_PROVIDER="juddi" \
+  SERVICE_REGISTRY_PROVIDER_ADDRESS="http://127.0.0.1:8009" \
+  bundle exec main.rb
+
+Note that +main.rb+ is completely decoupled from the selection of provider and
+provider configuration. We could swap and/or reconfigure the provider by
+manipulating only the Gemfile and the environment.
+
+
+
+
