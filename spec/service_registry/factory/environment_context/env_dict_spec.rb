@@ -29,13 +29,13 @@ describe ServiceRegistry::Factory::EnvironmentContext::EnvDict do
   context "Given a simple environment and a path" do
 
     let(:env) do
-      {"CONFIG_PROVIDER" => "juddi"}
+      {"SERVICE_REGISTRY_PROVIDER" => "juddi"}
     end
 
     subject { described_class.new(env, "config") }
 
     it "provides access to each value by string key" do
-      expect(subject["provider"]).to eq env["CONFIG_PROVIDER"]
+      expect(subject["provider"]).to eq env["SERVICE_REGISTRY_PROVIDER"]
     end
 
     it "raises KeyError with name of environment variable for a nonexistent key" do
@@ -45,7 +45,7 @@ describe ServiceRegistry::Factory::EnvironmentContext::EnvDict do
 
     it "scrubs the environment on request" do
       subject.scrub!
-      expect(env["CONFIG_PROVIDER"]).to be_nil
+      expect(env["SERVICE_REGISTRY_PROVIDER"]).to be_nil
     end
 
   end
@@ -103,12 +103,12 @@ describe ServiceRegistry::Factory::EnvironmentContext::EnvDict do
     end
 
     it "provides access to the values of substrings of path" do
-      expect(subject["address"]).to eq env["SERVICE_REGISTRY_ADDRESS"]
+      expect(subject["address"]).to eq env["SERVICE_REGISTRY_PROVIDER_ADDRESS"]
     end
 
     it "scrubs substrings of path" do
       subject.scrub!
-      expect(env["SERVICE_REGISTRY_ADDRESS"]).to be_nil
+      expect(env["SERVICE_REGISTRY_PROVIDER_ADDRESS"]).to be_nil
     end
 
     it "does not scrub the exact match" do
@@ -121,17 +121,17 @@ describe ServiceRegistry::Factory::EnvironmentContext::EnvDict do
   describe "As a hash" do
 
     let(:env) do
-      {"SERVICE_REGISTRY_TOKEN" => "543b8c05-0899-41e4-bb00-40d1283ebf32"}
+      {"SERVICE_REGISTRY_PROVIDER_TOKEN" => "543b8c05-0899-41e4-bb00-40d1283ebf32"}
     end
 
     subject { described_class.new(env, "config") }
 
     it "supports string access" do
-      expect(subject["token"]).to eq env["SERVICE_REGISTRY_TOKEN"]
+      expect(subject["token"]).to eq env["SERVICE_REGISTRY_PROVIDER_TOKEN"]
     end
 
     it "supports symbolic access" do
-      expect(subject[:token]).to eq env["SERVICE_REGISTRY_TOKEN"]
+      expect(subject[:token]).to eq env["SERVICE_REGISTRY_PROVIDER_TOKEN"]
     end
 
     class TokenReceiver # :nodoc:
@@ -167,9 +167,9 @@ describe ServiceRegistry::Factory::EnvironmentContext::EnvDict do
     let(:env) do
       {
         "SERVICE_REGISTRY_IDENTIFIER" => "acme",
-        "SERVICE_REGISTRY_TOKEN" => "f1652fda-ee7b-4772-af7c-b71320f4cdb0",
+        "SERVICE_REGISTRY_PROVIDER_TOKEN" => "f1652fda-ee7b-4772-af7c-b71320f4cdb0",
         "SERVICE_REGISTRY_PROVIDER" => "vault",
-        "SERVICE_REGISTRY_ADDRESS" => "http://127.0.0.1:8009"
+        "SERVICE_REGISTRY_PROVIDER_ADDRESS" => "http://127.0.0.1:8009"
       }
     end
 
@@ -179,12 +179,12 @@ describe ServiceRegistry::Factory::EnvironmentContext::EnvDict do
 
     it "returns a dict whose keys are constrained by the new key" do
       slice = subject.subslice!(:provider)
-      expect { slice[:token] }.to raise_error(KeyError, /\bSERVICE_REGISTRY_TOKEN\b/)
+      expect { slice[:token] }.to raise_error(KeyError, /\bSERVICE_REGISTRY_PROVIDER_TOKEN\b/)
     end
 
     it "returns dict whose keys are relative to the new key" do
       slice = subject.subslice!(:provider)
-      expect(slice[:address]).to eq env["SERVICE_REGISTRY_ADDRESS"]
+      expect(slice[:address]).to eq env["SERVICE_REGISTRY_PROVIDER_ADDRESS"]
     end
 
     it "returns a dict that is scrubbed when the parent dict is scrubbed" do
@@ -195,7 +195,7 @@ describe ServiceRegistry::Factory::EnvironmentContext::EnvDict do
 
     it "makes the sliced keys inaccessible in the parent dict" do
       subject.subslice!(:provider)
-      expect { subject[:provider_address] }.to raise_error(KeyError, /\bSERVICE_REGISTRY_ADDRESS\b/)
+      expect { subject[:provider_address] }.to raise_error(KeyError, /\bSERVICE_REGISTRY_PROVIDER_ADDRESS\b/)
     end
 
   end
