@@ -32,6 +32,6 @@ Feature: Querying a decision support system
   Scenario: DSS indicates failure
     Given a service with DSS meta
     And the service is selected for a query result
-    And the DSS indicates an error in attempting to determine inclusoin for the service
+    And the DSS indicates an error in attempting to determine inclusion for the service
     Then the service registry should not include the service in the result
 

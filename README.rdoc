@@ -1,8 +1,8 @@
 = Servicy registry
 
 The service registry provides:
-* {decision support}[file:../features/dss.feature] when mapping services
-* {listing domain perspectives}[file:features/list_domain_perspectives.feature] when provisioning service components and mapping service components to domain perspectives
+* {decision support}[file:features/dss_feature.html] when mapping services
+* {listing domain perspectives}[file:features/list_domain_perspectives_feature.html] when provisioning domain perspectives and service components
 * {listing service components}[file:features/list_service_components.feature] when provisioning service components and mapping service components to domain perspectives
 * {registering domain perspectives}[file:features/register_domain_perspective.feature] when new domain perspectives become relevant
 * {registering service components}[file:features/register_service_component.feature] when new service components are added
