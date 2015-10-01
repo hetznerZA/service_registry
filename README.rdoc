@@ -3,12 +3,18 @@
 The service registry provides:
 * {decision support}[file:features/dss_feature.html] when mapping services
 * {listing domain perspectives}[file:features/list_domain_perspectives_feature.html] when provisioning domain perspectives and service components
-* {listing service components}[file:features/list_service_components.feature] when provisioning service components and mapping service components to domain perspectives
 * {registering domain perspectives}[file:features/register_domain_perspective.feature] when new domain perspectives become relevant
+* {deregistering domain perspectives}[file:features/deregister_domain_perspective.feature] when domain perspectives become irrelevant
+* {listing service components}[file:features/listing_service_components.feature] when provisioning service components and mapping service components to domain perspectives
 * {registering service components}[file:features/register_service_component.feature] when new service components are added
+* {updating service components}[file:features/update_service_component.feature] when service component needs change
 * {deregistering service components}[file:features/deregister_service_component.feature] when service components should no longer be accessible
 * {registering services with their definition}[file:features/register_service.feature] when associating services with service components
-* {deregistering service components and their definitions}[file:features/deregister_service.feature] when service and service component associations should no longer be made
+* {updating service definitions}[file:features/register_service.feature] when associating services with service components
+* {deregistering service definitions}[file:features/deregister_service_definition.feature] when service and service component associations should no longer be made
+* {associating service components with domain perspectives}[file:features/associations.feature] when modelling the domain.
+* {changing associations}[file:features/associations_update.feature] when modelling the domain.
+* {removing associations}[file:features/associations_remove.feature] when modelling the domain.
 * {finding a list of services in domain perspectives}[file:features/service_search.feature] matching service search criteria
 * {obtaining a service definition}[file:features/service_definition.feature] given a service identifier
 
