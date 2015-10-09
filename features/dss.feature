@@ -1,9 +1,11 @@
 Feature: Querying a decision support system
   As a service registry
-  When a service requested has been tagged with meta indicating a DSS should be queried
-  And that service is selected for a query result
-  In order to obtain provide a decision about whether to include the service in the query result
-  I want to queried by DSS with the service and query details
+  When a service requested has meta indicating a DSS should be queried
+  Given a DSS
+  And query details
+  And a service
+  In order to decide whether to include the service in a query result
+  I want ask the DSS
 
   Scenario: DSS unavailable
     Given a service with DSS meta

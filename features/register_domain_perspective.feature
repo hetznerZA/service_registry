@@ -1,5 +1,5 @@
 Feature: Registering domain perspectives
-  As a developer
+  As a provisioner
   When I have identified a new domain perspective
   In order to make the domain perspective available
   I want to register the domain perspective
@@ -30,7 +30,7 @@ Feature: Registering domain perspectives
 
   Scenario: failure
     Given a domain perspective
-    And any failure
+    And a failure
     When I request registration of the domain perspective
     Then I should receive an error indicating 'failure registering domain perspective' 
     And the domain perspective should not be available

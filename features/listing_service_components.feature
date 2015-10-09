@@ -1,8 +1,7 @@
 Feature: Listing service components
-  As a people or service entity
-  When I am interested in service components
-  And I have a domain perspective of interest
-  In order to know which service components exist
+  As a provisioner
+  When I am provisioning service components
+  In order to present service components for provisioning
   I want to retrieve a list of service components
 
   Scenario: One or more service components and no domain perspective
@@ -30,6 +29,6 @@ Feature: Listing service components
 
   Scenario: failure
     Given a domain perspective
-    And any failure
+    And a failure
     When service components are listed
     Then I should receive an error indicating 'failure retrieving service components' 

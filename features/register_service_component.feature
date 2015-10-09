@@ -1,14 +1,9 @@
 Feature: Registering service components
-  As a developer
-  When I have instantiated a new service component
-  In order to make the service component available
+  As a provisioner
+  Given a domain perspective
+  When I have a service component
+  In order to make the service component available in the domain perspective
   I want to register the service component
-
-  Scenario: No domain perspective
-    Given no domain perspective
-    When I request registration of the service component
-    Then I should receive a 'no domain perspective provided' notification
-    And the service component should not be available
 
   Scenario: No service definitions
     Given no service definitions
@@ -22,17 +17,10 @@ Feature: Registering service components
     Then I should receive a 'no identifier provided' notification
     And the service component should not be available
 
-  Scenario: No URI
-    Given no URI
-    When I request registration of the service component
-    Then I should receive a 'no URI provided' notification
-    And the service component should not be available
-
   Scenario: New service component
     Given a new service component identifier
     And a domain perspective
     And a services definition
-    And a URI
     When I request registration of the service component
     Then I should receive a 'success' notification
     And the service component spective should be available
@@ -63,16 +51,9 @@ Feature: Registering service components
     Then I should receive a 'invalid domain perspective' notification
     And the service component should not be available
 
-  Scenario: Invalid URI
-    Given a new service component identifier
-    And an invalid URI
-    When I request registration of the service component
-    Then I should receive a 'invalid URI' notification
-    And the service component should not be available
-
   Scenario: failure
     Given a new service component identifier
-    And any failure
+    And a failure
     When I request registration of the service component
     Then I should receive an error indicating 'failure registering service component' 
     And the service component should not be available
