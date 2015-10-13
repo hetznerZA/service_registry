@@ -59,18 +59,3 @@ Feature: Searching for a service
     When I request services matching the pattern in the domain perspective
     Then I should receive a list of services matching the pattern
     And all services in the list must be in the domain perspective
-
-  Scenario: Extract URI
-    Given a pattern
-    And a service with the pattern in the service definition
-    When I request services matching the pattern
-    Then I should receive a list with the service included
-    And the service should have a URI
-
-  Scenario: Determine status
-    Given a pattern
-    And a service with the pattern in the service definition
-    When I request services matching the pattern
-    Then I should receive a list with the service included
-    And the service should have a status indicator
-
