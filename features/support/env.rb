@@ -3,7 +3,7 @@ require 'service_registry/test'
 
 Before do
   begin
-#    @test = ServiceRegistry::Test::OrchestratorEnvironmentFactory.build
+    @test = ServiceRegistry::Test::StubOrchestrationProvider.new
   rescue
     Cucumber.wants_to_quit = true
     raise
