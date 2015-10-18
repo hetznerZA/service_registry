@@ -6,7 +6,7 @@ Feature: Bootstrap with configuration service
 
   Scenario: No configuration service provided
     Given no configuration service bootstrap
-    When I am initailizing
+    When I am initializing
     Then I need to present a 'no configuration service' notification
     And I should not be available
 

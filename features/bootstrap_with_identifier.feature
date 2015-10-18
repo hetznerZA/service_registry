@@ -6,7 +6,7 @@ Feature: Bootstrap with identifier
 
   Scenario: No identifier provided
     Given no identifier bootstrap
-    When I am initailizing
+    When I am initializing
     Then I need to present a 'no identifier' notification
     And I should not be available
 
