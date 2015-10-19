@@ -1,7 +1,7 @@
 module ServiceRegistry
   module Test
     class StubOrchestrationProvider
-      attr_accessor :iut, :result
+      attr_accessor :iut, :result, :domain_perspective
       attr_reader :dss_decorated_service, :secure_service, :service, :query, :configuration_bootstrap
 
       def initialize
@@ -12,11 +12,15 @@ module ServiceRegistry
         @dss_decorated_service = { 'id' => 'dss_decorated_service_id', 'description' => 'secure service A', 'meta' => 'dss' }
         @secure_service = { 'id' => 'secure_service', 'description' => 'secure service B' }
         @notifications = []
+        @domain_perspective_1 = 'domain_perspective_1'
+        @domain_perspective_2 = 'domain_perspective_2'
+        @domain_perspective = nil
+        @service_component_1 = 'sc1.dev.auto-h.net'
       end
 
       def given_a_service_decorated_with_dss_meta
         @service = @dss_decorated_service
-        @iut.register_service(@dss_decorated_service)
+        process_result(@iut.register_service(@dss_decorated_service))
       end
 
       def given_dss_indicates_service_inclusion
@@ -36,7 +40,7 @@ module ServiceRegistry
       end
 
       def query_a_service
-        @result = @iut.query_service_by_pattern(@query)
+        process_result(@iut.query_service_by_pattern(@query))
       end
 
       def make_dss_unavailable
@@ -85,9 +89,7 @@ module ServiceRegistry
       end
 
       def initialize_service_registry
-        result = @iut.bootstrap(@configuration_bootstrap, @configuration_service)
-        @notifications << result['notifications'] if result and result['notifications']
-        @notifications.flatten!
+        process_result(@iut.bootstrap(@configuration_bootstrap, @configuration_service))
       end
 
       def has_received_notification?(message)
@@ -99,6 +101,92 @@ module ServiceRegistry
 
       def service_registry_available?
         @iut.available?
+      end
+
+      def define_one_domain_perspective
+        process_result(@iut.delete_all_domain_perspectives)
+        process_result(@iut.register_domain_perspective(@domain_perspective_1))
+      end
+
+      def define_multiple_domain_perspectives
+        process_result(@iut.delete_all_domain_perspectives)
+        process_result(@iut.register_domain_perspective(@domain_perspective_1))
+        process_result(@iut.register_domain_perspective(@domain_perspective_2))
+      end
+
+      def list_domain_perspectives
+        process_result(@iut.list_domain_perspectives)
+      end
+
+      def received_one_domain_perspective?
+        (@result.size == 1) and (@result.include?(@domain_perspective_1))
+      end
+
+      def received_multiple_domain_perspectives?
+        (@result.size == 2) and (@result.include?(@domain_perspective_1)) and (@result.include?(@domain_perspective_2))
+      end
+
+      def received_no_domain_perspectives
+        (@result.size == 0) and (@result == [])
+      end
+
+      def clear_all_domain_perspectives
+        @iut.delete_all_domain_perspectives
+      end
+
+      def break_registry
+        @iut.break
+      end
+
+      def given_no_domain_perspective
+        @domain_perspective = nil
+      end
+
+      def register_domain_perspective
+        process_result(@iut.register_domain_perspective(@domain_perspective))
+      end
+
+      def is_domain_perspective_available?
+        @iut.fix
+        available = @iut.list_domain_perspectives
+        available.include?(@domain_perspective)
+      end
+
+      def given_a_new_domain_perspective
+        @iut.delete_all_domain_perspectives
+        @domain_perspective = @domain_perspective_1
+      end
+
+      def given_an_existing_domain_perspective
+        define_one_domain_perspective
+        @domain_perspective = @domain_perspective_1
+      end
+
+      def given_an_invalid_domain_perspective
+        @domain_perspective = " "
+      end
+
+      def given_unknown_domain_perspective
+        @domain_perspective = 'unknown'
+      end
+
+      def deregister_domain_perspective
+        process_result(@iut.deregister_domain_perspective(@domain_perspective))
+      end
+
+      def given_no_service_components_associated_with_domain_perspective
+        @iut.delete_domain_perspective_service_component_associations(@domain_perspective)
+      end
+
+      def given_service_components_associated_with_domain_perspective
+        @iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component_1)
+      end
+
+      def process_result(result)
+        @result = result
+        
+        @notifications << @result['notifications'] if @result and result.is_a?(Hash) and @result['notifications']
+        @notifications.flatten!
       end
     end
   end

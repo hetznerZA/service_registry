@@ -1,11 +1,14 @@
 module ServiceRegistry
   module Test
     class StubServiceRegistry
-      attr_reader :dss, :services, :configuration, :available
+      attr_reader :dss, :services, :configuration, :available, :broken, :service_component_associations
 
       def initialize
         @services = {}
+        @domain_perspectives = []
         @available = false
+        @broken = false
+        @service_component_associations = {}
       end
 
       def bootstrap(configuration, configuration_service)
@@ -38,6 +41,54 @@ module ServiceRegistry
           result[service['id']] = service if service['description'].include?(pattern) and check_dss(service)
         end
         result
+      end
+
+      def delete_all_domain_perspectives
+        @domain_perspectives = []
+      end
+
+      def list_domain_perspectives
+        return { 'result' => 'error', 'notifications' => ['request failure'] } if @broken
+        @domain_perspectives
+      end
+
+      def break
+        @broken = true
+      end
+
+      def fix
+        @broken = false
+      end
+
+      def register_domain_perspective(domain_perspective)
+        return { 'result' => 'error', 'notifications' => ['failure registering domain perspective'] } if @broken
+        return { 'result' => 'error', 'notifications' => ['no domain perspective provided'] } if domain_perspective.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid domain perspective'] } if (domain_perspective.strip == "")
+        if not @domain_perspectives.include?(domain_perspective)
+          @domain_perspectives << domain_perspective
+          return { 'result' => 'success', 'notifications' => ['domain perspective registered'] }
+        else
+          return { 'result' => 'success', 'notifications' => ['domain perspective already exists'] }
+        end
+      end
+
+      def deregister_domain_perspective(domain_perspective)
+        return { 'result' => 'error', 'notifications' => ['failure deregistering domain perspective'] } if @broken
+        if not @domain_perspectives.include?(domain_perspective)
+          return { 'result' => 'success', 'notifications' => ['domain perspective unknown'] }
+        end
+        return { 'result' => 'error', 'notifications' => ['domain perspective has associations'] } if @service_component_associations[domain_perspective] and @service_component_associations[domain_perspective].count > 0
+        @domain_perspectives.delete(domain_perspective)
+        return { 'result' => 'success', 'notifications' => ['domain perspective deregistered'] }
+      end
+
+      def delete_domain_perspective_service_component_associations(domain_perspective)
+        @service_component_associations[domain_perspective] = nil
+      end
+
+      def associate_service_component_with_domain_perspective(domain_perspective, service_component)
+        @service_component_associations[domain_perspective] ||= []
+        @service_component_associations[domain_perspective] << service_component
       end
 
       private

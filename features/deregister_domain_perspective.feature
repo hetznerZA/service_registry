@@ -17,7 +17,7 @@ Feature: Deregistering domain perspectives
     And the domain perspective should no longer be available
 
   Scenario: Associated domain perspective
-    Given a domain perspective
+    Given an existing domain perspective
     And service components associated with the domain perspective
     When I request deregistration of the domain perspective
     Then I should receive a 'domain perspective has associations' notification
@@ -28,5 +28,5 @@ Feature: Deregistering domain perspectives
     And no service components associated with the domain perspective
     And a failure
     When I request deregistration of the domain perspective
-    Then I should receive an error indicating 'failure dregistering domain perspective' 
+    Then I should receive an error indicating 'failure deregistering domain perspective' 
     And the domain perspective should be available
