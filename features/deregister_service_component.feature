@@ -1,35 +1,40 @@
-Feature: De-registering a service component
+Feature: De-registering a service
   As a provisioner
   Given a service component
-  And a domain perspective
-  When a service component should no longer be associated with the domain perspective
-  In order to have the association no longer available
-  I want to deregister the service component from the domain perspective
+  When the service component is no longer relevant
+  In order to have the service component no longer available
+  I want to deregister the service component
 
-  Scenario: service component not registered in domain perspective
-    Given a service component
-    And a domain perspective
-    And the service component is not registered in the domain perspective
-    When I request deregistration of the service component from the domain perspective
-    Then I should receive a 'not registered' notification
+  Scenario: Unknown service component
+    Given an unknown service component
+    When I request deregistration of the service component
+    Then I should receive a 'service component unknown' notification
 
-  Scenario: invalid service component
-    Given an invalid service component
-    And a domain perspective
-    When I request deregistration of the service component from the domain perspective
-    Then I should receive an 'invalid service component' notification
+  Scenario: Existing service component
+    Given an existing service component identifier
+    And no services associated with the service component
+    When I request deregistration of the service component
+    Then I should receive a 'service component deregistered' notification
+    And the service component should not be available
 
-  Scenario: invalid domain perspective
-    Given an invalid domain perspective
-    And a service component
-    When I request deregistration of the service component from the domain perspectiv
-    Then I should receive an 'invalid domain perspective' notification
+  Scenario: Associated services
+    Given an existing service component identifier
+    And services associated with the service component
+    When I request deregistration of the service component
+    Then I should receive a 'service component has service associations' notification
+    And the service component should be available
 
-  Scenario: service component registered in domain perspective
-    Given a service component
-    And a domain perspective
-    And the service component is registered in the domain perspective
-    When I request deregistration of the service component from the domain perspective
-    Then I should receive a success notification
-    And the service component should no longer be registered in the domain perspective
+  Scenario: Associated domain perspectives
+    Given an existing service component identifier
+    And domain perspectives associated with the service component
+    When I request deregistration of the service component
+    Then I should receive a 'service component has domain perspective associations' notification
+    And the service component should be available
 
+  Scenario: failure
+    Given an existing service component identifier
+    And no services associated with the service component
+    And a failure
+    When I request deregistration of the service component
+    Then I should receive an error indicating 'failure deregistering service component' 
+    And the service component should be available

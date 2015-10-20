@@ -6,8 +6,9 @@ Feature: Listing service components
 
   Scenario: One or more service components and no domain perspective
     Given no domain perspective
+    And one or more service components exist
     When service components are listed
-    Then I should receive list of all service components
+    Then I should receive a list with all the service components
 
   Scenario: No service components and no domain perspective
     Given a domain perspective
@@ -17,13 +18,13 @@ Feature: Listing service components
 
   Scenario: No service components
     Given a domain perspective
-    And no service components exit
+    And no service components exist
     When service components are listed
     Then I should receive an empty list
 
   Scenario: One or more service components
     Given a domain perspective
-    And one or more service components exit
+    And one or more service components exist
     When service components are listed
     Then I should receive a list with all the service components
 

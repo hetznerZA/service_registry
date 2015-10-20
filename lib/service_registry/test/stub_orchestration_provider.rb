@@ -1,7 +1,7 @@
 module ServiceRegistry
   module Test
     class StubOrchestrationProvider
-      attr_accessor :iut, :result, :domain_perspective
+      attr_accessor :iut, :result, :domain_perspective, :service_component
       attr_reader :dss_decorated_service, :secure_service, :service, :query, :configuration_bootstrap
 
       def initialize
@@ -16,6 +16,7 @@ module ServiceRegistry
         @domain_perspective_2 = 'domain_perspective_2'
         @domain_perspective = nil
         @service_component_1 = 'sc1.dev.auto-h.net'
+        @service_component_2 = 'sc2.dev.auto-h.net'
       end
 
       def given_a_service_decorated_with_dss_meta
@@ -118,15 +119,37 @@ module ServiceRegistry
         process_result(@iut.list_domain_perspectives)
       end
 
+      def list_service_components
+        process_result(@iut.list_service_components)
+      end
+
+      def given_service_components_exist
+        process_result(@iut.delete_all_service_components)
+        process_result(@iut.register_service_component(@service_component_1))
+        process_result(@iut.register_service_component(@service_component_2))
+      end
+
+      def given_no_service_components_exist
+        process_result(@iut.delete_all_service_components)
+      end
+
+      def received_list_of_all_service_components?
+        @result.include?(@service_component_1) and @result.include?(@service_component_2)
+      end
+
       def received_one_domain_perspective?
         (@result.size == 1) and (@result.include?(@domain_perspective_1))
+      end
+
+      def received_no_service_components?
+        (@result.size == 0) and (@result == [])
       end
 
       def received_multiple_domain_perspectives?
         (@result.size == 2) and (@result.include?(@domain_perspective_1)) and (@result.include?(@domain_perspective_2))
       end
 
-      def received_no_domain_perspectives
+      def received_no_domain_perspectives?
         (@result.size == 0) and (@result == [])
       end
 
@@ -146,10 +169,20 @@ module ServiceRegistry
         process_result(@iut.register_domain_perspective(@domain_perspective))
       end
 
+      def register_service_component
+        process_result(@iut.register_service_component(@service_component))
+      end
+
       def is_domain_perspective_available?
         @iut.fix
         available = @iut.list_domain_perspectives
         available.include?(@domain_perspective)
+      end
+
+      def is_service_component_available?
+        @iut.fix
+        available = @iut.list_service_components
+        available.include?(@service_component)
       end
 
       def given_a_new_domain_perspective
@@ -162,8 +195,21 @@ module ServiceRegistry
         @domain_perspective = @domain_perspective_1
       end
 
+      def given_existing_service_component_identifier
+        @iut.register_service_component(@service_component_1)
+        @service_component = @service_component_1
+      end
+
       def given_an_invalid_domain_perspective
         @domain_perspective = " "
+      end
+
+      def given_invalid_service_component_identifier
+        @service_component = " "
+      end
+
+      def given_no_service_component_identifier
+        @service_component = nil
       end
 
       def given_unknown_domain_perspective
@@ -180,6 +226,22 @@ module ServiceRegistry
 
       def given_service_components_associated_with_domain_perspective
         @iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component_1)
+      end
+
+      def given_new_service_component_identifier
+        @service_component = @service_component_1
+      end
+
+      def given_unknown_service_component
+        @service_component = 'unknown'
+      end
+
+      def deregister_service_component
+        process_result(@iut.deregister_service_component(@service_component))
+      end
+
+      def given_no_services_associated_with_service_component
+        process_result(@iut.deregister_all_services_for_service_component(@service_component))
       end
 
       def process_result(result)

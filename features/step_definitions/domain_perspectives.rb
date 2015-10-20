@@ -23,7 +23,7 @@ Given(/^no domain perspectives have been defined$/) do
 end
 
 Then(/^I receive an empty list$/) do
-  expect(@test.received_no_domain_perspectives).to eq(true)
+  expect(@test.received_no_domain_perspectives?).to eq(true)
 end
 
 Given(/^domain perspectives have been defined$/) do
