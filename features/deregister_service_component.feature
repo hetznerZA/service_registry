@@ -5,6 +5,16 @@ Feature: De-registering a service
   In order to have the service component no longer available
   I want to deregister the service component
 
+  Scenario: No service component
+    Given no service component identifier
+    When I request deregistration of the service component
+    Then I should receive a 'no service component identifier provided' notification
+
+  Scenario: Invalid service component
+    Given invalid service component identifier
+    When I request deregistration of the service component
+    Then I should receive a 'invalid service component identifier' notification
+
   Scenario: Unknown service component
     Given an unknown service component
     When I request deregistration of the service component

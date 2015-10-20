@@ -17,6 +17,8 @@ module ServiceRegistry
         @domain_perspective = nil
         @service_component_1 = 'sc1.dev.auto-h.net'
         @service_component_2 = 'sc2.dev.auto-h.net'
+        @service_1 = 'service_id_1'
+        @service_2 = 'service_id_2'
       end
 
       def given_a_service_decorated_with_dss_meta
@@ -242,6 +244,15 @@ module ServiceRegistry
 
       def given_no_services_associated_with_service_component
         process_result(@iut.deregister_all_services_for_service_component(@service_component))
+      end
+
+      def associate_services_with_service_component
+        process_result(@iut.associate_service_with_service_component(@service_component, @service_1))
+        process_result(@iut.associate_service_with_service_component(@service_component, @service_2))
+      end
+
+      def associate_domain_perspective_with_service_component
+        process_result(@iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component))
       end
 
       def process_result(result)

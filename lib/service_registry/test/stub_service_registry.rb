@@ -86,6 +86,18 @@ module ServiceRegistry
         count > 0
       end
 
+      def does_service_component_have_domain_perspectives_associated?(service_component)
+        return false if not @service_component_associations[service_component]
+        return false if not @service_component_associations[service_component]['domain_perspectives']
+        @service_component_associations[service_component]['domain_perspectives'].count > 0
+      end
+
+      def does_service_component_have_services_associated?(service_component)
+        return false if not @service_component_associations[service_component]
+        return false if not @service_component_associations[service_component]['services']
+        @service_component_associations[service_component]['services'].count > 0
+      end
+
       def deregister_domain_perspective(domain_perspective)
         return { 'result' => 'error', 'notifications' => ['failure deregistering domain perspective'] } if @broken
         if not @domain_perspectives.include?(domain_perspective)
@@ -109,12 +121,15 @@ module ServiceRegistry
       end
 
       def deregister_service_component(service_component)
-#        return { 'result' => 'error', 'notifications' => ['failure deregistering service component'] } if @broken
-#        return { 'result' => 'error', 'notifications' => ['no service component identifier provided'] } if service_component.nil?
-#        return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component and service_component.strip == "")
+        return { 'result' => 'error', 'notifications' => ['failure deregistering service component'] } if @broken
+        return { 'result' => 'error', 'notifications' => ['no service component identifier provided'] } if service_component.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component and service_component.strip == "")
         if @service_components.include?(service_component)
-#          @service_components.delete(service_component)
-#          return { 'result' => 'success', 'notifications' => ['service component deregistered'] }
+          return { 'result' => 'error', 'notifications' => ['service component has service associations'] } if does_service_component_have_services_associated?(service_component)
+          return { 'result' => 'error', 'notifications' => ['service component has domain perspective associations'] } if does_service_component_have_domain_perspectives_associated?(service_component)
+          @service_components.delete(service_component)
+          return { 'result' => 'success', 'notifications' => ['service component deregistered'] }
+service component has domain perspective associations
         else
           return { 'result' => 'success', 'notifications' => ['service component unknown'] }
         end
@@ -137,6 +152,13 @@ module ServiceRegistry
       end
 
       def deregister_all_services_for_service_component(service_component)
+        @service_component_associations[service_component]['services'] = [] if @service_component_associations[service_component]
+      end
+
+      def associate_service_with_service_component(service_component, service)
+        @service_component_associations[service_component] ||= {}
+        @service_component_associations[service_component]['services'] ||= []
+        @service_component_associations[service_component]['services'] << service
       end
 
       private
