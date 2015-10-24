@@ -14,7 +14,7 @@ Given(/^multiple domain perspectives have been defined$/) do
   @test.define_multiple_domain_perspectives
 end
 
-Then(/^I receive a list containing the domain perspectives$/) do
+Then(/^I receive list containing the domain perspectives$/) do
   expect(@test.received_multiple_domain_perspectives?).to eq(true)
 end
 

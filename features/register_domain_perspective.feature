@@ -32,5 +32,5 @@ Feature: Registering domain perspectives
     Given a domain perspective
     And a failure
     When I request registration of the domain perspective
-    Then I receive 'failure registering domain perspective' indication
+    Then I receive 'failure registering domain perspective' notification
     And the domain perspective should not be available

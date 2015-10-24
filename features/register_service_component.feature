@@ -18,7 +18,7 @@ Feature: Registering service components
     And the service component should be available
 
   Scenario: Existing service component
-    Given an existing service component identifier
+    Given existing service component identifier
     When I request registration of the service component
     Then I receive 'service component already exists' notification
     And the service component should still be available, unchanged

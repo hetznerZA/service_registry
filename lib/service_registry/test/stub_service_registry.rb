@@ -1,3 +1,5 @@
+require 'uri'
+
 module ServiceRegistry
   module Test
     class StubServiceRegistry
@@ -200,6 +202,21 @@ service component has domain perspective associations
         @service_component_associations[service_component] ||= {}
         @service_component_associations[service_component]['services'] ||= []
         @service_component_associations[service_component]['services'] << service
+      end
+
+      def configure_service_component_uri(service_component, uri)
+        return { 'result' => 'error', 'notifications' => ['no service component provided'] } if service_component.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component.strip == "")
+        return { 'result' => 'error', 'notifications' => ['no URI provided'] } if uri.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid URI'] } if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
+        return { 'result' => 'error', 'notifications' => ['failure configuring service component'] } if @broken
+        @service_component_associations[service_component] ||= {}
+        @service_component_associations[service_component]['uri'] = uri
+      end
+
+      def service_component_uri(service_component)
+        return nil if (not @service_component_associations[service_component]) or (not @service_component_associations[service_component]['uri'])
+        @service_component_associations[service_component]['uri']
       end
 
       private

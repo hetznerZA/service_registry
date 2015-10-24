@@ -22,7 +22,7 @@ Then(/^the service component should be available$/) do
   expect(@test.is_service_component_available?).to eq(true)
 end
 
-Given(/^an existing service component identifier$/) do
+Given(/^existing service component identifier$/) do
   @test.given_existing_service_component_identifier
 end
 
@@ -112,4 +112,40 @@ end
 
 Then(/^I receive 'failure deregistering service component' notification$/) do
   expect(@test.has_received_notification?('failure deregistering service component')).to eq(true)
+end
+
+Given(/^valid URI$/) do
+  @test.given_valid_URI
+end
+
+Then(/^the service component should know about the URI$/) do
+  expect(@test.is_service_component_configured_with_URI?).to eq(true)
+end
+
+Given(/^invalid URI$/) do
+  @test.given_invalid_URI
+end
+
+Then(/^I receive 'invalid URI' notification$/) do
+  expect(@test.has_received_notification?('invalid URI')).to eq(true)
+end
+
+Then(/^the service component URI should remain unchanged$/) do
+  expect(@test.service_component_uri_changed?).to eq(false)
+end
+
+Given(/^no URI$/) do
+  @test.given_no_URI
+end
+
+Then(/^I receive 'no URI provided' notification$/) do
+  expect(@test.has_received_notification?('no URI provided')).to eq(true)
+end
+
+When(/^I request configuration of the service component$/) do
+  @test.configure_service_component_with_URI
+end
+
+Then(/^I receive 'failure configuring service component' notification$/) do
+  expect(@test.has_received_notification?('failure configuring service component')).to eq(true)
 end

@@ -1,7 +1,7 @@
 module ServiceRegistry
   module Test
     class StubOrchestrationProvider
-      attr_accessor :iut, :result, :domain_perspective, :service_component, :service
+      attr_accessor :iut, :result, :domain_perspective, :service_component, :service, :uri
       attr_reader :dss_decorated_service, :secure_service, :query, :configuration_bootstrap
 
       def initialize
@@ -19,6 +19,7 @@ module ServiceRegistry
         @domain_perspective = nil
         @service_component = nil
         @service = nil
+        @uri = nil
         @service_component_1 = 'sc1.dev.auto-h.net'
         @service_component_2 = 'sc2.dev.auto-h.net'
         @service_1 = 'service_id_1'
@@ -309,6 +310,32 @@ module ServiceRegistry
 
       def given_a_valid_service
         @service = @service_1
+      end
+
+      def given_no_URI
+        @uri = nil
+      end
+
+      def given_valid_URI
+        @uri = 'http://127.0.0.1'
+      end
+
+      def given_invalid_URI
+        @uri = 'http:// 127.0.0.1'
+      end
+
+      def configure_service_component_with_URI
+        process_result(@iut.configure_service_component_uri(@service_component, @uri))
+        @pre_uri = @uri if @result['result'] == 'success'
+      end
+
+      def is_service_component_configured_with_URI?
+        @iut.service_component_uri(@service_component) == @uri
+      end
+
+      def service_component_uri_changed?
+        @uri = @iut.service_component_uri(@service_component)
+        @uri != @pre_uri
       end
 
       def process_result(result)

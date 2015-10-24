@@ -16,13 +16,13 @@ Feature: Associate a service component with a domain perspective
 
   Scenario: No domain perspective
     Given no domain perspective
-    And an existing service component identifier
+    And existing service component identifier
     When I request association of the service component
     Then I receive 'no domain perspective provided' notification
     And the service component associations should not change
 
   Scenario: Existing service component
-    Given an existing service component identifier
+    Given existing service component identifier
     And a domain perspective
     And the service component is already associated with the domain perspective
     When I request association with the domain perspective
@@ -31,21 +31,21 @@ Feature: Associate a service component with a domain perspective
 
   Scenario: Invalid domain perspective
     Given invalid domain perspective
-    And an existing service component identifier
+    And existing service component identifier
     When I request association of the service component
     Then I receive 'invalid domain perspective provided' notification
     And the domain perspective associations should not change
 
   Scenario: valid domain perspective and service component associated
     Given a domain perspective
-    And an existing service component identifier
+    And existing service component identifier
     When I request association of the service component
     Then I receive 'success' notification
     And the service component should be associated with the domain perspective
 
   Scenario: failure
     Given a domain perspective
-    And an existing service component identifier
+    And existing service component identifier
     And a failure
     When I request association of the service component
     Then I receive 'failure associating service component with domain perspective' notification
