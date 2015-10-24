@@ -12,6 +12,8 @@ module ServiceRegistry
         @dss_decorated_service = { 'id' => 'dss_decorated_service_id', 'description' => 'secure service A', 'meta' => 'dss' }
         @secure_service = { 'id' => 'secure_service', 'description' => 'secure service B' }
         @notifications = []
+        @domain_perspective_associations = []
+        @service_component_domain_perspective_associations = []
         @domain_perspective_1 = 'domain_perspective_1'
         @domain_perspective_2 = 'domain_perspective_2'
         @domain_perspective = nil
@@ -246,13 +248,41 @@ module ServiceRegistry
         process_result(@iut.deregister_all_services_for_service_component(@service_component))
       end
 
+      def given_some_or_no_associations_of_service_components_with_domain_perspective
+        @domain_perspective_associations = @iut.domain_perspective_associations(@domain_perspective)
+      end
+
+      def given_some_or_no_associations_of_domain_perspectives_with_service_component
+        @service_component_domain_perspective_associations = @iut.service_component_domain_perspective_associations(@service_component)
+      end
+
+      def service_component_associations_changed?
+        not arrays_the_same?(@iut.service_component_domain_perspective_associations(@service_component), @service_component_domain_perspective_associations)
+      end
+
+      def arrays_the_same?(a, b)
+        c = a - b
+        d = b - a
+        (c.empty? and d.empty?)
+      end
+
+      def domain_perspective_associations_changed?
+        not arrays_the_same?(@iut.domain_perspective_associations(@domain_perspective), @domain_perspective_associations)
+      end
+
       def associate_services_with_service_component
         process_result(@iut.associate_service_with_service_component(@service_component, @service_1))
         process_result(@iut.associate_service_with_service_component(@service_component, @service_2))
       end
 
       def associate_domain_perspective_with_service_component
-        process_result(@iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component))
+        result = process_result(@iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component))
+        @domain_perspective_associations = @iut.domain_perspective_associations(@domain_perspective)
+        result
+      end
+
+      def is_service_component_associated_with_domain_perspective?
+        @iut.service_component_domain_perspective_associations(@service_component).include?(@domain_perspective)
       end
 
       def process_result(result)

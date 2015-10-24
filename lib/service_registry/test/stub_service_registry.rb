@@ -86,10 +86,23 @@ module ServiceRegistry
         count > 0
       end
 
+      def domain_perspective_associations(domain_perspective)
+        associated = []
+        @service_component_associations.each do |service_component, associations|
+          associated << service_component if associations['domain_perspectives'] and associations['domain_perspectives'].include?(domain_perspective)
+        end
+        associated
+      end
+
       def does_service_component_have_domain_perspectives_associated?(service_component)
         return false if not @service_component_associations[service_component]
         return false if not @service_component_associations[service_component]['domain_perspectives']
         @service_component_associations[service_component]['domain_perspectives'].count > 0
+      end
+
+      def service_component_domain_perspective_associations(service_component)
+        return @service_component_associations[service_component]['domain_perspectives'] if @service_component_associations[service_component] and @service_component_associations[service_component]['domain_perspectives']
+        []
       end
 
       def does_service_component_have_services_associated?(service_component)
@@ -142,9 +155,17 @@ service component has domain perspective associations
       end
 
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)
+        return { 'result' => 'error', 'notifications' => ['no service component provided'] } if service_component.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component.strip == "")
+        return { 'result' => 'error', 'notifications' => ['no domain perspective provided'] } if domain_perspective.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid domain perspective provided'] } if (domain_perspective.strip == "")
+        return { 'result' => 'error', 'notifications' => ['failure associating service component with domain perspective'] } if @broken
+
         @service_component_associations[service_component] ||= {}
         @service_component_associations[service_component]['domain_perspectives'] ||= []
+        return { 'result' => 'error', 'notifications' => ['already associated'] } if @service_component_associations[service_component]['domain_perspectives'].include?(domain_perspective)
         @service_component_associations[service_component]['domain_perspectives'] << domain_perspective
+        { 'result' => 'success', 'notifications' => ['association successful'] }
       end
 
       def delete_all_service_components
