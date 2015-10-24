@@ -8,30 +8,30 @@ Feature: Registering service components
   Scenario: No identifier
     Given no service component identifier
     When I request registration of the service component
-    Then I should receive a 'no service component identifier provided' notification
+    Then I receive 'no service component identifier provided' notification
     And the service component should not be available
 
   Scenario: New service component
     Given a new service component identifier
     When I request registration of the service component
-    Then I should receive a 'service component registered' notification
+    Then I receive 'service component registered' notification
     And the service component should be available
 
   Scenario: Existing service component
     Given an existing service component identifier
     When I request registration of the service component
-    Then I should receive a 'service component already exists' notification
+    Then I receive 'service component already exists' notification
     And the service component should still be available, unchanged
 
   Scenario: Invalid service component identifier
     Given invalid service component identifier
     When I request registration of the service component
-    Then I should receive a 'invalid service component identifier' notification
+    Then I receive 'invalid service component identifier' notification
     And the service component should not be available
 
   Scenario: failure
     Given a new service component identifier
     And a failure
     When I request registration of the service component
-    Then I should receive an error indicating 'failure registering service component' 
+    Then I receive 'failure registering service component' notification
     And the service component should not be available

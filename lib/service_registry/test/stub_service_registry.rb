@@ -10,6 +10,7 @@ module ServiceRegistry
         @available = false
         @broken = false
         @service_component_associations = {}
+        @service_associations = {}
       end
 
       def bootstrap(configuration, configuration_service)
@@ -111,6 +112,11 @@ module ServiceRegistry
         @service_component_associations[service_component]['services'].count > 0
       end
 
+      def service_component_service_associations(service_component)
+        return @service_component_associations[service_component]['services'] if @service_component_associations[service_component] and @service_component_associations[service_component]['services']
+        []
+      end
+
       def deregister_domain_perspective(domain_perspective)
         return { 'result' => 'error', 'notifications' => ['failure deregistering domain perspective'] } if @broken
         if not @domain_perspectives.include?(domain_perspective)
@@ -154,6 +160,20 @@ service component has domain perspective associations
         end
       end
 
+      def associate_service_component_with_service(service, service_component)
+        return { 'result' => 'error', 'notifications' => ['no service component provided'] } if service_component.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component.strip == "")
+        return { 'result' => 'error', 'notifications' => ['no service provided'] } if service.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service provided'] } if (service.strip == "")
+        return { 'result' => 'error', 'notifications' => ['failure associating service component with service'] } if @broken
+
+        @service_component_associations[service_component] ||= {}
+        @service_component_associations[service_component]['services'] ||= []
+        return { 'result' => 'error', 'notifications' => ['already associated'] } if @service_component_associations[service_component]['services'].include?(service)
+        @service_component_associations[service_component]['services'] << service
+        { 'result' => 'success', 'notifications' => ['success'] }
+      end
+
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)
         return { 'result' => 'error', 'notifications' => ['no service component provided'] } if service_component.nil?
         return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component.strip == "")
@@ -165,7 +185,7 @@ service component has domain perspective associations
         @service_component_associations[service_component]['domain_perspectives'] ||= []
         return { 'result' => 'error', 'notifications' => ['already associated'] } if @service_component_associations[service_component]['domain_perspectives'].include?(domain_perspective)
         @service_component_associations[service_component]['domain_perspectives'] << domain_perspective
-        { 'result' => 'success', 'notifications' => ['association successful'] }
+        { 'result' => 'success', 'notifications' => ['success'] }
       end
 
       def delete_all_service_components

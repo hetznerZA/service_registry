@@ -15,7 +15,7 @@ Feature: Map service components to services
     Given the result of a service query
     And no service components provide the service
     When I index a service in the services list
-    Then I obtain an empty list of service components
+    Then I receive no service components
 
   Scenario: mapping URIs to service components
     Given the result of a service query

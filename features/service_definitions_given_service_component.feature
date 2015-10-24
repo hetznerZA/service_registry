@@ -6,19 +6,19 @@ Feature: Obtaining service definitions from service components
   I want to retrieve the list of service definitions
 
   Scenario: invalid service component
-    Given an invalid service component
+    Given invalid service component identifier
     When I request service definitions
-    Then I should receive an 'invalid service component' notification
+    Then I receive 'invalid service component' notification
 
   Scenario: no services associated
-    Given a valid service component
+    Given valid service component
     And no services associated with the service component
     When I request service definitions
-    Then I should receive an empty list of services
+    Then I receive no services
     And no service definitions
 
   Scenario: services associated
-    Given a valid service component
+    Given valid service component
     And services associated with the service component
     When I request service definitions
     Then I should a list of services

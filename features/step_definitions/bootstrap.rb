@@ -30,11 +30,11 @@ Given(/^no configuration stored in the configuration service$/) do
   @test.given_no_configuration_in_configuration_service
 end
 
-Then(/^I need to present an 'invalid configuration' notification$/) do
+Then(/^I need to present 'invalid configuration' notification$/) do
   expect(@test.has_received_notification?('invalid configuration')).to eq(true)
 end
 
-Given(/^a valid configuration in the configuration service$/) do
+Given(/^valid configuration in the configuration service$/) do
   @test.given_valid_configuration_in_configuration_service
 end
 
@@ -54,15 +54,15 @@ Then(/^I need to present a 'no identifier' notification$/) do
   expect(@test.has_received_notification?('no identifier')).to eq(true)
 end
 
-Given(/^an invalid identifier bootstrap$/) do
+Given(/^invalid identifier bootstrap$/) do
   @test.given_invalid_identifier_bootstrap
 end
 
-Then(/^I need to present a 'invalid identifier' notification$/) do
+Then(/^I need to present 'invalid identifier' notification$/) do
   expect(@test.has_received_notification?('invalid identifier')).to eq(true)
 end
 
-Given(/^a valid identifier bootstrap$/) do
+Given(/^valid identifier bootstrap$/) do
   @test.given_valid_identifier_bootstrap
 end
 

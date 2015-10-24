@@ -13,4 +13,4 @@ Feature: Retrieve a service definition for a service
     Given a service identifier
     And the service identifier is unknown
     When I request the service definition
-    Then I receive a 'not found' notification
+    Then I receive 'not found' notification

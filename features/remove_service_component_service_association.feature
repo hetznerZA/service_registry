@@ -7,27 +7,27 @@ Feature: Removing service component associations from services
   I want to deregister the service component from the service
 
   Scenario: invalid service
-    Given an invalid service
+    Given invalid service identifier
     When I remove the service component association
-    Then I receive an 'invalid service' notification
+    Then I receive 'invalid service' notification
 
   Scenario: invalid service component
-    Given an invalid service component
+    Given invalid service component identifier
     When I remove the service component association
-    Then I receive an 'invalid service component' notification
+    Then I receive 'invalid service component' notification
 
   Scenario: not associated
-    Given a valid service component
-    And a valid service
+    Given valid service component
+    And valid service
     And the service is not associated with the service component
     When I remove the service component association
-    Then I receive a 'not associated' notification
+    Then I receive 'not associated' notification
 
   Scenario: associated
-    Given a valid service component
-    And a valid service
+    Given valid service component
+    And valid service
     And the service is associated with the service component
     When I remove the service component association
-    Then I receive a 'success' notification
+    Then I receive 'success' notification
     And the service component is no longer associated with the service
 

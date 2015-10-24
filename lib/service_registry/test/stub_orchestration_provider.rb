@@ -1,8 +1,8 @@
 module ServiceRegistry
   module Test
     class StubOrchestrationProvider
-      attr_accessor :iut, :result, :domain_perspective, :service_component
-      attr_reader :dss_decorated_service, :secure_service, :service, :query, :configuration_bootstrap
+      attr_accessor :iut, :result, :domain_perspective, :service_component, :service
+      attr_reader :dss_decorated_service, :secure_service, :query, :configuration_bootstrap
 
       def initialize
         @dss = ServiceRegistry::Test::StubDSS.new
@@ -17,6 +17,8 @@ module ServiceRegistry
         @domain_perspective_1 = 'domain_perspective_1'
         @domain_perspective_2 = 'domain_perspective_2'
         @domain_perspective = nil
+        @service_component = nil
+        @service = nil
         @service_component_1 = 'sc1.dev.auto-h.net'
         @service_component_2 = 'sc2.dev.auto-h.net'
         @service_1 = 'service_id_1'
@@ -169,6 +171,10 @@ module ServiceRegistry
         @domain_perspective = nil
       end
 
+      def given_no_service
+        @service = nil
+      end
+
       def register_domain_perspective
         process_result(@iut.register_domain_perspective(@domain_perspective))
       end
@@ -210,6 +216,10 @@ module ServiceRegistry
 
       def given_invalid_service_component_identifier
         @service_component = " "
+      end
+
+      def given_invalid_service
+        @service = " "
       end
 
       def given_no_service_component_identifier
@@ -270,6 +280,10 @@ module ServiceRegistry
         not arrays_the_same?(@iut.domain_perspective_associations(@domain_perspective), @domain_perspective_associations)
       end
 
+      def service_associations_changed?
+        not arrays_the_same?(@iut.service_associations(@service), @service_associations)
+      end
+
       def associate_services_with_service_component
         process_result(@iut.associate_service_with_service_component(@service_component, @service_1))
         process_result(@iut.associate_service_with_service_component(@service_component, @service_2))
@@ -283,6 +297,18 @@ module ServiceRegistry
 
       def is_service_component_associated_with_domain_perspective?
         @iut.service_component_domain_perspective_associations(@service_component).include?(@domain_perspective)
+      end
+
+      def is_service_component_associated_with_service?
+        @iut.service_component_service_associations(@service_component).include?(@service)
+      end
+
+      def associate_service_with_service_component
+        process_result(@iut.associate_service_component_with_service(@service, @service_component))
+      end
+
+      def given_a_valid_service
+        @service = @service_1
       end
 
       def process_result(result)
