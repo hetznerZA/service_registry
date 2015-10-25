@@ -177,6 +177,20 @@ service component has domain perspective associations
         { 'result' => 'success', 'notifications' => ['success'] }
       end
 
+      def disassociate_service_component_from_service(service, service_component)
+        return { 'result' => 'error', 'notifications' => ['no service component provided'] } if service_component.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component.strip == "")
+        return { 'result' => 'error', 'notifications' => ['no service provided'] } if service.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service provided'] } if (service.strip == "")
+        return { 'result' => 'error', 'notifications' => ['failure disassociating service component with service'] } if @broken
+
+        @service_component_associations[service_component] ||= {}
+        @service_component_associations[service_component]['services'] ||= []
+        return { 'result' => 'error', 'notifications' => ['not associated'] } if not @service_component_associations[service_component]['services'].include?(service)
+        @service_component_associations[service_component]['services'].delete(service)
+        { 'result' => 'success', 'notifications' => ['success'] }
+      end
+
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)
         return { 'result' => 'error', 'notifications' => ['no service component provided'] } if service_component.nil?
         return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component.strip == "")
@@ -188,6 +202,20 @@ service component has domain perspective associations
         @service_component_associations[service_component]['domain_perspectives'] ||= []
         return { 'result' => 'error', 'notifications' => ['already associated'] } if @service_component_associations[service_component]['domain_perspectives'].include?(domain_perspective)
         @service_component_associations[service_component]['domain_perspectives'] << domain_perspective
+        { 'result' => 'success', 'notifications' => ['success'] }
+      end
+
+      def disassociate_service_component_from_domain_perspective(domain_perspective, service_component)
+        return { 'result' => 'error', 'notifications' => ['no service component provided'] } if service_component.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service component identifier'] } if (service_component.strip == "")
+        return { 'result' => 'error', 'notifications' => ['no domain perspective provided'] } if domain_perspective.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid domain perspective provided'] } if (domain_perspective.strip == "")
+        return { 'result' => 'error', 'notifications' => ['failure disassociating service component from domain perspective'] } if @broken
+
+        @service_component_associations[service_component] ||= {}
+        @service_component_associations[service_component]['domain_perspectives'] ||= []
+        return { 'result' => 'error', 'notifications' => ['not associated'] } if not @service_component_associations[service_component]['domain_perspectives'].include?(domain_perspective)
+        @service_component_associations[service_component]['domain_perspectives'].delete(domain_perspective)
         { 'result' => 'success', 'notifications' => ['success'] }
       end
 

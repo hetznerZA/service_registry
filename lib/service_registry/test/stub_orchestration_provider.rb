@@ -299,6 +299,12 @@ module ServiceRegistry
         result
       end
 
+      def disassociate_domain_perspective_from_service_component
+        result = process_result(@iut.disassociate_service_component_from_domain_perspective(@domain_perspective, @service_component))
+        @domain_perspective_associations = @iut.domain_perspective_associations(@domain_perspective)
+        result
+      end
+
       def is_service_component_associated_with_domain_perspective?
         @iut.service_component_domain_perspective_associations(@service_component).include?(@domain_perspective)
       end
@@ -309,6 +315,10 @@ module ServiceRegistry
 
       def associate_service_with_service_component
         process_result(@iut.associate_service_component_with_service(@service, @service_component))
+      end
+
+      def disassociate_service_from_service_component
+        process_result(@iut.disassociate_service_component_from_service(@service, @service_component))
       end
 
       def given_a_valid_service
