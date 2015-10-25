@@ -2,7 +2,7 @@ module ServiceRegistry
   module Test
     class StubOrchestrationProvider
       attr_accessor :iut, :result, :domain_perspective, :service_component, :service, :uri, :service_definition
-      attr_reader :dss_decorated_service, :secure_service, :query, :configuration_bootstrap
+      attr_reader :dss_decorated_service, :secure_service, :query, :configuration_bootstrap, :need, :services_found
 
       def initialize
         @dss = ServiceRegistry::Test::StubDSS.new
@@ -10,7 +10,12 @@ module ServiceRegistry
         @iut.associate_dss(@dss)
         @configuration_service = ServiceRegistry::Test::StubConfigurationService.new
         @dss_decorated_service = { 'id' => 'dss_decorated_service_id', 'description' => 'secure service A', 'meta' => 'dss', 'definition' => nil }
-        @valid_service = { 'id' => 'valid_service_id', 'description' => 'valid service A', 'definition' => nil }
+        @valid_service = { 'id' => 'valid_service_id_1', 'description' => 'valid service A', 'definition' => nil }
+        @service_1 = { 'id' => 'valid_service_id_1', 'description' => 'valid service A', 'definition' => nil }
+        @service_2 = { 'id' => 'valid_service_id_2', 'description' => 'valid service B', 'definition' => nil }
+        @service_3 = { 'id' => 'entropy_service_id_3', 'description' => 'entropy service C', 'definition' => nil }
+        @service_4 = { 'id' => 'service_id_4', 'description' => 'entropy service D', 'definition' => nil }
+        @service_5 = { 'id' => 'service_id_5', 'description' => 'service E', 'definition' => nil }
         @secure_service = { 'id' => 'secure_service', 'description' => 'secure service B' }
         @notifications = []
         @domain_perspective_associations = []
@@ -23,8 +28,6 @@ module ServiceRegistry
         @uri = nil
         @service_component_1 = 'sc1.dev.auto-h.net'
         @service_component_2 = 'sc2.dev.auto-h.net'
-        @service_1 = 'service_id_1'
-        @service_2 = 'service_id_2'
         @service_definition = nil
         @service_definition_1 = "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type='text/xsl' href='/wadl/wadl.xsl'?><wadl:application xmlns:wadl='http://wadl.dev.java.net/2009/02'    xmlns:jr='http://jasperreports.sourceforge.net/xsd/jasperreport.xsd'    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://wadl.dev.java.net/2009/02 wadl.xsd '><wadl:resources base='/'><wadl:resource path='/available-policies'>  <wadl:method name='GET' id='_available-policies'>    <wadl:doc>      Lists the policies available against which this service can validate credentials    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/validate-credential-using-policy'>  <wadl:method name='POST' id='_validate-credential-using-policy'>    <wadl:doc>      Given a credential string, examine the entropy against a security paradigm    </wadl:doc>    <wadl:request>      <wadl:param name='credential' type='xsd:string' required='true' style='query'>      </wadl:param>      <wadl:param name='policy' type='xsd:string' required='true' style='query'>      </wadl:param>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/generate-credential'>  <wadl:method name='GET' id='_generate-credential'>    <wadl:doc>      Generates a strong credential given a policy to adhere to    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status'>  <wadl:method name='GET' id='_status'>    <wadl:doc>      Returns 100 if capable of validating credentials against a policy and returns 0 if policy dependencies have failed and unable to validate credentials against policies    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status-detail'>  <wadl:method name='GET' id='_status-detail'>    <wadl:doc>      This endpoint provides detail of the status measure available on the /status endpoint    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/lexicon'>  <wadl:method name='GET' id='_lexicon'>    <wadl:doc>      Description of all the services available on this service component    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource></wadl:resources></wadl:application>"
       end
@@ -289,8 +292,8 @@ module ServiceRegistry
       end
 
       def associate_services_with_service_component
-        process_result(@iut.associate_service_with_service_component(@service_component, @service_1))
-        process_result(@iut.associate_service_with_service_component(@service_component, @service_2))
+        process_result(@iut.associate_service_with_service_component(@service_component, @service_1['id']))
+        process_result(@iut.associate_service_with_service_component(@service_component, @service_2['id']))
       end
 
       def associate_domain_perspective_with_service_component
@@ -386,6 +389,117 @@ module ServiceRegistry
 
       def has_received_service_definition?
         @result == @service_definition_1
+      end
+
+      def given_a_need
+        @need = 'valid'
+      end
+
+      def given_a_pattern
+        @need = 'entropy'
+      end
+
+      def no_services_match_need
+        @need = 'no services match this'
+      end
+
+      def match_need
+        process_result(@iut.search_for_service(@need))
+      end
+
+      def services_found?
+        not @result.empty?
+      end
+
+      def provide_one_matching_service
+        @iut.register_service(@service_1)
+        @iut.register_service_definition(@service_1['id'], @service_definition_1)
+      end
+
+      def provide_two_matching_services
+        @iut.register_service(@service_1)
+        @iut.register_service(@service_2)
+        @iut.register_service_definition(@service_1['id'], @service_definition_1)
+        @iut.register_service_definition(@service_2['id'], @service_definition_1)
+      end
+
+      def single_service_match?
+        (@result.count == 1) and (@result.first['id'] == @service_1['id'])
+      end
+
+      def multiple_services_match?
+        (@result.count == 2) and ((@result[0]['id'] == @service_1['id']) or (@result[0]['id'] == @service_2['id'])) and ((@result[1]['id'] == @service_1['id']) or (@result[1]['id'] == @service_2['id']))
+      end
+
+      def entry_matches?
+        @result.first['id'].include?(@need) == true
+      end
+
+      def both_entries_match?
+        @result[0]['id'].include?(@need) == true
+        @result[1]['id'].include?(@need) == true
+      end
+
+      def service_by_id
+        process_result(@iut.service_by_id(@service))
+      end
+
+      def given_service_with_pattern_in_id
+        @expected_pattern_service = @service_3
+        @iut.register_service(@service_3)
+        @iut.register_service_definition(@service_3['id'], @service_definition_1)
+      end
+
+      def given_service_with_pattern_in_description
+        @expected_pattern_service = @service_4
+        @iut.register_service(@service_4)
+        @iut.register_service_definition(@service_4['id'], @service_definition_1)
+      end
+
+      def multiple_existing_services
+        @iut.register_service(@service_1)
+        @iut.register_service(@service_4)
+        @expected_pattern_service = @service_4
+        @iut.register_service_definition(@service_4['id'], @service_definition_1)
+      end
+
+      def multiple_existing_service_components
+        @iut.register_service_component(@service_component_1)
+        @iut.register_service_component(@service_component_2)
+        @iut.associate_service_component_with_service(@service_4['id'], @service_component_2)
+        @iut.associate_service_component_with_service(@service_1['id'], @service_component_1)
+      end
+
+      def multiple_existing_domain_perspectives
+        @iut.register_domain_perspective(@domain_perspective_1)
+        @iut.register_domain_perspective(@domain_perspective_2)
+      end
+
+      def service_components_registered_in_different_domain_perspectives
+        @iut.associate_service_component_with_domain_perspective(@domain_perspective_2, @service_component_1)
+        @iut.associate_service_component_with_domain_perspective(@domain_perspective_1, @service_component_2)
+      end
+
+      def given_service_with_pattern_in_definition
+        @expected_pattern_service = @service_5
+        @iut.register_service(@service_5)
+        @iut.register_service_definition(@service_5['id'], @service_definition_1)
+      end
+
+      def service_matched_pattern?
+        (@result.count == 1) and (@result.first['id'] == @expected_pattern_service['id'])
+      end
+
+      def match_pattern_in_domain_perspective
+        process_result(@iut.search_domain_perspective(@domain_perspective_1, @need))
+      end
+
+      def matched_pattern_in_domain_perspectice?
+        @result.size == 1
+      end
+
+      def matched_only_in_domain_perspective?
+        @result[0] == @service_4
       end
 
       def process_result(result)

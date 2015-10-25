@@ -32,7 +32,8 @@ module ServiceRegistry
       end
 
       def register_service(service)
-         { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if service.nil? or service['id'].nil? or (not service.is_a? Hash)
+         { 'result' => 'error', 'notifications' => ['no service identifier provided'] } if service.nil? or service['id'].nil?
+         { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if (not service.is_a? Hash)
         @services[service['id']] = service
       end
 
@@ -249,7 +250,8 @@ service component has domain perspective associations
       end
 
       def register_service_definition(service, service_definition)
-        return { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if service.nil? or (service.strip == "")
+        return { 'result' => 'error', 'notifications' => ['no service identifier provided'] } if service.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if service.strip == ""
         return { 'result' => 'error', 'notifications' => ['unknown service identifier'] } if @services[service].nil?
         return { 'result' => 'error', 'notifications' => ['invalid service definition'] } if service_definition.nil? or (not service_definition.include?("wadl"))
 
@@ -275,6 +277,36 @@ service component has domain perspective associations
         return { 'result' => 'error', 'notifications' => ['service has no definition'] } if @services[service]['definition'].nil?
         return @services[service]['definition'] if (not service.nil?) and (not @services[service].nil?)
         nil
+      end
+
+      def search_for_service_in_services(list, pattern)
+        matches = []
+        list.each do |id, service|
+          matches << service if (id == pattern) or (service['description'] and service['description'].include?(pattern)) or (service['definition'] and service['definition'].include?(pattern))
+        end
+        matches
+      end
+
+      def search_for_service(pattern)
+        return { 'result' => 'error', 'notifications' => ['invalid pattern'] } if pattern.nil?
+        return { 'result' => 'error', 'notifications' => ['pattern too short'] } if (pattern.size < 4)
+        search_for_service_in_services(@services, pattern)
+      end
+
+      def search_domain_perspective(domain_perspective, pattern)
+        domain_perspective_associations(domain_perspective).each do |service_component|
+          @service_component_associations[service_component] ||= {}
+          service_list = {}
+          @service_component_associations[service_component]['services'].each do |id|
+            service_list[id] = @services[id]
+          end
+          return search_for_service_in_services(service_list, pattern)
+        end
+        return {}
+      end
+
+      def service_by_id(id)
+        @services[id].nil? ? [] : [@services[id]]
       end
 
       private

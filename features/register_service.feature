@@ -19,9 +19,9 @@ Feature: Registering service definitions
     And the service is described by the service definition
 
   Scenario: No service identifier
-    Given no service identifier
+    Given no service
     When I register the service definition with the service
-    Then I receive 'no service provided' notification
+    Then I receive 'no service identifier provided' notification
 
   Scenario: service identifier invalid
     Given invalid service identifier

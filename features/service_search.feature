@@ -22,22 +22,22 @@ Feature: Searching for a service
     And multiple service matches
     When I request a list of services that can meet my need
     Then I receive a list of services with multiple entries
-    And the entres should all match my need
+    And the entries should all match my need
 
-  Scenario: Match by service name
-    Given a service name
-    When I request the service by name
+  Scenario: Match by service ID
+    Given a service ID
+    When I request the service by ID
     Then I receive a list with the service as the single entry in it
 
-  Scenario: No match for by service name
-    Given a service name
-    And no match for the service name
-    When I request the service by name
+  Scenario: No match for by service ID
+    Given a service ID
+    And no match for the service ID
+    When I request the service by ID
     Then I receive no services
 
-  Scenario: Match by pattern in name
+  Scenario: Match by pattern in ID
     Given a pattern
-    And a service with the pattern in the name
+    And a service with the pattern in the ID
     When I request services matching the pattern
     Then I receive a list with the service included
 
@@ -55,7 +55,10 @@ Feature: Searching for a service
 
   Scenario: Filter by domain perspective
     Given a pattern
-    And a domain perspective
+    And multiple existing services
+    And multiple existing service components
+    And multiple existing domain perspectives
+    And the service components registered in different domain perspectives
     When I request services matching the pattern in the domain perspective
     Then I receive a list of services matching the pattern
     And all services in the list must be in the domain perspective

@@ -49,7 +49,7 @@ The service requires:
 == Configuration
 
 The service supports:
-* {file:features/configuration.feature configuration} of the registry.
+* {file:features/bootstrap_with_configuration_service.feature configuration} of the registry using a configuration service.
 
 == Dependencies
 
