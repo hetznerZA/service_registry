@@ -18,13 +18,18 @@ Feature: Registering service definitions
     Then I receive 'success' notification
     And the service is described by the service definition
 
+  Scenario: No service identifier
+    Given no service identifier
+    When I register the service definition with the service
+    Then I receive 'no service provided' notification
+
   Scenario: service identifier invalid
     Given invalid service identifier
-    When I register a service definition with the service
+    When I register the service definition with the service
     Then I receive 'invalid service identifier' notification
 
   Scenario: service definition invalid
-    Given a service identifier
+    Given an existing service identifier
     And invalid service definition
     When I register the service definition with the service
     Then I receive 'invalid service definition' notification

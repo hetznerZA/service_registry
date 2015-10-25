@@ -32,6 +32,7 @@ module ServiceRegistry
       end
 
       def register_service(service)
+         { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if service.nil? or service['id'].nil? or (not service.is_a? Hash)
         @services[service['id']] = service
       end
 
@@ -217,6 +218,35 @@ service component has domain perspective associations
       def service_component_uri(service_component)
         return nil if (not @service_component_associations[service_component]) or (not @service_component_associations[service_component]['uri'])
         @service_component_associations[service_component]['uri']
+      end
+
+      def register_service_definition(service, service_definition)
+        return { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if service.nil? or (service.strip == "")
+        return { 'result' => 'error', 'notifications' => ['unknown service identifier'] } if @services[service].nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service definition'] } if service_definition.nil? or (not service_definition.include?("wadl"))
+
+        @services[service]['definition'] = service_definition
+        { 'result' => 'success', 'notifications' => ['success'] }
+      end
+
+      def deregister_service_definition(service)
+        return { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if service.nil? or (service.strip == "")
+        return { 'result' => 'error', 'notifications' => ['unknown service identifier'] } if @services[service].nil?
+        @services[service].delete('definition')
+        { 'result' => 'success', 'notifications' => ['success'] }
+      end
+
+      def service_registered?(service)
+        not (@services[service].nil?)
+      end
+
+      def service_definition(service)
+        return { 'result' => 'error', 'notifications' => ['no service provided'] } if service.nil?
+        return { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if (service.strip == "")
+        return { 'result' => 'error', 'notifications' => ['unknown service identifier'] } if @services[service].nil?
+        return { 'result' => 'error', 'notifications' => ['service has no definition'] } if @services[service]['definition'].nil?
+        return @services[service]['definition'] if (not service.nil?) and (not @services[service].nil?)
+        nil
       end
 
       private

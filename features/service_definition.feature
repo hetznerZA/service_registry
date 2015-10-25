@@ -5,12 +5,23 @@ Feature: Retrieve a service definition for a service
   I want to retrieve the service definition
 
   Scenario: definition found
-    Given a service identifier
+    Given valid service definition
+    And an existing service identifier
+    And it is described by a service definition
     When I request the service definition
     Then I receive the service definition
 
-  Scenario: definition not found
-    Given a service identifier
-    And the service identifier is unknown
+  Scenario: no service
+    Given no service component identifier
     When I request the service definition
-    Then I receive 'not found' notification
+    Then I receive 'no service provided' notification
+
+  Scenario: invalid service
+    Given invalid service identifier
+    When I request the service definition
+    Then I receive 'invalid service identifier' notification
+
+  Scenario: definition not found
+    Given an existing service identifier
+    When I request the service definition
+    Then I receive 'service has no definition' notification

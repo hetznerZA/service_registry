@@ -1,7 +1,7 @@
 module ServiceRegistry
   module Test
     class StubOrchestrationProvider
-      attr_accessor :iut, :result, :domain_perspective, :service_component, :service, :uri
+      attr_accessor :iut, :result, :domain_perspective, :service_component, :service, :uri, :service_definition
       attr_reader :dss_decorated_service, :secure_service, :query, :configuration_bootstrap
 
       def initialize
@@ -9,7 +9,8 @@ module ServiceRegistry
         @iut = ServiceRegistry::Test::StubServiceRegistry.new
         @iut.associate_dss(@dss)
         @configuration_service = ServiceRegistry::Test::StubConfigurationService.new
-        @dss_decorated_service = { 'id' => 'dss_decorated_service_id', 'description' => 'secure service A', 'meta' => 'dss' }
+        @dss_decorated_service = { 'id' => 'dss_decorated_service_id', 'description' => 'secure service A', 'meta' => 'dss', 'definition' => nil }
+        @valid_service = { 'id' => 'valid_service_id', 'description' => 'valid service A', 'definition' => nil }
         @secure_service = { 'id' => 'secure_service', 'description' => 'secure service B' }
         @notifications = []
         @domain_perspective_associations = []
@@ -24,6 +25,8 @@ module ServiceRegistry
         @service_component_2 = 'sc2.dev.auto-h.net'
         @service_1 = 'service_id_1'
         @service_2 = 'service_id_2'
+        @service_definition = nil
+        @service_definition_1 = "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type='text/xsl' href='/wadl/wadl.xsl'?><wadl:application xmlns:wadl='http://wadl.dev.java.net/2009/02'    xmlns:jr='http://jasperreports.sourceforge.net/xsd/jasperreport.xsd'    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://wadl.dev.java.net/2009/02 wadl.xsd '><wadl:resources base='/'><wadl:resource path='/available-policies'>  <wadl:method name='GET' id='_available-policies'>    <wadl:doc>      Lists the policies available against which this service can validate credentials    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/validate-credential-using-policy'>  <wadl:method name='POST' id='_validate-credential-using-policy'>    <wadl:doc>      Given a credential string, examine the entropy against a security paradigm    </wadl:doc>    <wadl:request>      <wadl:param name='credential' type='xsd:string' required='true' style='query'>      </wadl:param>      <wadl:param name='policy' type='xsd:string' required='true' style='query'>      </wadl:param>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/generate-credential'>  <wadl:method name='GET' id='_generate-credential'>    <wadl:doc>      Generates a strong credential given a policy to adhere to    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status'>  <wadl:method name='GET' id='_status'>    <wadl:doc>      Returns 100 if capable of validating credentials against a policy and returns 0 if policy dependencies have failed and unable to validate credentials against policies    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status-detail'>  <wadl:method name='GET' id='_status-detail'>    <wadl:doc>      This endpoint provides detail of the status measure available on the /status endpoint    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/lexicon'>  <wadl:method name='GET' id='_lexicon'>    <wadl:doc>      Description of all the services available on this service component    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource></wadl:resources></wadl:application>"
       end
 
       def given_a_service_decorated_with_dss_meta
@@ -309,7 +312,12 @@ module ServiceRegistry
       end
 
       def given_a_valid_service
-        @service = @service_1
+        @service = @valid_service['id']
+        @iut.register_service(@valid_service)
+      end
+
+      def given_unknown_service
+        @service = "unknown"
       end
 
       def given_no_URI
@@ -336,6 +344,38 @@ module ServiceRegistry
       def service_component_uri_changed?
         @uri = @iut.service_component_uri(@service_component)
         @uri != @pre_uri
+      end
+
+      def given_a_valid_service_definition
+        @service_definition = @service_definition_1
+      end
+
+      def register_service_definition
+        process_result(@iut.register_service_definition(@service, @service_definition))
+      end
+
+      def deregister_service_definition
+        process_result(@iut.deregister_service_definition(@service))
+      end
+
+      def service_available?
+        @iut.service_registered?(@service)
+      end
+
+      def is_service_described_by_service_definition?
+        @iut.service_definition(@service) == @service_definition
+      end
+
+      def given_invalid_service_definition
+        @service_definition = "blah"
+      end
+
+      def request_service_definition
+        process_result(@iut.service_definition(@service))
+      end
+
+      def has_received_service_definition?
+        @result == @service_definition_1
       end
 
       def process_result(result)
