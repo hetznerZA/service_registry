@@ -74,6 +74,10 @@ module ServiceRegistry
         @configuration_bootstrap = {}
       end
 
+      def given_invalid_configuration_service_bootstrap
+        @configuration_bootstrap = nil
+      end
+
       def given_no_identifier_bootstrap
         @configuration_bootstrap = {'CFGSRV_PROVIDER_ADDRESS' => 'https://127.0.0.1', 'CFGSRV_TOKEN' => 'abcd'}
       end
@@ -535,7 +539,8 @@ module ServiceRegistry
       def process_result(result)
         @result = result
         
-        @notifications << @result['notifications'] if @result and result.is_a?(Hash) and @result['notifications']
+        @notifications.push(@result['data']['notifications']) if @result and @result.is_a?(Hash) and @result['data'] and @result['data'].is_a?(Hash) and @result['data']['notifications']
+        @notifications << @result if @result and not @result.is_a?(Hash)
         @notifications.flatten!
       end
     end
