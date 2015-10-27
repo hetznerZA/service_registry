@@ -6,7 +6,7 @@ Feature: Bootstrap with configuration service
 
   Scenario: No configuration service provided
     Given no configuration service bootstrap
-    When I am initailizing
+    When I am initializing
     Then I need to present a 'no configuration service' notification
     And I should not be available
 
@@ -21,12 +21,12 @@ Feature: Bootstrap with configuration service
     Given a configuration service bootstrap
     And no configuration stored in the configuration service
     When I am initializing
-    Then I need to present an 'invalid configuration' notification
+    Then I need to present 'invalid configuration' notification
     And I should not be available
 
   Scenario: Configuration valid
     Given a configuration service bootstrap
-    And a valid configuration in the configuration service
+    And valid configuration in the configuration service
     When I am initializing
     Then I need to present a 'configuration valid' notification
     And I should be available

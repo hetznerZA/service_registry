@@ -35,7 +35,6 @@ The service registry provides a variety of features supporting domain and servic
 === services
 
 * {file:features/service_search.feature finding a list of services in a domain perspectives} when exploring a domain perspective
-* {file:features/service_definitions_given_service_component.feature finding a list of services given a service component} when exploring service components
 * {file:features/service_search.feature finding a list of services  matching service search criteria} when exploring services
 * {file:features/service_service_components.feature querying service status} when deciding which service from a pool of candidate services are best to use
 * {file:features/service_service_components.feature finding a URI} for accessing the service on a service component
@@ -49,7 +48,7 @@ The service requires:
 == Configuration
 
 The service supports:
-* {file:features/configuration.feature configuration} of the registry.
+* {file:features/bootstrap_with_configuration_service.feature configuration} of the registry using a configuration service.
 
 == Dependencies
 
@@ -57,6 +56,10 @@ The service registry depends on:
 * {file:features/configure_with_directory.feature a directory configuration} for UDDI and inetOrgPerson support
 * {file:features/discover_domain_perspectives.feature discovery of domain perspectives}
 * {file:features/discover_service_components.feature discovery of service components} using a UDDI directory.
+
+== Service definitions and service components
+
+To find a list of service definitions given a service component, one would have to ask the service registry for all services on the service component first, and then for the definitions of each. The SOAR architecture offers a /lexicon end-point on all SOAR web applications that returns the desired aggregate. This aggregate is not a core feature of the service registry.
 
 A pluggable Ruby API is provided in {ServiceRegistry::Base}.
 

@@ -7,21 +7,21 @@ Feature: Listing domain perspectives
   Scenario: There is only one domain perspective
     Given one domain perspectives has been defined
     When I request a list of domain perspectives
-    Then I receive a list containing the one domain perspective
+    Then I receive list containing the one domain perspective
 
   Scenario: There are more than one domain perspective
     Given multiple domain perspectives have been defined
     When I request a list of domain perspectives
-    Then I receive a list containing the domain perspectives
+    Then I receive list containing the domain perspectives
 
   Scenario: There are no domain perspectives
     Given no domain perspectives have been defined
     When I request a list of domain perspectives
-    Then I receive an empty list
+    Then I receive no domain perspectives
 
   Scenario: An error occurs when listing domain perspectives
     Given domain perspectives have been defined
     And an error condition prevents listing domain perspectives
     When I request a list of domain perspectives
-    Then I receive a 'request failure' notification
+    Then I receive 'request failure' notification
 

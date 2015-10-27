@@ -6,25 +6,42 @@ Feature: Map service components to services
   I want to be given details about the service components
 
   Scenario: obtain a list of service components
-    Given the result of a service query
-    And service components providing the service
-    When I index a service in the services list
+    Given a need
+    And existing service component identifier
+    And one service match
+    And the service is associated with the service component
+    When I request a list of services that can meet my need
     Then I obtain a list of service components that provide that service
 
   Scenario: no service components provide the service
-    Given the result of a service query
-    And no service components provide the service
-    When I index a service in the services list
-    Then I obtain an empty list of service components
+    Given a need
+    And no services match
+    When I request a list of services that can meet my need
+    Then I receive no service components
 
   Scenario: mapping URIs to service components
-    Given the result of a service query
-    And the list of service components
-    When I look at each service component entry
-    Then I can extract a URI to the service on that service component
+    Given a need
+    And valid URI
+    And one service match
+    And existing service component identifier
+    And I request configuration of the service component
+    And the service is associated with the service component
+    And I request configuration of the service component
+    When I request a list of services that can meet my need
+    Then I can extract a URI to the service on a service component
 
   Scenario: mapping status to service components
-    Given the result of a service query
-    And the list of service components
-    When I look at each service component entry
+    Given a need
+    And existing service component identifier
+    And one service match
+    And the service is associated with the service component
+    When I request a list of services that can meet my need
     Then I can extract a status of the service component providing that service
+
+  Scenario: multiple service components providing the service
+    Given a need
+    And multiple existing service components
+    And one service match
+    And the service is associated with two service components
+    When I request a list of services that can meet my need
+    Then I can extract all service components providing the service

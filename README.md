@@ -21,4 +21,4 @@ bundle install
 bundle exec rake
 ```
 
-Note that the tests are applied to a stub service provider. This just tests the test framework architecture.
+Note that the tests are applied to a stub service provider. This validated the service API.

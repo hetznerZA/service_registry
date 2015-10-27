@@ -6,18 +6,18 @@ Feature: Bootstrap with identifier
 
   Scenario: No identifier provided
     Given no identifier bootstrap
-    When I am initailizing
+    When I am initializing
     Then I need to present a 'no identifier' notification
     And I should not be available
 
   Scenario: Invalid identifier
-    Given an invalid identifier bootstrap
+    Given invalid identifier bootstrap
     When I am initializing
-    Then I need to present a 'invalid identifier' notification
+    Then I need to present 'invalid identifier' notification
     And I should not be available
 
   Scenario: Valid identifier
-    Given a valid identifier bootstrap
+    Given valid identifier bootstrap
     When I am initializing
     Then I need to present a 'valid identifier' notification
     And I should be available
