@@ -12,7 +12,7 @@ Feature: Retrieve a service definition for a service
     Then I receive the service definition
 
   Scenario: no service
-    Given no service component identifier
+    Given no service
     When I request the service definition
     Then I receive 'no service provided' notification
 

@@ -116,9 +116,21 @@ module ServiceRegistry
         @service_component_associations[service_component]['services'].count > 0
       end
 
-      def service_component_service_associations(service_component)
-        return @service_component_associations[service_component]['services'] if @service_component_associations[service_component] and @service_component_associations[service_component]['services']
-        []
+      def does_service_component_have_service_associated?(service_component, service)
+        return false if not @service_component_associations[service_component]
+        return false if not @service_component_associations[service_component]['services']
+        @service_component_associations[service_component]['services'].include?(service)
+      end
+
+      def service_service_component_associations(service)
+        return nil if service.nil?
+        associated = {}
+        @service_component_associations.each do |id, service_component|
+          if service_component['services'] and service_component['services'].include?(service)
+            associated[id] = { 'uri' => service_component_uri(id), 'status' => '100' }
+          end
+        end
+        associated
       end
 
       def deregister_domain_perspective(domain_perspective)
@@ -270,7 +282,7 @@ service component has domain perspective associations
         not (@services[service].nil?)
       end
 
-      def service_definition(service)
+      def service_definition_for_service(service)
         return { 'result' => 'error', 'notifications' => ['no service provided'] } if service.nil?
         return { 'result' => 'error', 'notifications' => ['invalid service identifier'] } if (service.strip == "")
         return { 'result' => 'error', 'notifications' => ['unknown service identifier'] } if @services[service].nil?
@@ -283,6 +295,9 @@ service component has domain perspective associations
         matches = []
         list.each do |id, service|
           matches << service if (id == pattern) or (service['description'] and service['description'].include?(pattern)) or (service['definition'] and service['definition'].include?(pattern))
+        end
+        matches.each do |service|
+          service['service_components'] = service_service_component_associations(service['id'])
         end
         matches
       end
@@ -307,6 +322,9 @@ service component has domain perspective associations
 
       def service_by_id(id)
         @services[id].nil? ? [] : [@services[id]]
+      end
+
+      def service_definition(service)
       end
 
       private

@@ -5,6 +5,7 @@ module ServiceRegistry
       attr_reader :dss_decorated_service, :secure_service, :query, :configuration_bootstrap, :need, :services_found
 
       def initialize
+        @valid_uri = 'http://127.0.0.1'
         @dss = ServiceRegistry::Test::StubDSS.new
         @iut = ServiceRegistry::Test::StubServiceRegistry.new
         @iut.associate_dss(@dss)
@@ -313,11 +314,16 @@ module ServiceRegistry
       end
 
       def is_service_component_associated_with_service?
-        @iut.service_component_service_associations(@service_component).include?(@service)
+        @iut.does_service_component_have_service_associated?(@service_component, @service)
       end
 
       def associate_service_with_service_component
         process_result(@iut.associate_service_component_with_service(@service, @service_component))
+      end
+
+      def associate_service_with_two_service_components
+        process_result(@iut.associate_service_component_with_service(@service, @service_component_1))
+        process_result(@iut.associate_service_component_with_service(@service, @service_component_2))
       end
 
       def disassociate_service_from_service_component
@@ -338,7 +344,7 @@ module ServiceRegistry
       end
 
       def given_valid_URI
-        @uri = 'http://127.0.0.1'
+        @uri = @valid_uri
       end
 
       def given_invalid_URI
@@ -376,7 +382,7 @@ module ServiceRegistry
       end
 
       def is_service_described_by_service_definition?
-        @iut.service_definition(@service) == @service_definition
+        @iut.service_definition_for_service(@service) == @service_definition
       end
 
       def given_invalid_service_definition
@@ -384,7 +390,7 @@ module ServiceRegistry
       end
 
       def request_service_definition
-        process_result(@iut.service_definition(@service))
+        process_result(@iut.service_definition_for_service(@service))
       end
 
       def has_received_service_definition?
@@ -412,6 +418,7 @@ module ServiceRegistry
       end
 
       def provide_one_matching_service
+        @service = @service_1['id']
         @iut.register_service(@service_1)
         @iut.register_service_definition(@service_1['id'], @service_definition_1)
       end
@@ -500,6 +507,29 @@ module ServiceRegistry
 
       def matched_only_in_domain_perspective?
         @result[0] == @service_4
+      end
+
+      def has_list_of_service_components_providing_service?
+        @result[0]['service_components'].count > 0
+      end
+
+      def has_list_of_both_service_components_providing_service?
+        scs = @result[0]['service_components']
+        (scs.count > 0) and (not scs[@service_component_1].nil?) and (not scs[@service_component_2].nil?)
+      end
+
+      def has_uri_to_service_component_providing_service?
+        sc = @result[0]['service_components'][@service_component]
+        sc['uri'] == @valid_uri
+      end
+
+      def has_status_of_service_component_providing_service?
+        sc = @result[0]['service_components'][@service_component]
+        sc['status'] == '100'
+      end
+
+      def service_definitions
+        process_result(@iut.service_definitions(service_component))
       end
 
       def process_result(result)

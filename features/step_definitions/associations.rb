@@ -78,6 +78,10 @@ Then(/^the service component should be associated with the service$/) do
   expect(@test.is_service_component_associated_with_service?).to eq(true)
 end
 
+Given(/^the service is associated with two service components$/) do
+  @test.associate_service_with_two_service_components
+end
+
 Then(/^I receive 'failure associating service component with service' notification$/) do
   expect(@test.has_received_notification?('failure associating service component with service')).to eq(true)
 end
