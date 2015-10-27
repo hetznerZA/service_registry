@@ -6,6 +6,14 @@ Then(/^I need to present a 'no configuration service' notification$/) do
   expect(@test.has_received_notification?('no configuration service')).to eq(true)
 end
 
+Given(/^invalid configuration service bootstrap$/) do
+  @test.given_invalid_configuration_service_bootstrap
+end
+
+Then(/^I need to present a 'invalid configuration service' notification$/) do
+  expect(@test.has_received_notification?('invalid configuration service')).to eq(true)
+end
+
 Then(/^I should not be available$/) do
   expect(@test.service_registry_available?).to eq(false)
 end
