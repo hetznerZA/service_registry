@@ -6,7 +6,7 @@ Feature: Retrieve a service definition for a service
 
   Scenario: definition found
     Given valid service definition
-    And an existing service identifier
+    And a registered service
     And it is described by a service definition
     When I request the service definition
     Then I receive the service definition
@@ -19,9 +19,9 @@ Feature: Retrieve a service definition for a service
   Scenario: invalid service
     Given invalid service identifier
     When I request the service definition
-    Then I receive 'invalid service identifier' notification
+    Then I receive 'invalid service identifier provided' notification
 
   Scenario: definition not found
-    Given an existing service identifier
+    Given a registered service
     When I request the service definition
     Then I receive 'service has no definition' notification

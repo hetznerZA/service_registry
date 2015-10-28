@@ -38,6 +38,11 @@ module ServiceRegistry
         process_result(@iut.register_service(@dss_decorated_service))
       end
 
+      def given_a_registered_service
+        @service = @service_1
+        process_result(@iut.register_service(@service))
+      end
+
       def given_dss_indicates_service_inclusion
         @dss.select(@service)
       end
@@ -216,6 +221,10 @@ module ServiceRegistry
         process_result(@iut.register_domain_perspective(@domain_perspective))
       end
 
+      def register_service
+        process_result(@iut.register_service(@service))
+      end
+
       def register_service_component
         process_result(@iut.register_service_component(@service_component))
       end
@@ -257,6 +266,18 @@ module ServiceRegistry
 
       def given_invalid_service
         @service = " "
+      end
+
+      def given_invalid_service_for_registration
+        @service = { 'id' => "" }
+      end
+
+      def given_existing_service_identifier
+        @service = @service_1['id']
+      end
+
+      def given_new_service
+        @service = @service_2
       end
 
       def given_no_service_component_identifier
@@ -360,6 +381,14 @@ module ServiceRegistry
       def given_a_valid_service
         @service = @valid_service['id']
         @iut.register_service(@valid_service)
+        result = @iut.service_definition_for_service(@service)
+        @pre_service_definition = result['status'] == 'fail' ? nil : result['data']['definition']
+      end
+
+      def service_definition_changed?
+        result = @iut.service_definition_for_service(@service.is_a?(Hash) ? @service['id'] : @service)
+        @current_definition = result['status'] == 'fail' ? nil : result['data']['definition']
+        not (@current_definition == @pre_service_definition)
       end
 
       def given_unknown_service
@@ -399,20 +428,21 @@ module ServiceRegistry
       end
 
       def register_service_definition
-        process_result(@iut.register_service_definition(@service, @service_definition))
+        process_result(@iut.register_service_definition(@service.is_a?(Hash) ? @service['id'] : @service, @service_definition))
       end
 
       def deregister_service_definition
-        process_result(@iut.deregister_service_definition(@service))
+        process_result(@iut.deregister_service_definition(@service.is_a?(Hash) ? @service['id'] : @service))
       end
 
       def service_available?
-        process_result(@iut.service_registered?(@service))
+        id = @service.nil? ? "" : @service['id']
+        process_result(@iut.service_registered?(id))
         data['registered']
       end
 
       def is_service_described_by_service_definition?
-        process_result(@iut.service_definition_for_service(@service))
+        process_result(@iut.service_definition_for_service(@service.is_a?(Hash) ? @service['id'] : @service))
         data['definition'] == @service_definition
       end
 
@@ -420,8 +450,12 @@ module ServiceRegistry
         @service_definition = "blah"
       end
 
+      def given_no_service_definition
+        @service_definition = nil
+      end
+
       def request_service_definition
-        process_result(@iut.service_definition_for_service(@service))
+        process_result(@iut.service_definition_for_service(@service.is_a?(Hash) ? @service['id'] : @service))
       end
 
       def has_received_service_definition?
