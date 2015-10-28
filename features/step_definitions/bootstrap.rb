@@ -38,8 +38,16 @@ Given(/^no configuration stored in the configuration service$/) do
   @test.given_no_configuration_in_configuration_service
 end
 
+Given(/^an invalid configuration stored in the configuration service$/) do
+  @test.given_invalid_configuration_in_configuration_service
+end
+
 Then(/^I need to present 'invalid configuration' notification$/) do
   expect(@test.has_received_notification?('invalid configuration')).to eq(true)
+end
+
+Then(/^I need to present 'no configuration' notification$/) do
+  expect(@test.has_received_notification?('no configuration')).to eq(true)
 end
 
 Given(/^valid configuration in the configuration service$/) do

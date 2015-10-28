@@ -98,6 +98,11 @@ module ServiceRegistry
         @configuration_service.clear_configuration
       end
 
+      def given_invalid_configuration_in_configuration_service
+        @configuration_service.clear_configuration
+        @configuration_service.configure({})
+      end
+
       def given_valid_configuration_in_configuration_service
         @configuration_service.configure(@configuration_bootstrap)
       end
@@ -139,7 +144,7 @@ module ServiceRegistry
       end
 
       def list_service_components
-        process_result(@iut.list_service_components)
+        process_result(@iut.list_service_components(@domain_perspective))
       end
 
       def given_service_components_exist
@@ -148,12 +153,27 @@ module ServiceRegistry
         process_result(@iut.register_service_component(@service_component_2))
       end
 
+      def given_service_components_exist_in_the_domain_perspective
+        process_result(@iut.delete_all_service_components)
+        process_result(@iut.register_service_component(@service_component_1))
+        process_result(@iut.register_service_component(@service_component_2))
+        process_result(@iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component_1))
+      end
+
       def given_no_service_components_exist
+        process_result(@iut.delete_all_service_components)
+      end
+
+      def given_no_service_components_exist_in_domain_perspective
         process_result(@iut.delete_all_service_components)
       end
 
       def received_list_of_all_service_components?
         success? and data['service_components'].include?(@service_component_1) and data['service_components'].include?(@service_component_2)
+      end
+
+      def received_list_of_all_service_components_in_domain_perspective?
+        success? and (data['service_components'].include?(@service_component_1)) and (data['service_components'].size == 1)
       end
 
       def received_one_domain_perspective?
@@ -164,7 +184,7 @@ module ServiceRegistry
         success? and (data['services'] == [])
       end
 
-      def received_no_service_components?
+      def received_empty_list_of_service_components?
         success? and (data['service_components'] == [])
       end
 
@@ -172,7 +192,7 @@ module ServiceRegistry
         success? and (data['domain_perspectives'].size == 2) and (data['domain_perspectives'].include?(@domain_perspective_1)) and (data['domain_perspectives'].include?(@domain_perspective_2))
       end
 
-      def received_no_domain_perspectives?
+      def received_an_empty_list_of_domain_perspectives?
         success? and (data['domain_perspectives'] == [])
       end
 
@@ -273,6 +293,10 @@ module ServiceRegistry
 
       def given_no_services_associated_with_service_component
         process_result(@iut.deregister_all_services_for_service_component(@service_component))
+      end
+
+      def given_no_domain_perspectives_associated_with_service_component
+        # do nothing, when the test starts none of these exist
       end
 
       def given_some_or_no_associations_of_service_components_with_domain_perspective

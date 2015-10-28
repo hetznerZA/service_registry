@@ -27,6 +27,13 @@ Feature: Bootstrap with configuration service
     Given a configuration service bootstrap
     And no configuration stored in the configuration service
     When I am initializing
+    Then I need to present 'no configuration' notification
+    And I should not be available
+
+  Scenario: Invalid configuration
+    Given a configuration service bootstrap
+    And an invalid configuration stored in the configuration service
+    When I am initializing
     Then I need to present 'invalid configuration' notification
     And I should not be available
 

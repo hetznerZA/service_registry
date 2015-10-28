@@ -1,6 +1,5 @@
 Feature: Registering service components
   As a provisioner
-  Given a domain perspective
   When I have a service component
   In order to make the service component available in the domain perspective
   I want to register the service component

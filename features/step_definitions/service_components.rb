@@ -58,16 +58,28 @@ Given(/^no service components exist$/) do
   @test.given_no_service_components_exist
 end
 
-Then(/^I receive no service components$/) do
-  expect(@test.received_no_service_components?).to eq(true)
+Given(/^no service components exist in the domain perspective$/) do
+  @test.given_no_service_components_exist_in_domain_perspective
+end
+
+Then(/^I receive an empty list of service components$/) do
+  expect(@test.received_empty_list_of_service_components?).to eq(true)
 end
 
 Given(/^one or more service components exist$/) do
   @test.given_service_components_exist
 end
 
+Given(/^one or more service components exist in the domain perspective$/) do
+  @test.given_service_components_exist_in_the_domain_perspective
+end
+
 Then(/^I receive a list with all the service components$/) do
   expect(@test.received_list_of_all_service_components?).to eq(true)
+end
+
+Then(/^I receive a list with all the service components in the domain perspective$/) do
+  expect(@test.received_list_of_all_service_components_in_domain_perspective?).to eq(true)
 end
 
 Then(/^I receive 'failure retrieving service components' notification$/) do
@@ -88,6 +100,10 @@ end
 
 Given(/^no services associated with the service component$/) do
   @test.given_no_services_associated_with_service_component
+end
+
+Given(/^no domain perspectives associated with the service component$/) do
+  @test.given_no_domain_perspectives_associated_with_service_component
 end
 
 Then(/^I receive 'service component deregistered' notification$/) do

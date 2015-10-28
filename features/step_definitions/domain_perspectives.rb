@@ -22,8 +22,8 @@ Given(/^no domain perspectives have been defined$/) do
   @test.clear_all_domain_perspectives
 end
 
-Then(/^I receive no domain perspectives$/) do
-  expect(@test.received_no_domain_perspectives?).to eq(true)
+Then(/^I receive an empty list of domain perspectives$/) do
+  expect(@test.received_an_empty_list_of_domain_perspectives?).to eq(true)
 end
 
 Given(/^domain perspectives have been defined$/) do
@@ -34,8 +34,8 @@ Given(/^an error condition prevents listing domain perspectives$/) do
   @test.break_registry
 end
 
-Then(/^I receive 'request failure' notification$/) do
-  expect(@test.has_received_notification?('request failure')).to eq(true)
+Then(/^I receive 'failure listing domain perspectives' notification$/) do
+  expect(@test.has_received_notification?('failure listing domain perspectives')).to eq(true)
 end
 
 Given(/^no domain perspective$/) do

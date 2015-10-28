@@ -23,6 +23,7 @@ Feature: De-registering a service
   Scenario: Existing service component
     Given existing service component identifier
     And no services associated with the service component
+    And no domain perspectives associated with the service component
     When I request deregistration of the service component
     Then I receive 'service component deregistered' notification
     And the service component should not be available
