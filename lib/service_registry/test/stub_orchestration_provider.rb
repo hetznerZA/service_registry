@@ -225,6 +225,10 @@ module ServiceRegistry
         process_result(@iut.register_service(@service))
       end
 
+      def deregister_service
+        process_result(@iut.deregister_service(@service.is_a?(Hash) ? @service['id'] : @service))
+      end
+
       def register_service_component
         process_result(@iut.register_service_component(@service_component))
       end

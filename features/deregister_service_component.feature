@@ -1,4 +1,4 @@
-Feature: De-registering a service
+Feature: De-registering a service component
   As a provisioner
   Given a service component
   When the service component is no longer relevant

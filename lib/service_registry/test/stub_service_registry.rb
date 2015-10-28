@@ -141,6 +141,15 @@ module ServiceRegistry
         end
       end
 
+      def deregister_service(service)
+        return fail('failure deregistering service') if @broken
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return success('unknown service') if @services[service].nil?
+        @services.delete(service)
+        success('service deregistered')
+      end
+
       def deregister_service_component(service_component)
         return fail('failure deregistering service component') if @broken
         return fail('no service component identifier provided') if service_component.nil?

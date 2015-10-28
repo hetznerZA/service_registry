@@ -234,3 +234,20 @@ end
 Given(/^an existing service identifier$/) do
   @test.given_existing_service_identifier
 end
+
+When(/^I request deregistration of the service$/) do
+  @test.deregister_service
+end
+
+Then(/^I receive 'service unknown' notification$/) do
+  expect(@test.has_received_notification?('unknown service')).to eq(true)
+end
+
+Then(/^I receive 'service deregistered' notification$/) do
+  expect(@test.has_received_notification?('service deregistered')).to eq(true)
+end
+
+Then(/^I receive 'failure deregistering service' notification$/) do
+  expect(@test.has_received_notification?('failure deregistering service')).to eq(true)
+end
+
