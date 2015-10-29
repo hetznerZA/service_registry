@@ -24,9 +24,9 @@ module ServiceRegistry
 
         def lookup(identifier, feature)
           raise UnknownTestOrchestrator if @providers[identifier].nil?
-          return @providers[identifier]["*"] if @providers[identifier]["*"]
-          raise FeatureNotRegisteredWithTestOrchestratorError if @providers[identifier][feature].nil?
-          @providers[identifier][feature]
+          raise FeatureNotRegisteredWithTestOrchestratorError if (@providers[identifier][feature].nil?) and (@providers[identifier]["*"].nil?)
+          return @providers[identifier][feature] if @providers[identifier][feature]
+          @providers[identifier]["*"]
         end
 
         def list_of_identifiers
