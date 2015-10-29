@@ -3,8 +3,7 @@ module ServiceRegistry
     class StubOrchestrationProvider
       attr_accessor :iut, :result, :domain_perspective, :service_component, :service, :uri, :service_definition
       attr_reader :dss_decorated_service, :secure_service, :query, :configuration_bootstrap, :need, :services_found
-
-      def initialize
+      def setup
         @valid_uri = 'http://127.0.0.1'
         @dss = ServiceRegistry::Test::StubDSS.new
         @iut = ServiceRegistry::Test::StubServiceRegistry.new
@@ -629,3 +628,5 @@ module ServiceRegistry
     end
   end
 end
+
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "*", ServiceRegistry::Test::StubOrchestrationProvider)
