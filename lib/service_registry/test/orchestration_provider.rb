@@ -128,6 +128,22 @@ module ServiceRegistry
         process_result(@iut.register_service_definition(@service.is_a?(Hash) ? @service['id'] : @service, @service_definition))
       end
 
+      def associate_service_with_two_service_components
+        process_result(@iut.associate_service_component_with_service(@service, @service_component_1))
+        process_result(@iut.associate_service_component_with_service(@service, @service_component_2))
+      end
+
+      def associate_service_with_service_component
+        process_result(@iut.associate_service_component_with_service(@service, @service_component))
+      end
+
+      def given_a_valid_service
+        @service = @valid_service['id']
+        @iut.register_service(@valid_service)
+        result = @iut.service_definition_for_service(@service)
+        @pre_service_definition = result['status'] == 'fail' ? nil : result['data']['definition']
+      end
+
       def break_registry
         @iut.break
       end

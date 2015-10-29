@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class StubOrchestrationProvider < OrchestrationProvider
+    class StubServiceOrchestrationProvider < OrchestrationProvider
       def received_no_services?
         success? and (data['services'] == [])
       end
@@ -19,60 +19,6 @@ module ServiceRegistry
 
       def given_new_service
         @service = @service_2
-      end
-
-      def given_some_or_no_associations_of_service_components_with_domain_perspective
-        @domain_perspective_associations = @iut.domain_perspective_associations(@domain_perspective)
-      end
-
-      def given_some_or_no_associations_of_domain_perspectives_with_service_component
-        @service_component_domain_perspective_associations = @iut.service_component_domain_perspective_associations(@service_component)
-      end
-
-      def service_component_associations_changed?
-        process_result(@iut.service_component_domain_perspective_associations(@service_component))
-        not arrays_the_same?(data['associations'], @service_component_domain_perspective_associations)
-      end
-
-      def domain_perspective_associations_changed?
-        process_result(@iut.domain_perspective_associations(@domain_perspective))
-        not arrays_the_same?(data['associations'], @domain_perspective_associations)
-      end
-
-      def disassociate_domain_perspective_from_service_component
-        process_result(@iut.disassociate_service_component_from_domain_perspective(@domain_perspective, @service_component))
-        process_result(@iut.domain_perspective_associations(@domain_perspective))
-        @domain_perspective_associations = data['associations']
-      end
-
-      def is_service_component_associated_with_domain_perspective?
-        process_result(@iut.service_component_domain_perspective_associations(@service_component))
-        data['associations'].include?(@domain_perspective)
-      end
-
-      def is_service_component_associated_with_service?
-        process_result(@iut.does_service_component_have_service_associated?(@service_component, @service))
-        data['associated']
-      end
-
-      def associate_service_with_service_component
-        process_result(@iut.associate_service_component_with_service(@service, @service_component))
-      end
-
-      def associate_service_with_two_service_components
-        process_result(@iut.associate_service_component_with_service(@service, @service_component_1))
-        process_result(@iut.associate_service_component_with_service(@service, @service_component_2))
-      end
-
-      def disassociate_service_from_service_component
-        process_result(@iut.disassociate_service_component_from_service(@service, @service_component))
-      end
-
-      def given_a_valid_service
-        @service = @valid_service['id']
-        @iut.register_service(@valid_service)
-        result = @iut.service_definition_for_service(@service)
-        @pre_service_definition = result['status'] == 'fail' ? nil : result['data']['definition']
       end
 
       def service_available?
@@ -219,4 +165,7 @@ module ServiceRegistry
   end
 end
 
-ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "*", ServiceRegistry::Test::StubOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "De-registering a service", ServiceRegistry::Test::StubServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Registering services", ServiceRegistry::Test::StubServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Searching for a service", ServiceRegistry::Test::StubServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Map service components to services", ServiceRegistry::Test::StubServiceOrchestrationProvider)
