@@ -1,17 +1,6 @@
 module ServiceRegistry
   module Test
     class StubServiceOrchestrationProvider < OrchestrationProvider
-      def received_no_services?
-        success? and (data['services'] == [])
-      end
-
-      def register_service
-        process_result(@iut.register_service(@service))
-      end
-
-      def deregister_service
-        process_result(@iut.deregister_service(@service.is_a?(Hash) ? @service['id'] : @service))
-      end
 
       def given_invalid_service_for_registration
         @service = { 'id' => "" }
@@ -19,12 +8,6 @@ module ServiceRegistry
 
       def given_new_service
         @service = @service_2
-      end
-
-      def service_available?
-        id = @service.nil? ? "" : @service['id']
-        process_result(@iut.service_registered?(id))
-        data['registered']
       end
 
       def given_a_need
@@ -35,16 +18,38 @@ module ServiceRegistry
         @need = 'entropy'
       end
 
+      def given_service_with_pattern_in_id
+        @expected_pattern_service = @service_3
+        @iut.register_service(@service_3)
+        @iut.register_service_definition(@service_3['id'], @service_definition_1)
+      end
+
+      def given_service_with_pattern_in_description
+        @expected_pattern_service = @service_4
+        @iut.register_service(@service_4)
+        @iut.register_service_definition(@service_4['id'], @service_definition_1)
+      end
+
+      def given_service_with_pattern_in_definition
+        @expected_pattern_service = @service_5
+        @iut.register_service(@service_5)
+        @iut.register_service_definition(@service_5['id'], @service_definition_1)
+      end
+
       def no_services_match_need
         @need = 'no services match this'
       end
 
-      def match_need
-        process_result(@iut.search_for_service(@need))
+      def register_service
+        process_result(@iut.register_service(@service))
       end
 
-      def services_found?
-        not data['services'].empty?
+      def deregister_service
+        process_result(@iut.deregister_service(@service.is_a?(Hash) ? @service['id'] : @service))
+      end
+
+      def match_need
+        process_result(@iut.search_for_service(@need))
       end
 
       def provide_one_matching_service
@@ -60,37 +65,8 @@ module ServiceRegistry
         @iut.register_service_definition(@service_2['id'], @service_definition_1)
       end
 
-      def single_service_match?
-        (data['services'].count == 1) and (data['services'].first['id'] == @service_1['id'])
-      end
-
-      def multiple_services_match?
-        (data['services'].count == 2) and ((data['services'][0]['id'] == @service_1['id']) or (data['services'][0]['id'] == @service_2['id'])) and ((data['services'][1]['id'] == @service_1['id']) or (data['services'][1]['id'] == @service_2['id']))
-      end
-
-      def entry_matches?
-        data['services'].first['id'].include?(@need) == true
-      end
-
-      def both_entries_match?
-        data['services'][0]['id'].include?(@need) == true
-        data['services'][1]['id'].include?(@need) == true
-      end
-
       def service_by_id
         process_result(@iut.service_by_id(@service))
-      end
-
-      def given_service_with_pattern_in_id
-        @expected_pattern_service = @service_3
-        @iut.register_service(@service_3)
-        @iut.register_service_definition(@service_3['id'], @service_definition_1)
-      end
-
-      def given_service_with_pattern_in_description
-        @expected_pattern_service = @service_4
-        @iut.register_service(@service_4)
-        @iut.register_service_definition(@service_4['id'], @service_definition_1)
       end
 
       def multiple_existing_services
@@ -117,18 +93,47 @@ module ServiceRegistry
         @iut.associate_service_component_with_domain_perspective(@domain_perspective_1, @service_component_2)
       end
 
-      def given_service_with_pattern_in_definition
-        @expected_pattern_service = @service_5
-        @iut.register_service(@service_5)
-        @iut.register_service_definition(@service_5['id'], @service_definition_1)
+      def match_pattern_in_domain_perspective
+        process_result(@iut.search_domain_perspective(@domain_perspective_1, @need))
+      end
+
+      def service_definitions
+        process_result(@iut.service_definitions(service_component))
+      end
+
+      def received_no_services?
+        success? and (data['services'] == [])
+      end
+
+      def service_available?
+        id = @service.nil? ? "" : @service['id']
+        process_result(@iut.service_registered?(id))
+        data['registered']
+      end
+
+      def services_found?
+        not data['services'].empty?
+      end
+
+      def single_service_match?
+        (data['services'].count == 1) and (data['services'].first['id'] == @service_1['id'])
+      end
+
+      def multiple_services_match?
+        (data['services'].count == 2) and ((data['services'][0]['id'] == @service_1['id']) or (data['services'][0]['id'] == @service_2['id'])) and ((data['services'][1]['id'] == @service_1['id']) or (data['services'][1]['id'] == @service_2['id']))
+      end
+
+      def entry_matches?
+        data['services'].first['id'].include?(@need) == true
+      end
+
+      def both_entries_match?
+        data['services'][0]['id'].include?(@need) == true
+        data['services'][1]['id'].include?(@need) == true
       end
 
       def service_matched_pattern?
         (data['services'].count == 1) and (data['services'].first['id'] == @expected_pattern_service['id'])
-      end
-
-      def match_pattern_in_domain_perspective
-        process_result(@iut.search_domain_perspective(@domain_perspective_1, @need))
       end
 
       def matched_pattern_in_domain_perspectice?
@@ -156,10 +161,6 @@ module ServiceRegistry
       def has_status_of_service_component_providing_service?
         sc = data['services'][0]['service_components'][@service_component]
         sc['status'] == '100'
-      end
-
-      def service_definitions
-        process_result(@iut.service_definitions(service_component))
       end
     end
   end

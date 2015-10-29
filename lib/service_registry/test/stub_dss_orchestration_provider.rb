@@ -30,12 +30,12 @@ module ServiceRegistry
         @dss.error
       end
 
-      def make_dss_unavailable
-        @dss.break
-      end
-
       def given_dss_indicates_service_not_known
         @dss.deselect(@service)
+      end
+
+      def make_dss_unavailable
+        @dss.break
       end
     end
   end
