@@ -38,6 +38,11 @@ module ServiceRegistry
         process_result(@iut.register_service(@dss_decorated_service))
       end
 
+      def given_a_registered_service
+        @service = @service_1
+        process_result(@iut.register_service(@service))
+      end
+
       def given_dss_indicates_service_inclusion
         @dss.select(@service)
       end
@@ -98,6 +103,11 @@ module ServiceRegistry
         @configuration_service.clear_configuration
       end
 
+      def given_invalid_configuration_in_configuration_service
+        @configuration_service.clear_configuration
+        @configuration_service.configure({})
+      end
+
       def given_valid_configuration_in_configuration_service
         @configuration_service.configure(@configuration_bootstrap)
       end
@@ -139,7 +149,7 @@ module ServiceRegistry
       end
 
       def list_service_components
-        process_result(@iut.list_service_components)
+        process_result(@iut.list_service_components(@domain_perspective))
       end
 
       def given_service_components_exist
@@ -148,12 +158,27 @@ module ServiceRegistry
         process_result(@iut.register_service_component(@service_component_2))
       end
 
+      def given_service_components_exist_in_the_domain_perspective
+        process_result(@iut.delete_all_service_components)
+        process_result(@iut.register_service_component(@service_component_1))
+        process_result(@iut.register_service_component(@service_component_2))
+        process_result(@iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component_1))
+      end
+
       def given_no_service_components_exist
+        process_result(@iut.delete_all_service_components)
+      end
+
+      def given_no_service_components_exist_in_domain_perspective
         process_result(@iut.delete_all_service_components)
       end
 
       def received_list_of_all_service_components?
         success? and data['service_components'].include?(@service_component_1) and data['service_components'].include?(@service_component_2)
+      end
+
+      def received_list_of_all_service_components_in_domain_perspective?
+        success? and (data['service_components'].include?(@service_component_1)) and (data['service_components'].size == 1)
       end
 
       def received_one_domain_perspective?
@@ -164,7 +189,7 @@ module ServiceRegistry
         success? and (data['services'] == [])
       end
 
-      def received_no_service_components?
+      def received_empty_list_of_service_components?
         success? and (data['service_components'] == [])
       end
 
@@ -172,7 +197,7 @@ module ServiceRegistry
         success? and (data['domain_perspectives'].size == 2) and (data['domain_perspectives'].include?(@domain_perspective_1)) and (data['domain_perspectives'].include?(@domain_perspective_2))
       end
 
-      def received_no_domain_perspectives?
+      def received_an_empty_list_of_domain_perspectives?
         success? and (data['domain_perspectives'] == [])
       end
 
@@ -194,6 +219,14 @@ module ServiceRegistry
 
       def register_domain_perspective
         process_result(@iut.register_domain_perspective(@domain_perspective))
+      end
+
+      def register_service
+        process_result(@iut.register_service(@service))
+      end
+
+      def deregister_service
+        process_result(@iut.deregister_service(@service.is_a?(Hash) ? @service['id'] : @service))
       end
 
       def register_service_component
@@ -239,6 +272,18 @@ module ServiceRegistry
         @service = " "
       end
 
+      def given_invalid_service_for_registration
+        @service = { 'id' => "" }
+      end
+
+      def given_existing_service_identifier
+        @service = @service_1['id']
+      end
+
+      def given_new_service
+        @service = @service_2
+      end
+
       def given_no_service_component_identifier
         @service_component = nil
       end
@@ -273,6 +318,10 @@ module ServiceRegistry
 
       def given_no_services_associated_with_service_component
         process_result(@iut.deregister_all_services_for_service_component(@service_component))
+      end
+
+      def given_no_domain_perspectives_associated_with_service_component
+        # do nothing, when the test starts none of these exist
       end
 
       def given_some_or_no_associations_of_service_components_with_domain_perspective
@@ -336,6 +385,14 @@ module ServiceRegistry
       def given_a_valid_service
         @service = @valid_service['id']
         @iut.register_service(@valid_service)
+        result = @iut.service_definition_for_service(@service)
+        @pre_service_definition = result['status'] == 'fail' ? nil : result['data']['definition']
+      end
+
+      def service_definition_changed?
+        result = @iut.service_definition_for_service(@service.is_a?(Hash) ? @service['id'] : @service)
+        @current_definition = result['status'] == 'fail' ? nil : result['data']['definition']
+        not (@current_definition == @pre_service_definition)
       end
 
       def given_unknown_service
@@ -375,20 +432,21 @@ module ServiceRegistry
       end
 
       def register_service_definition
-        process_result(@iut.register_service_definition(@service, @service_definition))
+        process_result(@iut.register_service_definition(@service.is_a?(Hash) ? @service['id'] : @service, @service_definition))
       end
 
       def deregister_service_definition
-        process_result(@iut.deregister_service_definition(@service))
+        process_result(@iut.deregister_service_definition(@service.is_a?(Hash) ? @service['id'] : @service))
       end
 
       def service_available?
-        process_result(@iut.service_registered?(@service))
+        id = @service.nil? ? "" : @service['id']
+        process_result(@iut.service_registered?(id))
         data['registered']
       end
 
       def is_service_described_by_service_definition?
-        process_result(@iut.service_definition_for_service(@service))
+        process_result(@iut.service_definition_for_service(@service.is_a?(Hash) ? @service['id'] : @service))
         data['definition'] == @service_definition
       end
 
@@ -396,8 +454,12 @@ module ServiceRegistry
         @service_definition = "blah"
       end
 
+      def given_no_service_definition
+        @service_definition = nil
+      end
+
       def request_service_definition
-        process_result(@iut.service_definition_for_service(@service))
+        process_result(@iut.service_definition_for_service(@service.is_a?(Hash) ? @service['id'] : @service))
       end
 
       def has_received_service_definition?
@@ -533,6 +595,10 @@ module ServiceRegistry
       def has_status_of_service_component_providing_service?
         sc = data['services'][0]['service_components'][@service_component]
         sc['status'] == '100'
+      end
+
+      def no_service_definition_associated
+        # By default no service definition associated
       end
 
       def service_definitions

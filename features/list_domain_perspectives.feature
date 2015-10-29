@@ -17,11 +17,11 @@ Feature: Listing domain perspectives
   Scenario: There are no domain perspectives
     Given no domain perspectives have been defined
     When I request a list of domain perspectives
-    Then I receive no domain perspectives
+    Then I receive an empty list of domain perspectives
 
   Scenario: An error occurs when listing domain perspectives
     Given domain perspectives have been defined
     And an error condition prevents listing domain perspectives
     When I request a list of domain perspectives
-    Then I receive 'request failure' notification
+    Then I receive 'failure listing domain perspectives' notification
 

@@ -1,37 +1,36 @@
-Feature: Registering service definitions
+Feature: Registering services
   As a provisioner
-  When registering a service
-  In order to have the services available and understood
-  I want to register a service definition for the service
+  When I have a service
+  In order to make the service available
+  I want to register the service
 
-  Scenario: service definition valid
-    Given unknown service identifier
-    And valid service definition
-    When I register the service definition with the service
-    Then I receive 'unknown service identifier' notification
-    And the service unavailable
-
-  Scenario: service already registered
-    Given an existing service identifier
-    And a service definition
-    When I register the service definition with the service
-    Then I receive 'success' notification
-    And the service is described by the service definition
-
-  Scenario: No service identifier
+  Scenario: No identifier
     Given no service
-    When I register the service definition with the service
+    When I request registration of the service
     Then I receive 'no service identifier provided' notification
+    And the service should not be available
 
-  Scenario: service identifier invalid
-    Given invalid service identifier
-    When I register the service definition with the service
-    Then I receive 'invalid service identifier' notification
+  Scenario: New service
+    Given a new service identifier
+    When I request registration of the service
+    Then I receive 'service registered' notification
+    And the service should be available
 
-  Scenario: service definition invalid
-    Given an existing service identifier
-    And invalid service definition
-    When I register the service definition with the service
-    Then I receive 'invalid service definition' notification
+  Scenario: Existing service
+    Given a registered service
+    When I request registration of the service
+    Then I receive 'service already exists' notification
+    And the service should still be available, unchanged
 
+  Scenario: Invalid service identifier
+    Given invalid service for registration
+    When I request registration of the service
+    Then I receive 'invalid service identifier provided' notification
+    And the service should not be available
 
+  Scenario: failure
+    Given a new service identifier
+    And a failure
+    When I request registration of the service
+    Then I receive 'failure registering service' notification
+    And the service should not be available

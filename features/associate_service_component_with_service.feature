@@ -28,7 +28,15 @@ Feature: Associate a service component with a service
     Then I receive 'invalid service provided' notification
     And the service associations should not change
 
-  Scenario: valid service and service component associated
+  Scenario: already associated
+    Given valid service
+    And existing service component identifier
+    And the service is already associated with the service component
+    When I request association with the service
+    Then I receive 'already associated' notification
+    And the service component should be associated with the service
+
+  Scenario: valid service and service component
     Given valid service
     And existing service component identifier
     When I request association with the service

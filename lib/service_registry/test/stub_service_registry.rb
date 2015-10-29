@@ -22,7 +22,8 @@ module ServiceRegistry
         return fail('no identifier') if @configuration['CFGSRV_IDENTIFIER'].nil?
         return fail('invalid identifier') if @configuration['CFGSRV_IDENTIFIER'].strip == ""
         return fail('configuration error') if configuration_service.broken?
-        return fail('invalid configuration') if configuration_service.configuration.nil?
+        return fail('no configuration') if configuration_service.configuration.nil?
+        return fail('invalid configuration') if configuration_service.configuration.empty?
         @available = true
         return success(['configuration valid', 'valid identifier']) if @configuration
       end
@@ -32,10 +33,12 @@ module ServiceRegistry
       end
 
       def register_service(service)
-        fail('no service identifier provided') if service.nil? or service['id'].nil?
-        fail('invalid service identifier') if (not service.is_a? Hash)
+        return fail('failure registering service') if @broken
+        return fail('no service identifier provided') if service.nil? or service['id'].nil?
+        return fail('invalid service identifier provided') if ((not service.is_a? Hash) or (service['id'].strip == ""))
+        return fail('service already exists') if not @services[service['id']].nil?
         @services[service['id']] = service
-        success
+        success('service registered')
       end
 
       def associate_dss(dss)
@@ -57,13 +60,15 @@ module ServiceRegistry
       end
 
       def list_domain_perspectives
-        return fail('request failure') if @broken
+        return fail('failure listing domain perspectives') if @broken
         success_data({ 'domain_perspectives' => @domain_perspectives })
       end
 
-      def list_service_components
+      def list_service_components(domain_perspective = nil)
         return fail('failure retrieving service components') if @broken
-        success_data({ 'service_components' => @service_components })
+        return success_data({ 'service_components' => @service_components }) if domain_perspective.nil?
+        result = domain_perspective_associations(domain_perspective)
+        success_data({ 'service_components' => result['data']['associations'] })
       end
 
       def break
@@ -134,6 +139,15 @@ module ServiceRegistry
         else
           return success('service component already exists')
         end
+      end
+
+      def deregister_service(service)
+        return fail('failure deregistering service') if @broken
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return success('unknown service') if @services[service].nil?
+        @services.delete(service)
+        success('service deregistered')
       end
 
       def deregister_service_component(service_component)
@@ -248,18 +262,20 @@ service component has domain perspective associations
       end
 
       def register_service_definition(service, service_definition)
+        return fail('failure registering service definition') if @broken
         return fail('no service identifier provided') if service.nil?
-        return fail('invalid service identifier') if service.strip == ""
-        return fail('unknown service identifier') if @services[service].nil?
-        return fail('invalid service definition') if service_definition.nil? or (not service_definition.include?("wadl"))
+        return fail('invalid service identifier provided') if service.strip == ""
+        return fail('unknown service identifier provided') if @services[service].nil?
+        return fail('no service definition provided') if service_definition.nil?
+        return fail('invalid service definition provided') if service_definition.nil? or (not service_definition.include?("wadl"))
 
         @services[service]['definition'] = service_definition
         success
       end
 
       def deregister_service_definition(service)
-        return fail('invalid service identifier') if service.nil? or (service.strip == "")
-        return fail('unknown service identifier') if @services[service].nil?
+        return fail('invalid service identifier provided') if service.nil? or (service.strip == "")
+        return fail('unknown service identifier provided') if @services[service].nil?
         @services[service].delete('definition')
         success
       end
@@ -270,8 +286,8 @@ service component has domain perspective associations
 
       def service_definition_for_service(service)
         return fail('no service provided') if service.nil?
-        return fail('invalid service identifier') if (service.strip == "")
-        return fail('unknown service identifier') if @services[service].nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return fail('unknown service identifier provided') if @services[service].nil?
         return fail('service has no definition') if @services[service]['definition'].nil?
         return success_data({'definition' => @services[service]['definition']}) if (not service.nil?) and (not @services[service].nil?)
         success_data({'definition' => nil})

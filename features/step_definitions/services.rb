@@ -11,19 +11,23 @@ When(/^I register the service definition with the service$/) do
   @test.register_service_definition
 end
 
-Then(/^I receive 'unknown service identifier' notification$/) do
-  expect(@test.has_received_notification?('unknown service identifier')).to eq(true)
+Given(/^the service is already associated with the service component$/) do
+  @test.associate_service_with_service_component
+end
+
+Then(/^I receive 'unknown service identifier provided' notification$/) do
+  expect(@test.has_received_notification?('unknown service identifier provided')).to eq(true)
 end
 
 Then(/^the service unavailable$/) do
   expect(@test.service_available?).to eq(false)
 end
 
-Given(/^an existing service identifier$/) do
-  @test.given_a_valid_service
+Given(/^a registered service$/) do
+  @test.given_a_registered_service
 end
 
-Given(/^a service definition$/) do
+Given(/^a valid service definition$/) do
   @test.given_a_valid_service_definition
 end
 
@@ -35,16 +39,24 @@ Then(/^I receive 'no service identifier provided' notification$/) do
   expect(@test.has_received_notification?('no service identifier provided')).to eq(true)
 end
 
-Then(/^I receive 'invalid service identifier' notification$/) do
-  expect(@test.has_received_notification?('invalid service identifier')).to eq(true)
+Then(/^I receive 'no service definition provided' notification$/) do
+  expect(@test.has_received_notification?('no service definition provided')).to eq(true)
+end
+
+Then(/^I receive 'invalid service identifier provided' notification$/) do
+  expect(@test.has_received_notification?('invalid service identifier provided')).to eq(true)
+end
+
+Given(/^no service definition$/) do
+  @test.given_no_service_definition
 end
 
 Given(/^invalid service definition$/) do
   @test.given_invalid_service_definition
 end
 
-Then(/^I receive 'invalid service definition' notification$/) do
-  expect(@test.has_received_notification?('invalid service definition')).to eq(true)
+Then(/^I receive 'invalid service definition provided' notification$/) do
+  expect(@test.has_received_notification?('invalid service definition provided')).to eq(true)
 end
 
 When(/^I deregister the service definition$/) do
@@ -55,7 +67,7 @@ Then(/^the service is no longer described by the service definition$/) do
   expect(@test.is_service_described_by_service_definition?).to eq(false)
 end
 
-Given(/^it is described by a service definition$/) do
+Given(/^the service definition describes the service$/) do
   @test.register_service_definition
 end
 
@@ -83,7 +95,7 @@ When(/^I request a list of services that can meet my need$/) do
   @test.match_need
 end
 
-Then(/^I receive no services$/) do
+Then(/^I receive an empty list of services$/) do
   expect(@test.services_found?).to eq(false)
 end
 
@@ -177,4 +189,72 @@ end
 
 Then(/^all services in the list must be in the domain perspective$/) do
   expect(@test.matched_only_in_domain_perspective?).to eq(true)
+end
+
+Then(/^the service definition associated with the service remains unchanged$/) do
+  expect(@test.service_definition_changed?).to eq(false)
+end
+
+Then(/^I receive 'failure registering service definition' notification$/) do
+  expect(@test.has_received_notification?('failure registering service definition')).to eq(true)
+end
+
+When(/^I request registration of the service$/) do
+  @test.register_service
+end
+
+Then(/^the service should not be available$/) do
+  expect(@test.service_available?).to eq(false)
+end
+
+Given(/^a new service identifier$/) do
+  @test.given_new_service
+end
+
+Then(/^I receive 'service registered' notification$/) do
+  expect(@test.has_received_notification?('service registered')).to eq(true)
+end
+
+Then(/^the service should be available$/) do
+  expect(@test.service_available?).to eq(true)
+end
+
+Then(/^I receive 'service already exists' notification$/) do
+  expect(@test.has_received_notification?('service already exists')).to eq(true)
+end
+
+Then(/^the service should still be available, unchanged$/) do
+  expect(@test.service_available?).to eq(true)
+end
+
+Then(/^I receive 'failure registering service' notification$/) do
+  expect(@test.has_received_notification?('failure registering service')).to eq(true)
+end
+
+Given(/^invalid service for registration$/) do
+  @test.given_invalid_service_for_registration
+end
+
+Given(/^an existing service identifier$/) do
+  @test.given_existing_service_identifier
+end
+
+When(/^I request deregistration of the service$/) do
+  @test.deregister_service
+end
+
+Then(/^I receive 'service unknown' notification$/) do
+  expect(@test.has_received_notification?('unknown service')).to eq(true)
+end
+
+Then(/^I receive 'service deregistered' notification$/) do
+  expect(@test.has_received_notification?('service deregistered')).to eq(true)
+end
+
+Then(/^I receive 'failure deregistering service' notification$/) do
+  expect(@test.has_received_notification?('failure deregistering service')).to eq(true)
+end
+
+Given(/^no service definition associated with it$/) do
+  @test.no_service_definition_associated
 end

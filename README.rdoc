@@ -18,9 +18,13 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/deregister_service_component.feature deregistering service components} when service components should no longer be accessible
 * {file:features/service_component_uri.feature configuring service component URI} when enabling location of service components
 
+=== services
+* {file:features/register_service.feature registering services} when provisioning services
+* {file:features/deregister_service.feature deregistering services} when provisioning services
+
 === service definitions
-* {file:features/register_service.feature registering services with their definition} when provisioning services
-* {file:features/register_service.feature updating service definitions} when provisioning services
+* {file:features/register_service_definition.feature registering definitions for services} when provisioning services
+* {file:features/register_service_definition.feature updating service definitions} when provisioning services
 * {file:features/deregister_service_definition.feature deregistering service definitions} when provisioning services
 * {file:features/service_definition.feature obtaining a service definition} given a service identifier
 
@@ -112,6 +116,9 @@ Note that +main.rb+ is completely decoupled from the selection of provider and
 provider configuration. We could swap and/or reconfigure the provider by
 manipulating only the Gemfile and the environment.
 
+TODO:
 
+for tfa and production, consider this API:
+http://uddi4r.rubyforge.org
 
 
