@@ -4,7 +4,7 @@ Feature: Removing service component associations from services
   And a service
   When a service component should no longer be associated with a service
   In order to have the service component not be listed as associated with the service
-  I want to deregister the service component from the service
+  I want to remove the service - service component association
 
   Scenario: no service
     Given existing service component identifier

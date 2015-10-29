@@ -17,7 +17,7 @@ Feature: Map service components to services
     Given a need
     And no services match
     When I request a list of services that can meet my need
-    Then I receive no services
+    Then I receive an empty list of services
 
   Scenario: mapping URIs to service components
     Given a need

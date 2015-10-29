@@ -11,6 +11,10 @@ When(/^I register the service definition with the service$/) do
   @test.register_service_definition
 end
 
+Given(/^the service is already associated with the service component$/) do
+  @test.associate_service_with_service_component
+end
+
 Then(/^I receive 'unknown service identifier provided' notification$/) do
   expect(@test.has_received_notification?('unknown service identifier provided')).to eq(true)
 end
@@ -63,7 +67,7 @@ Then(/^the service is no longer described by the service definition$/) do
   expect(@test.is_service_described_by_service_definition?).to eq(false)
 end
 
-Given(/^it is described by a service definition$/) do
+Given(/^the service definition describes the service$/) do
   @test.register_service_definition
 end
 
@@ -91,7 +95,7 @@ When(/^I request a list of services that can meet my need$/) do
   @test.match_need
 end
 
-Then(/^I receive no services$/) do
+Then(/^I receive an empty list of services$/) do
   expect(@test.services_found?).to eq(false)
 end
 
@@ -251,3 +255,6 @@ Then(/^I receive 'failure deregistering service' notification$/) do
   expect(@test.has_received_notification?('failure deregistering service')).to eq(true)
 end
 
+Given(/^no service definition associated with it$/) do
+  @test.no_service_definition_associated
+end

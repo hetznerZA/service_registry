@@ -7,7 +7,7 @@ Feature: Retrieve a service definition for a service
   Scenario: definition found
     Given valid service definition
     And a registered service
-    And it is described by a service definition
+    And the service definition describes the service
     When I request the service definition
     Then I receive the service definition
 
@@ -23,5 +23,6 @@ Feature: Retrieve a service definition for a service
 
   Scenario: definition not found
     Given a registered service
+    And no service definition associated with it
     When I request the service definition
     Then I receive 'service has no definition' notification

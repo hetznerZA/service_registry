@@ -12,7 +12,7 @@ Feature: Deregistering a service definition
   Scenario: valid service identifier
     Given a registered service
     And a valid service definition
-    And it is described by a service definition
+    And the service definition describes the service
     When I deregister the service definition
     Then I receive 'success' notification
     And the service is no longer described by the service definition

@@ -116,6 +116,9 @@ Note that +main.rb+ is completely decoupled from the selection of provider and
 provider configuration. We could swap and/or reconfigure the provider by
 manipulating only the Gemfile and the environment.
 
+TODO:
 
+for tfa and production, consider this API:
+http://uddi4r.rubyforge.org
 
 

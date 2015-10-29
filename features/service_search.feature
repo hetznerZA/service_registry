@@ -8,7 +8,7 @@ Feature: Searching for a service
     Given a need
     And no services match
     When I request a list of services that can meet my need
-    Then I receive no services
+    Then I receive an empty list of services
 
   Scenario: One match
     Given a need
@@ -33,7 +33,7 @@ Feature: Searching for a service
     Given a service ID
     And no match for the service ID
     When I request the service by ID
-    Then I receive no services
+    Then I receive an empty list of services
 
   Scenario: Match by pattern in ID
     Given a pattern

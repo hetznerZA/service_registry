@@ -597,6 +597,10 @@ module ServiceRegistry
         sc['status'] == '100'
       end
 
+      def no_service_definition_associated
+        # By default no service definition associated
+      end
+
       def service_definitions
         process_result(@iut.service_definitions(service_component))
       end
