@@ -68,6 +68,66 @@ module ServiceRegistry
         @domain_perspective = @domain_perspective_1
       end
 
+      def given_existing_service_component_identifier
+        @iut.register_service_component(@service_component_1)
+        @service_component = @service_component_1
+      end
+
+      def configure_service_component_with_URI
+        process_result(@iut.configure_service_component_uri(@service_component, @uri))
+        @pre_uri = @uri if success?
+      end
+
+      def given_no_URI
+        @uri = nil
+      end
+
+      def given_valid_URI
+        @uri = @valid_uri
+      end
+
+      def given_invalid_URI
+        @uri = 'http:// 127.0.0.1'
+      end
+
+      def given_invalid_service_component_identifier
+        @service_component = " "
+      end
+
+      def given_no_service_component_identifier
+        @service_component = nil
+      end
+
+      def given_new_service_component_identifier
+        @service_component = @service_component_1
+      end
+
+      def given_unknown_service_component
+        @service_component = 'unknown'
+      end
+
+      def given_unknown_service
+        @service = "unknown"
+      end
+
+      def given_invalid_service
+        @service = " "
+      end
+
+      def given_no_service
+        @service = nil
+      end
+
+      def associate_domain_perspective_with_service_component
+        process_result(@iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component))
+        perspective_associations = process_result(@iut.domain_perspective_associations(@domain_perspective))
+        @domain_perspective_associations = data['associations']
+      end
+
+      def register_service_definition
+        process_result(@iut.register_service_definition(@service.is_a?(Hash) ? @service['id'] : @service, @service_definition))
+      end
+
       def break_registry
         @iut.break
       end

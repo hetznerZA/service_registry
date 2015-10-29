@@ -36,7 +36,7 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/associate_service_component_with_service.feature changing service associations} when provisioning services.
 * {file:features/remove_service_component_service_association.feature removing service associations} when provisioning services.
 
-=== services
+=== search and filters
 
 * {file:features/service_search.feature finding a list of services in a domain perspectives} when exploring a domain perspective
 * {file:features/service_search.feature finding a list of services  matching service search criteria} when exploring services
