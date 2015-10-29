@@ -1,34 +1,6 @@
 module ServiceRegistry
   module Test
     class StubOrchestrationProvider < OrchestrationProvider
-      alias :parent_setup :setup
-
-      attr_accessor :iut, :domain_perspective, :service_component, :uri, :service_definition
-      attr_reader :secure_service, :query, :configuration_bootstrap, :need, :services_found
-      def setup
-        parent_setup()
-
-        @valid_uri = 'http://127.0.0.1'
-        @configuration_service = ServiceRegistry::Test::StubConfigurationService.new
-        @valid_service = { 'id' => 'valid_service_id_1', 'description' => 'valid service A', 'definition' => nil }
-        @service_2 = { 'id' => 'valid_service_id_2', 'description' => 'valid service B', 'definition' => nil }
-        @service_3 = { 'id' => 'entropy_service_id_3', 'description' => 'entropy service C', 'definition' => nil }
-        @service_4 = { 'id' => 'service_id_4', 'description' => 'entropy service D', 'definition' => nil }
-        @service_5 = { 'id' => 'service_id_5', 'description' => 'service E', 'definition' => nil }
-        @secure_service = { 'id' => 'secure_service', 'description' => 'secure service B' }
-        @domain_perspective_associations = []
-        @service_component_domain_perspective_associations = []
-        @domain_perspective_1 = 'domain_perspective_1'
-        @domain_perspective_2 = 'domain_perspective_2'
-        @domain_perspective = nil
-        @service_component = nil
-        @uri = nil
-        @service_component_1 = 'sc1.dev.auto-h.net'
-        @service_component_2 = 'sc2.dev.auto-h.net'
-        @service_definition = nil
-        @service_definition_1 = "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type='text/xsl' href='/wadl/wadl.xsl'?><wadl:application xmlns:wadl='http://wadl.dev.java.net/2009/02'    xmlns:jr='http://jasperreports.sourceforge.net/xsd/jasperreport.xsd'    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://wadl.dev.java.net/2009/02 wadl.xsd '><wadl:resources base='/'><wadl:resource path='/available-policies'>  <wadl:method name='GET' id='_available-policies'>    <wadl:doc>      Lists the policies available against which this service can validate credentials    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/validate-credential-using-policy'>  <wadl:method name='POST' id='_validate-credential-using-policy'>    <wadl:doc>      Given a credential string, examine the entropy against a security paradigm    </wadl:doc>    <wadl:request>      <wadl:param name='credential' type='xsd:string' required='true' style='query'>      </wadl:param>      <wadl:param name='policy' type='xsd:string' required='true' style='query'>      </wadl:param>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/generate-credential'>  <wadl:method name='GET' id='_generate-credential'>    <wadl:doc>      Generates a strong credential given a policy to adhere to    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status'>  <wadl:method name='GET' id='_status'>    <wadl:doc>      Returns 100 if capable of validating credentials against a policy and returns 0 if policy dependencies have failed and unable to validate credentials against policies    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status-detail'>  <wadl:method name='GET' id='_status-detail'>    <wadl:doc>      This endpoint provides detail of the status measure available on the /status endpoint    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/lexicon'>  <wadl:method name='GET' id='_lexicon'>    <wadl:doc>      Description of all the services available on this service component    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource></wadl:resources></wadl:application>"
-      end
-
       def given_no_configuration_service_bootstrap
         @configuration_bootstrap = {}
       end
@@ -75,31 +47,9 @@ module ServiceRegistry
         process_result(@iut.bootstrap(@configuration_bootstrap, @configuration_service))
       end
 
-      def has_received_notification?(message)
-        @notifications.each do |notification|
-          return true if notification == message
-        end
-        false
-      end
-
       def service_registry_available?
         process_result(@iut.available?)
         success? and (data['available'] == true)
-      end
-
-      def define_one_domain_perspective
-        process_result(@iut.delete_all_domain_perspectives)
-        process_result(@iut.register_domain_perspective(@domain_perspective_1))
-      end
-
-      def define_multiple_domain_perspectives
-        process_result(@iut.delete_all_domain_perspectives)
-        process_result(@iut.register_domain_perspective(@domain_perspective_1))
-        process_result(@iut.register_domain_perspective(@domain_perspective_2))
-      end
-
-      def list_domain_perspectives
-        process_result(@iut.list_domain_perspectives)
       end
 
       def list_service_components
@@ -135,10 +85,6 @@ module ServiceRegistry
         success? and (data['service_components'].include?(@service_component_1)) and (data['service_components'].size == 1)
       end
 
-      def received_one_domain_perspective?
-        success? and (data['domain_perspectives'].size == 1) and (data['domain_perspectives'].include?(@domain_perspective_1))
-      end
-
       def received_no_services?
         success? and (data['services'] == [])
       end
@@ -147,32 +93,8 @@ module ServiceRegistry
         success? and (data['service_components'] == [])
       end
 
-      def received_multiple_domain_perspectives?
-        success? and (data['domain_perspectives'].size == 2) and (data['domain_perspectives'].include?(@domain_perspective_1)) and (data['domain_perspectives'].include?(@domain_perspective_2))
-      end
-
-      def received_an_empty_list_of_domain_perspectives?
-        success? and (data['domain_perspectives'] == [])
-      end
-
-      def clear_all_domain_perspectives
-        @iut.delete_all_domain_perspectives
-      end
-
-      def break_registry
-        @iut.break
-      end
-
-      def given_no_domain_perspective
-        @domain_perspective = nil
-      end
-
       def given_no_service
         @service = nil
-      end
-
-      def register_domain_perspective
-        process_result(@iut.register_domain_perspective(@domain_perspective))
       end
 
       def register_service
@@ -187,35 +109,15 @@ module ServiceRegistry
         process_result(@iut.register_service_component(@service_component))
       end
 
-      def is_domain_perspective_available?
-        @iut.fix
-        process_result(@iut.list_domain_perspectives)
-        success? and data['domain_perspectives'].include?(@domain_perspective)
-      end
-
       def is_service_component_available?
         @iut.fix
         process_result(@iut.list_service_components)
         success? and data['service_components'].include?(@service_component)
       end
 
-      def given_a_new_domain_perspective
-        @iut.delete_all_domain_perspectives
-        @domain_perspective = @domain_perspective_1
-      end
-
-      def given_an_existing_domain_perspective
-        define_one_domain_perspective
-        @domain_perspective = @domain_perspective_1
-      end
-
       def given_existing_service_component_identifier
         @iut.register_service_component(@service_component_1)
         @service_component = @service_component_1
-      end
-
-      def given_an_invalid_domain_perspective
-        @domain_perspective = " "
       end
 
       def given_invalid_service_component_identifier
@@ -240,22 +142,6 @@ module ServiceRegistry
 
       def given_no_service_component_identifier
         @service_component = nil
-      end
-
-      def given_unknown_domain_perspective
-        @domain_perspective = 'unknown'
-      end
-
-      def deregister_domain_perspective
-        process_result(@iut.deregister_domain_perspective(@domain_perspective))
-      end
-
-      def given_no_service_components_associated_with_domain_perspective
-        @iut.delete_domain_perspective_service_component_associations(@domain_perspective)
-      end
-
-      def given_service_components_associated_with_domain_perspective
-        @iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component_1)
       end
 
       def given_new_service_component_identifier
