@@ -6,6 +6,7 @@ module ServiceRegistry
       attr_reader :dss, :services, :configuration, :available, :broken, :service_component_associations
 
       def initialize
+        @meta = {}
         @services = {}
         @domain_perspectives = []
         @service_components = []
@@ -316,6 +317,19 @@ service component has domain perspective associations
       end
 
       def service_definition(service)
+      end
+
+      def configure_meta_for_service(service, meta)
+        return fail('no meta provided') if meta.nil?
+        return fail('invalid meta') if not meta.is_a?(Hash)
+        return fail('no service provided') if service.nil?
+        return fail('invalid service provided') if (service.strip == "")
+        return fail('failure configuring service with meta') if @broken
+        @meta[service] = meta
+      end
+
+      def meta_for_service(service)
+        @meta[service]
       end
 
       private
