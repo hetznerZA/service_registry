@@ -6,6 +6,11 @@ Feature: Removing service component associations from services
   In order to have the service component not be listed as associated with the service
   I want to remove the service - service component association
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I remove the service association
+    Then I receive 'not authorized' notification
+
   Scenario: no service
     Given existing service component identifier
     And no service

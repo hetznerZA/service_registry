@@ -6,6 +6,11 @@ Feature: Removing service component associations from domain perspectives
   In order to have the service component not be listed as associated with the domain perspective
   I want to deregister the service component from the domain perspective
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I remove the service component association
+    Then I receive 'not authorized' notification
+
   Scenario: no domain perspective
     Given existing service component identifier
     And no domain perspective

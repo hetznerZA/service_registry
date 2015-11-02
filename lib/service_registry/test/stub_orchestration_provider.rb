@@ -178,6 +178,10 @@ module ServiceRegistry
         end
         false
       end
+
+      def unauthorized
+        @iut.authorized = false
+      end
     end
   end
 end

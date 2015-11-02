@@ -4,6 +4,11 @@ Feature: Registering service definitions
   In order to have the services available and understood
   I want to register a service definition for the service
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I register the service definition with the service
+    Then I receive 'not authorized' notification
+
   Scenario: service definition valid
     Given unknown service identifier
     And valid service definition

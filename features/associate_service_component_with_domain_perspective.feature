@@ -1,4 +1,8 @@
 Feature: Associate a service component with a domain perspective
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I request association with the domain perspective
+    Then I receive 'not authorized' notification
 
   Scenario: No service component
     Given no service component identifier

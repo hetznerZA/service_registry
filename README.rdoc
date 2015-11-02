@@ -4,9 +4,6 @@
 
 The service registry provides a variety of features supporting domain and service modelling, discovery and support.
 
-=== authorization
-* {file: features/authorization.feature authorization} when publishing to the registry
-
 === decision support system
 * {file:features/dss.feature decision support} when mapping services
 

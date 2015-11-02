@@ -1,4 +1,8 @@
 Feature: Associate a service component with a service
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I request association with the service
+    Then I receive 'not authorized' notification
 
   Scenario: No service component
     Given no service component identifier

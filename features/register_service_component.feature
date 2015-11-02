@@ -4,6 +4,11 @@ Feature: Registering service components
   In order to make the service component available in the domain perspective
   I want to register the service component
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I request registration of the service component
+    Then I receive 'not authorized' notification
+
   Scenario: No identifier
     Given no service component identifier
     When I request registration of the service component

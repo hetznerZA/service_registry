@@ -5,6 +5,11 @@ Feature: De-registering a service
   In order to have the service no longer available
   I want to deregister the service
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I request deregistration of the service
+    Then I receive 'not authorized' notification
+
   Scenario: No service
     Given no service
     When I request deregistration of the service
