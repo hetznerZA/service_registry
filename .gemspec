@@ -25,4 +25,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-expectations", "~> 3.3"
   spec.add_development_dependency 'yard'
   spec.add_development_dependency 'byebug'
+  spec.add_development_dependency 'roxml'
 end

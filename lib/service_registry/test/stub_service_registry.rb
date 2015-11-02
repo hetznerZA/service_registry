@@ -2,7 +2,7 @@ require 'uri'
 
 module ServiceRegistry
   module Test
-    class StubServiceRegistry
+    class StubServiceRegistry < ServiceRegistry::Providers::JSendProvider
       attr_reader :dss, :services, :configuration, :available, :broken, :service_component_associations
       attr_writer :authorized
 
@@ -349,26 +349,6 @@ service component has domain perspective associations
       end
 
       private
-
-      def report(status, message, data = nil)
-        data ||= {}
-        data['notifications'] = message.is_a?(Array) ? message : [ message ] 
-        { 'status' => status, 'data' => data }
-      end
-
-      def fail(message = nil, data = nil)
-        message ||= 'fail'
-        report('fail', message, data)
-      end
-
-      def success_data(data = nil)
-        success(nil, data)
-      end
-
-      def success(message = nil, data = nil)
-        message ||= 'success'
-        report('success', message, data)
-      end
 
       def check_dss(service)
         return true if not service['meta'].include?('dss')
