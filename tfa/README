@@ -17,6 +17,9 @@ Add:
   <role rolename="manager-gui"/>
   <user username="tomcat" password="s3cret" roles="manager-gui"/>
 
+Logo:
+  copy the logo of your choice to juddi-tomcat-directory/webapps/juddi-gui/img/logo2.png
+
 Start so:
   bin/catalina.sh start
 
