@@ -1,8 +1,9 @@
 module ServiceRegistry
   module Test
-    class StubOrchestrationProvider
+    class BaseOrchestrationProvider
       def setup
         @iut = ServiceRegistry::Test::StubServiceRegistry.new
+#        @iut = ServiceRegistry::Providers::JUDDIProvider.new
         @notifications = []
         @domain_perspective = nil
         @service = nil

@@ -1,5 +1,5 @@
 module ServiceRegistry
-  module Test
+  module Providers
     class JUDDIProvider
     end
   end
