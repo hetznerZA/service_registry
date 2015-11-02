@@ -4,6 +4,11 @@ Feature: Registering services
   In order to make the service available
   I want to register the service
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I request registration of the service
+    Then I receive 'not authorized' notification
+
   Scenario: No identifier
     Given no service
     When I request registration of the service

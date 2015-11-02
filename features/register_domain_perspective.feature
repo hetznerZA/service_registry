@@ -4,6 +4,11 @@ Feature: Registering domain perspectives
   In order to make the domain perspective available
   I want to register the domain perspective
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I request registration of the domain perspective
+    Then I receive 'not authorized' notification
+
   Scenario: No domain perspective
     Given no domain perspective
     When I request registration of the domain perspective

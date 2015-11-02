@@ -1,1 +1,63 @@
-http://www.tutorialspoint.com/uddi/index.htm
+Download version 3.3.1 of jUDDI here: http://apache.mirrors.lucidnetworks.net/juddi/juddi/3.3.1/juddi-distro-3.3.1.tar.gz or elsewhere.
+
+jUDDI server
+------------
+
+Install:
+  cd juddi-directory/tomcat-directory
+  export CATALINA_HOME=$(pwd)
+  export CATALINA_BASE=$(pwd)
+
+Ensure $JAVA_HOME points to your java (>= 7)
+
+Configure a user (find existing usernames and passwords here:)
+  vi conf/tomcat-users.xml
+
+Add:
+  <role rolename="manager-gui"/>
+  <user username="tomcat" password="s3cret" roles="manager-gui"/>
+
+Start so:
+  bin/catalina.sh start
+
+Manage tomcat here:
+  http://localhost:8080/manager/html
+
+Access jUDDI here:
+  http://localhost:8080/juddiv3/
+
+Access the jUDDI GUI here:
+  http://localhost:8080/juddi-gui/
+  default: admin, admin
+
+Administer jUDDI here:
+  http://localhost:8080/juddiv3/admin
+  http://localhost:8080/juddi-gui/settings.jsp
+  default: uddiadmin, da_password1
+
+juddiv3 REST API:
+  https://juddi.apache.org/docs/3.x/devguide/html/ch09.html
+
+Publishers are issued auth tokens for making changes. Everyone can read by default. For more information on authentication with jUDDI (we can plug our own IDM and CAS in...) see https://juddi.apache.org/docs/3.x/userguide/html/ch04.html#_administering_users_and_access_control For the TFA, simply use the 'root' userid, no credential required with the default authentication provider.
+
+SOAP requests using curl:
+-------------------------
+
+Create a request xml as defined by the WSDL in question (see for example: http://localhost:8080/juddiv3/services/security?wsdl) For a list of jUDDI services, see: http://localhost:8080/juddiv3/services/
+
+Example:
+tfa/soap/get_authToken.xml
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+     xmlns:urn="urn:uddi-org:api_v3">
+<soapenv:Header/>
+<soapenv:Body>
+    <urn:get_authToken userID="root" cred="root"/>
+</soapenv:Body>
+</soapenv:Envelope>
+
+Then issue request:
+
+curl --header "Content-Type: text/xml;charset=UTF-8" --header "SOAPAction: get_authToken" --data @../../soap/get_authToken.xml http://localhost:8080/juddiv3/services/security
+
+#http://www.tutorialspoint.com/uddi/index.htm

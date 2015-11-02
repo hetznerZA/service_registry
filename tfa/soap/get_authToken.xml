@@ -1,0 +1,7 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+     xmlns:urn="urn:uddi-org:api_v3">
+<soapenv:Header/>
+<soapenv:Body>
+    <urn:get_authToken userID="root" cred="root"/>
+</soapenv:Body>
+</soapenv:Envelope>

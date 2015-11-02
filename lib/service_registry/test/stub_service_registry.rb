@@ -4,8 +4,10 @@ module ServiceRegistry
   module Test
     class StubServiceRegistry
       attr_reader :dss, :services, :configuration, :available, :broken, :service_component_associations
+      attr_writer :authorized
 
       def initialize
+        @authorized = true
         @meta = {}
         @services = {}
         @domain_perspectives = []
@@ -34,6 +36,7 @@ module ServiceRegistry
       end
 
       def register_service(service)
+        return fail('not authorized') if not @authorized
         return fail('failure registering service') if @broken
         return fail('no service identifier provided') if service.nil? or service['id'].nil?
         return fail('invalid service identifier provided') if ((not service.is_a? Hash) or (service['id'].strip == ""))
@@ -83,6 +86,7 @@ module ServiceRegistry
       end
 
       def register_domain_perspective(domain_perspective)
+        return fail('not authorized') if not @authorized
         return fail('failure registering domain perspective') if @broken
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective') if (domain_perspective and domain_perspective.strip == "")
@@ -121,6 +125,7 @@ module ServiceRegistry
       end
 
       def deregister_domain_perspective(domain_perspective)
+        return fail('not authorized') if not @authorized
         return fail('failure deregistering domain perspective') if @broken
         if not @domain_perspectives.include?(domain_perspective)
           return success('domain perspective unknown')
@@ -131,6 +136,7 @@ module ServiceRegistry
       end
 
       def register_service_component(service_component)
+        return fail('not authorized') if not @authorized
         return fail('failure registering service component') if @broken
         return fail('no service component identifier provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component and service_component.strip == "")
@@ -143,6 +149,7 @@ module ServiceRegistry
       end
 
       def deregister_service(service)
+        return fail('not authorized') if not @authorized
         return fail('failure deregistering service') if @broken
         return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
@@ -152,6 +159,7 @@ module ServiceRegistry
       end
 
       def deregister_service_component(service_component)
+        return fail('not authorized') if not @authorized
         return fail('failure deregistering service component') if @broken
         return fail('no service component identifier provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component and service_component.strip == "")
@@ -174,6 +182,7 @@ service component has domain perspective associations
       end
 
       def associate_service_component_with_service(service, service_component)
+        return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component.strip == "")
         return fail('no service provided') if service.nil?
@@ -188,6 +197,7 @@ service component has domain perspective associations
       end
 
       def disassociate_service_component_from_service(service, service_component)
+        return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component.strip == "")
         return fail('no service provided') if service.nil?
@@ -202,6 +212,7 @@ service component has domain perspective associations
       end
 
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)
+        return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component.strip == "")
         return fail('no domain perspective provided') if domain_perspective.nil?
@@ -216,6 +227,7 @@ service component has domain perspective associations
       end
 
       def disassociate_service_component_from_domain_perspective(domain_perspective, service_component)
+        return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component.strip == "")
         return fail('no domain perspective provided') if domain_perspective.nil?
@@ -247,6 +259,7 @@ service component has domain perspective associations
       end
 
       def configure_service_component_uri(service_component, uri)
+        return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component.strip == "")
         return fail('no URI provided') if uri.nil?
@@ -263,6 +276,7 @@ service component has domain perspective associations
       end
 
       def register_service_definition(service, service_definition)
+        return fail('not authorized') if not @authorized
         return fail('failure registering service definition') if @broken
         return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if service.strip == ""
@@ -275,6 +289,7 @@ service component has domain perspective associations
       end
 
       def deregister_service_definition(service)
+        return fail('not authorized') if not @authorized
         return fail('invalid service identifier provided') if service.nil? or (service.strip == "")
         return fail('unknown service identifier provided') if @services[service].nil?
         @services[service].delete('definition')
@@ -320,6 +335,7 @@ service component has domain perspective associations
       end
 
       def configure_meta_for_service(service, meta)
+        return fail('not authorized') if not @authorized
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)
         return fail('no service provided') if service.nil?

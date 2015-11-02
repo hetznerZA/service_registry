@@ -1,3 +1,11 @@
+Given(/^unauthorized publisher$/) do
+  @test.unauthorized
+end
+
+Then(/^I receive 'not authorized' notification$/) do
+  expect(@test.has_received_notification?('not authorized')).to eq(true)
+end
+
 And (/^Some or no associations of service components with the domain perspective$/) do
   @test.given_some_or_no_associations_of_service_components_with_domain_perspective
 end

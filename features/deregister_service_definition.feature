@@ -4,6 +4,11 @@ Feature: Deregistering a service definition
   In order to have services no longer available
   I want to deregister service definitions
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I deregister the service definition
+    Then I receive 'not authorized' notification
+
   Scenario: invalid service identifier
     Given invalid service identifier
     When I deregister the service definition

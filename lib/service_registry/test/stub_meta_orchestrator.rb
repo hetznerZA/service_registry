@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class StubMetaOrchestrationProvider < OrchestrationProvider
+    class StubMetaOrchestrationProvider < StubOrchestrationProvider
       def given_valid_meta
         @meta = @valid_meta
       end 

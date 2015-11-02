@@ -4,6 +4,11 @@ Feature: Configuring meta for a service
   In order to have the service behave dynamically
   I want to configure meta for the service
 
+  Scenario: Not authorized
+    Given unauthorized publisher
+    When I request configuration of the service with meta
+    Then I receive 'not authorized' notification
+
   Scenario: Providing meta for a service component
     Given valid meta
     And a registered service

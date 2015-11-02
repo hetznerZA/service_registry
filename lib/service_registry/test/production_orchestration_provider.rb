@@ -1,6 +1,8 @@
+require_relative 'stub_orchestration_provider.rb'
+
 module ServiceRegistry
   module Test
-    class OrchestrationProvider
+    class ProductionOrchestrationProvider
       def setup
         @iut = ServiceRegistry::Test::StubServiceRegistry.new
         @notifications = []
