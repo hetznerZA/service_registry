@@ -1,8 +1,6 @@
 module ServiceRegistry
   module Test
-    class StubServiceComponentOrchestrationProvider < OrchestrationProvider
-
-
+    class StubServiceComponentOrchestrationProvider < StubOrchestrationProvider
       def given_service_components_exist
         process_result(@iut.delete_all_service_components)
         process_result(@iut.register_service_component(@service_component_1))

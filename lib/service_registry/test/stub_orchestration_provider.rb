@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class OrchestrationProvider
+    class StubOrchestrationProvider
       def setup
         @iut = ServiceRegistry::Test::StubServiceRegistry.new
         @notifications = []

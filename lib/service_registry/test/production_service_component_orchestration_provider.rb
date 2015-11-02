@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class ProductionServiceDefinitionOrchestrationProvider < OrchestrationProvider
+    class ProductionServiceDefinitionOrchestrationProvider < ProductionOrchestrationProvider
       def given_a_valid_service_definition
 #        @service_definition = @service_definition_1
       end

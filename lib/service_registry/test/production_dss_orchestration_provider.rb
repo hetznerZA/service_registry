@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class ProductionDSSOrchestrationProvider < OrchestrationProvider
+    class ProductionDSSOrchestrationProvider < ProductionOrchestrationProvider
 #      alias :parent_setup :setup
 
 #      attr_reader :dss_decorated_service

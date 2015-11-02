@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class ProductionBootstrapOrchestrationProvider < OrchestrationProvider
+    class ProductionBootstrapOrchestrationProvider < ProductionOrchestrationProvider
       def given_no_configuration_service_bootstrap
 #        @configuration_bootstrap = {}
       end

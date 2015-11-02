@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class StubDomainPerspectiveOrchestrationProvider < OrchestrationProvider
+    class StubDomainPerspectiveOrchestrationProvider < StubOrchestrationProvider
       def given_no_service_components_associated_with_domain_perspective
         @iut.delete_domain_perspective_service_component_associations(@domain_perspective)
       end

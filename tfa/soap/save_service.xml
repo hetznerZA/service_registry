@@ -1,0 +1,10 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+     xmlns:urn="urn:uddi-org:api_v2">
+<soapenv:Header/>
+<soapenv:Body>
+  <save_service generic="2.0" xmlns="urn:uddi-org:api_v2" >
+     <authInfo/>
+     <businessService/> [<businessService/>.]
+  </save_service>
+</soapenv:Body>
+</soapenv:Envelope>

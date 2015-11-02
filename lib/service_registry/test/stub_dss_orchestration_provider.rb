@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class StubDSSOrchestrationProvider < OrchestrationProvider
+    class StubDSSOrchestrationProvider < StubOrchestrationProvider
       alias :parent_setup :setup
 
       attr_reader :dss_decorated_service

@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class StubServiceOrchestrationProvider < OrchestrationProvider
+    class StubServiceOrchestrationProvider < StubOrchestrationProvider
 
       def given_invalid_service_for_registration
         @service = { 'id' => "" }

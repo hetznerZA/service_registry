@@ -1,6 +1,6 @@
 module ServiceRegistry
   module Test
-    class StubAssociationOrchestrationProvider < OrchestrationProvider
+    class StubAssociationOrchestrationProvider < StubOrchestrationProvider
       def given_some_or_no_associations_of_service_components_with_domain_perspective
         @domain_perspective_associations = @iut.domain_perspective_associations(@domain_perspective)
       end
