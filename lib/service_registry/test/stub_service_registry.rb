@@ -3,7 +3,7 @@ require 'uri'
 module ServiceRegistry
   module Test
     class StubServiceRegistry < ServiceRegistry::Providers::JSendProvider
-      attr_reader :dss, :services, :configuration, :available, :broken, :service_component_associations
+      attr_reader :dss, :services, :broken, :service_component_associations
       attr_writer :authorized
 
       def initialize
@@ -18,19 +18,6 @@ module ServiceRegistry
         @service_associations = {}
       end
 
-      def bootstrap(configuration, configuration_service)
-        @configuration = configuration
-        return fail('invalid configuration service') if @configuration.nil?
-        return fail('no configuration service') if @configuration['CFGSRV_PROVIDER_ADDRESS'].nil?
-        return fail('no identifier') if @configuration['CFGSRV_IDENTIFIER'].nil?
-        return fail('invalid identifier') if @configuration['CFGSRV_IDENTIFIER'].strip == ""
-        return fail('configuration error') if configuration_service.broken?
-        return fail('no configuration') if configuration_service.configuration.nil?
-        return fail('invalid configuration') if configuration_service.configuration.empty?
-        @available = true
-        return success(['configuration valid', 'valid identifier']) if @configuration
-      end
-
       def available?
         success_data('available' => @available)
       end
@@ -43,11 +30,6 @@ module ServiceRegistry
         return fail('service already exists') if not @services[service['id']].nil?
         @services[service['id']] = service
         success('service registered')
-      end
-
-      def associate_dss(dss)
-        @dss = dss
-        success
       end
 
       def query_service_by_pattern(pattern)

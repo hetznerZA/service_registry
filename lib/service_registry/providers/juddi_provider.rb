@@ -1,10 +1,12 @@
 module ServiceRegistry
   module Providers
     class JUDDIProvider < JSendProvider
-      attr_reader :dss
-
-      def associate_dss(dss)
-        @dss = dss
+      def available?
+        if @available
+          result = `curl -S http://localhost:8080/juddiv3 2>&1`
+          @available = not(result.downcase.include?("fail"))
+        end
+        success_data('available' => @available)
       end
     end
   end
