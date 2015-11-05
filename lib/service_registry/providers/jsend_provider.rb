@@ -20,10 +20,11 @@ module ServiceRegistry
         return success(['configuration valid', 'valid identifier']) if @configuration
       end
 
-      def report(status, message, data = nil)
+      def report(status, message, result = nil)
         data ||= {}
+        result = { 'result' => result} if not result.is_a? Hash
         data['notifications'] = message.is_a?(Array) ? message : [ message ] 
-        { 'status' => status, 'data' => data }
+        { 'status' => status, 'data' => result }
       end
 
       def fail(message = nil, data = nil)

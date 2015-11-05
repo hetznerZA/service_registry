@@ -43,6 +43,16 @@ juddiv3 REST API:
 
 Publishers are issued auth tokens for making changes. Everyone can read by default. For more information on authentication with jUDDI (we can plug our own IDM and CAS in...) see https://juddi.apache.org/docs/3.x/userguide/html/ch04.html#_administering_users_and_access_control For the TFA, simply use the 'root' userid, no credential required with the default authentication provider.
 
+tModels:
+
+In order to create services in jUDDI, a tModel hierarchy needs to be in place. Log into the gui and create the following tModels:
+
+uddi:hetzner.co.za:keygenerator
+uddi:hetzner.co.za:service:keygenerator
+
+This allows services of the following form to be created via the API:
+uddi:hetzner.co.za:services:new-service-name-1788
+
 SOAP requests using curl:
 -------------------------
 
