@@ -48,7 +48,10 @@ tModels:
 In order to create services in jUDDI, a tModel hierarchy needs to be in place. Log into the gui and create the following tModels:
 
 uddi:hetzner.co.za:keygenerator
-uddi:hetzner.co.za:service:keygenerator
+uddi:hetzner.co.za:service (in the categories section add a reference key and select uddi:hetzner.co.za:keygenerator)
+uddi:hetzner.co.za:service-components (in the categories section add a reference key and select uddi:hetzner.co.za:keygenerator)
+
+Businesses represent companies and departments in the company. They allow services to be associated with them as well as contact details. Domain perspectives are like departments, but purely from a grouping of services perspective. They do how-ever also have contact associated, and of course services. This makes the businesses type a good fit for domain perspectives.
 
 This allows services of the following form to be created via the API:
 uddi:hetzner.co.za:services:new-service-name-1788
@@ -73,4 +76,13 @@ Then issue request:
 
 curl --header "Content-Type: text/xml;charset=UTF-8" --header "SOAPAction: get_authToken" --data @../../soap/get_authToken.xml http://localhost:8080/juddiv3/services/security
 
-#http://www.tutorialspoint.com/uddi/index.htm
+REST requests using curl:
+-------------------------
+
+For some reason, with jUDDI out of the box JSON REST request do not return data. The same request with XML as format does work, e.g.:
+
+http://localhost:8080/juddiv3/services/inquiryRest/JSON/businessList (broken)
+
+http://localhost:8080/juddiv3/services/inquiryRest/XML/businessList (works)
+
+I have not been able to resolve this, so whether REST or SOAP, we have to work with the XML anyway. For now I've opted for the TFA to use SOAP.
