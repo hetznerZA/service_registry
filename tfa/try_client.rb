@@ -8,20 +8,31 @@ test = 1
 
 if test == 1
   result = iut.save_service('temporary', 'A temporary service', 'http://github.com/temp/one.wadl')
-byebug
   result = iut.save_bindings('temporary', ['http://sc1.dev.auto-h/net/temporary', 'http://sc2.dev.auto-h/net/temporary'])
-  sleep 10
   ##check in juddi
 
   service = iut.get_service('temporary')
 
   puts service
 
+  bindings = iut.find_bindings('temporary')
+
+  puts "BINDINGS"
+  puts bindings
+  puts "--------"
   #services = iut.find_services['data']['services']
   #puts services
 
   services = iut.find_services('empo')['data']['services']
   #puts services
+
+  result = iut.delete_binding(bindings['data']['bindings'].first[0])
+
+  bindings = iut.find_bindings('temporary')
+
+  puts "BINDINGS after delete"
+  puts bindings
+  puts "---------------------"
 
   result = iut.delete_service('temporary')
   puts result

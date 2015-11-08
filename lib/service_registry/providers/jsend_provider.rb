@@ -32,6 +32,10 @@ module ServiceRegistry
         report('fail', message, data)
       end
 
+      def fail_data(data = nil)
+        fail(nil, data)
+      end
+
       def success_data(data = nil)
         success(nil, data)
       end
