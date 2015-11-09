@@ -267,7 +267,7 @@ service component has domain perspective associations
         return fail('invalid service definition provided') if service_definition.nil? or (not service_definition.include?("wadl"))
 
         @services[service]['definition'] = service_definition
-        success
+        success('service definition registered')
       end
 
       def deregister_service_definition(service)

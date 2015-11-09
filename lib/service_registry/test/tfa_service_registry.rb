@@ -71,10 +71,24 @@ module ServiceRegistry
       end
 
       def register_service_definition(service, definition)
+        authorize       
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        registered = service_registered?(service)
+        return success('unknown service identifier provided') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return fail('no service definition provided') if definition.nil?
+        return fail('invalid service definition provided') if not definition.include?("wadl")
+
         result = @juddi.get_service(service)
         service = result['data']
         service['definition'] = definition
-        @juddi.save_service(service['name'], service['description'], service['definition'])
+        result = @juddi.save_service(service['name'], service['description'], service['definition'])
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')        
+        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        success('service definition registered')
+      rescue => ex
+        fix if @broken
+        fail('failure registering service definition')           
       end
 
       def service_definition_for_service(service)
@@ -89,6 +103,7 @@ module ServiceRegistry
       end
 
       def deregister_service_definition(service)
+        authorize
         return fail('no service provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
         registered = service_registered?(service)

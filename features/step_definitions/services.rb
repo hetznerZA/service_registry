@@ -1,5 +1,4 @@
 Given(/^unknown service identifier$/) do
-  @test.register_service_definition
   @test.given_unknown_service
 end
 
@@ -261,4 +260,8 @@ end
 
 Then(/^I receive 'service definition deregistered' notification$/) do
   expect(@test.has_received_notification?('service definition deregistered')).to eq(true)
+end
+
+Then(/^I receive 'service definition registered' notification$/) do
+  expect(@test.has_received_notification?('service definition registered')).to eq(true)
 end

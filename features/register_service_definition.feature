@@ -6,6 +6,8 @@ Feature: Registering service definitions
 
   Scenario: Not authorized
     Given unauthorized publisher
+    And a registered service
+    And valid service definition
     When I register the service definition with the service
     Then I receive 'not authorized' notification
 
@@ -19,7 +21,7 @@ Feature: Registering service definitions
     Given a registered service
     And valid service definition
     When I register the service definition with the service
-    Then I receive 'success' notification
+    Then I receive 'service definition registered' notification
     And the service is described by the service definition
 
   Scenario: no service identifier
@@ -33,21 +35,21 @@ Feature: Registering service definitions
     Then I receive 'invalid service identifier provided' notification
 
   Scenario: no service definition
-    Given a registered service
+    Given valid service
     And no service definition
     When I register the service definition with the service
     Then I receive 'no service definition provided' notification
     And the service definition associated with the service remains unchanged
 
   Scenario: service definition invalid
-    Given a registered service
+    Given valid service
     And invalid service definition
     When I register the service definition with the service
     Then I receive 'invalid service definition provided' notification
     And the service definition associated with the service remains unchanged
 
   Scenario: failure
-    Given an existing service identifier
+    Given valid service
     And valid service definition
     And a failure
     When I register the service definition with the service
