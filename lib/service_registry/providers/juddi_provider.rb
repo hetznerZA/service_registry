@@ -88,21 +88,17 @@ module ServiceRegistry
         end
       end
 
-      def service_eq?(service, comparison)
-        service == "#{@services_urn}:#{comparison}"
+      def service_urn(service)
+        "#{@services_urn}:#{service}"
+      end
+
+      def business_urn(business)
+        "#{@domain_urn}#{business}"
       end
 
       def available?
         { 'available' => check_availability }
       end
-
-      # pull up into the tfa
-      #def delete_all_domain_perspectives
-      #  businesses = list_domain_perspectives
-      #  businesses.each do |id, name|
-      #    delete_business(id)
-      #  end
-      #end  
 
       def save_business(name)
         authorize
@@ -120,10 +116,10 @@ module ServiceRegistry
         end
       end
 
-      def delete_business(id)
+      def delete_business(name)
         authorize
         request_soap('publishv2', 'delete_business',
-        "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessKey>#{id}</urn:businessKey>") do |res|
+        "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessKey>#{@domain_urn}#{name}</urn:businessKey>") do |res|
           { 'errno' => extract_errno(res.body) }
         end
       end
@@ -144,7 +140,7 @@ module ServiceRegistry
         entry = soap[/<ns2:serviceInfos>(.*?)<\/ns2:serviceInfos>/, entries.size + 1]
 
         while entry do
-          entries[extract_service_id(entry)] = extract_name(entry)
+          entries[extract_service_id(entry).gsub(@services_urn + ":", "")] = extract_name(entry)
           entry = soap[/<ns2:serviceInfos>(.*?)<\/ns2:serviceInfos>/, entries.size + 1]
         end
         { 'services' => entries }
@@ -160,7 +156,7 @@ module ServiceRegistry
 
       def extract_business(soap)
         entries = {}
-        entries[extract_business_id(soap)] = extract_name(soap)
+        entries[extract_business_id(soap).gsub(@domain_urn, "")] = extract_name(soap)
         entries
       end
 
@@ -169,10 +165,10 @@ module ServiceRegistry
         entry = soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1]
 
         while entry do
+          entry[/<ns2:serviceInfos(.*?)<\/ns2:serviceInfos>/, 1] = "" if entry[/<ns2:serviceInfos(.*?)<\/ns2:serviceInfos>/, 1]
           # only include Hetzner entries
-          entries[extract_business_id(entry)] = extract_name(entry) if extract_business_id(entry).include?('hetzner')
-          # this trickery here is required as the regex match gets in trouble
-          soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1] = ""
+          entries[extract_business_id(entry).gsub(@domain_urn, "")] = extract_name(entry) if extract_business_id(entry).include?(@domain_urn)
+          soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1] = "" if soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1]
           soap.gsub!("<ns2:businessInfo </ns2:businessInfo>", "")
           entry = soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1]
         end

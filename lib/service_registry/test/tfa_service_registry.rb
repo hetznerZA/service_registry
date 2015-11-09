@@ -27,6 +27,8 @@ module ServiceRegistry
         @broken = true
       end
 
+      # ---- services ----
+
       def register_service(service)
         authorize
         return fail('no service identifier provided') if service.nil? or service['name'].nil?
@@ -48,7 +50,7 @@ module ServiceRegistry
         registered = false
         if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
           result['data']['services'].each do |service_key, description|
-            registered =  true if @juddi.service_eq?(service_key, service)
+            registered = (service.downcase == service_key.downcase)
           end
         end
         success_data({'registered' => registered})
@@ -69,6 +71,8 @@ module ServiceRegistry
         fix if @broken
         fail('failure deregistering service')        
       end
+
+      # ---- service definition ----
 
       def register_service_definition(service, definition)
         authorize       
@@ -114,6 +118,78 @@ module ServiceRegistry
         result = @juddi.save_service(service['name'], service['description'], service['definition'])
         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
         success('service definition deregistered')
+      end
+
+      # ---- domain perspectives ----      
+
+      def reset_domain_perspectives
+        authorize
+        return if not @authorized
+        result = list_domain_perspectives
+        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'domain_perspectives') 
+          result['data']['domain_perspectives'].each do |domain_perspective|
+            @juddi.delete_business(domain_perspective)
+          end
+        end
+      end
+
+      def list_domain_perspectives
+        result = @juddi.find_businesses
+        result['data']['domain_perspectives'] = []
+
+        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'businesses')
+          result['data']['businesses'].each do |business, description|
+            result['data']['domain_perspectives'] << business
+          end
+        end
+        result
+      end
+
+      def domain_perspective_registered?(domain_perspective)
+        result = @juddi.find_businesses(domain_perspective)
+        registered = false
+        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'businesses')
+          result['data']['businesses'].each do |business, description|
+            registered = (domain_perspective.downcase == business.downcase)
+          end
+        end
+        success_data({'registered' => registered})
+      end
+
+      def register_domain_perspective(domain_perspective)
+        authorize
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective') if (domain_perspective and domain_perspective.strip == "")
+        registered = domain_perspective_registered?(domain_perspective)
+        return fail('domain perspective already exists') if (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+
+        result = @juddi.save_business(domain_perspective)
+        return fail('invalid domain perspective') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        success('domain perspective registered')
+
+      rescue => ex
+        fix if @broken
+        fail('failure registering domain perspective')     
+      end
+
+      def deregister_domain_perspective(domain_perspective)
+        authorize
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if domain_perspective.strip == ""
+
+        registered = domain_perspective_registered?(domain_perspective)
+        return fail('domain perspective unknown') if (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        # return fail('domain perspective has associations') if does_domain_perspective_have_service_components_associated?(domain_perspective)
+
+        result = @juddi.delete_business(domain_perspective)
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid domain perspective provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        success('domain perspective deregistered')
+
+      rescue => ex
+        fix if @broken
+        fail('failure deregistering domain perspective')        
       end
 
       private

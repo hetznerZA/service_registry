@@ -40,7 +40,7 @@ module ServiceRegistry
         success_data({ 'services' => result })
       end
 
-      def delete_all_domain_perspectives
+      def reset_domain_perspectives
         @domain_perspectives = []
         success
       end
@@ -74,11 +74,10 @@ module ServiceRegistry
         return fail('invalid domain perspective') if (domain_perspective and domain_perspective.strip == "")
         if not @domain_perspectives.include?(domain_perspective)
           @domain_perspectives << domain_perspective
-          return fail('domain perspective registered')
         else
           return fail('domain perspective already exists')
         end
-        success
+        success('domain perspective registered')
       end
 
       def domain_perspective_associations(domain_perspective)

@@ -52,7 +52,7 @@ module ServiceRegistry
       end
 
       def given_a_new_domain_perspective
-        @iut.delete_all_domain_perspectives
+        @iut.reset_domain_perspectives
         @domain_perspective = @domain_perspective_1
       end
 
@@ -69,7 +69,7 @@ module ServiceRegistry
       end
 
       def given_an_existing_domain_perspective
-        process_result(@iut.delete_all_domain_perspectives)
+        process_result(@iut.reset_domain_perspectives)
         process_result(@iut.register_domain_perspective(@domain_perspective_1))
         @domain_perspective = @domain_perspective_1
       end

@@ -10,7 +10,7 @@ module ServiceRegistry
       end
 
       def clear_all_domain_perspectives
-        @iut.delete_all_domain_perspectives
+        @iut.reset_domain_perspectives
       end
 
       def list_domain_perspectives
@@ -26,12 +26,12 @@ module ServiceRegistry
       end
 
       def define_one_domain_perspective
-        process_result(@iut.delete_all_domain_perspectives)
+        process_result(@iut.reset_domain_perspectives)
         process_result(@iut.register_domain_perspective(@domain_perspective_1))
       end
 
       def define_multiple_domain_perspectives
-        process_result(@iut.delete_all_domain_perspectives)
+        process_result(@iut.reset_domain_perspectives)
         process_result(@iut.register_domain_perspective(@domain_perspective_1))
         process_result(@iut.register_domain_perspective(@domain_perspective_2))
       end

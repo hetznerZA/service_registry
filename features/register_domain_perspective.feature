@@ -6,6 +6,7 @@ Feature: Registering domain perspectives
 
   Scenario: Not authorized
     Given unauthorized publisher
+    And a new domain perspective    
     When I request registration of the domain perspective
     Then I receive 'not authorized' notification
 
