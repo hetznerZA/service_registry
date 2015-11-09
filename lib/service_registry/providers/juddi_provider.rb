@@ -4,9 +4,17 @@ require 'byebug'
 module ServiceRegistry
   module Providers
     class JUDDIProvider < JSendProvider
-      def initialize
+      def initialize(base_urn, company_urn, domain_urn, services_urn)
         @auth_user = ''
         @auth_password = ''
+        @base_urn = base_urn
+        @company_urn = company_urn
+        @domain_urn = domain_urn
+        @services_urn = services_urn
+      end
+
+      def set_uri(uri)
+        @base_uri = uri
       end
 
       def authenticate(auth_user, auth_password)
@@ -23,7 +31,7 @@ module ServiceRegistry
             url_type = 'https' if binding.include?('https')
             url_type = 'http' if (not binding.include?('https') and binding.include?('http'))
             url_type ||= 'unknown'
-            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='uddi:hetzner.co.za:services:#{service}'><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
+            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='#{@services_urn}:#{service}'><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
           end
         end
         request_soap('publishv2', 'save_binding', body) do | res|
@@ -32,7 +40,7 @@ module ServiceRegistry
       end
 
       def find_bindings(name)
-        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>uddi:hetzner.co.za:services:#{name}</urn:serviceKey>") do |res|
+        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{@services_urn}:#{name}</urn:serviceKey>") do |res|
           extract_bindings(res.body)
         end
       end
@@ -45,7 +53,7 @@ module ServiceRegistry
       end
 
       def get_service(name)
-        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>uddi:hetzner.co.za:services:#{name}</urn:serviceKey>") do |res|
+        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{@services_urn}:#{name}</urn:serviceKey>") do |res|
           { 'name' => extract_name(res.body),
             'description' => extract_description(res.body),
             'definition' => extract_service_definition(res.body) }
@@ -54,7 +62,7 @@ module ServiceRegistry
 
       def save_service(name, description = nil, definition = nil)
         authorize
-        body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessService businessKey='uddi:hetzner.co.za:hetzner' serviceKey='uddi:hetzner.co.za:services:#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
+        body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessService businessKey='#{@company_urn}' serviceKey='#{@services_urn}:#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
         body = body + "<urn:description xml:lang='en'>#{description}</urn:description>" if description and not (description == "")
         body = body + "<urn:categoryBag><urn:keyedReference tModelKey='uddi:uddi.org:wadl:types' keyName='service-definition' keyValue='#{definition}'></urn:keyedReference></urn:categoryBag>" if definition and not (definition.strip == "")
         body = body + "</urn:businessService>"
@@ -75,9 +83,13 @@ module ServiceRegistry
 
       def delete_service(name)
         authorize
-        request_soap('publishv2', 'delete_service', "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:serviceKey>uddi:hetzner.co.za:services:#{name}</urn:serviceKey>") do |res|
+        request_soap('publishv2', 'delete_service', "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:serviceKey>#{@services_urn}:#{name}</urn:serviceKey>") do |res|
           { 'errno' => extract_errno(res.body) }
         end
+      end
+
+      def service_eq?(service, comparison)
+        service == "#{@services_urn}:#{comparison}"
       end
 
       def available?
@@ -95,7 +107,7 @@ module ServiceRegistry
       def save_business(name)
         authorize
         request_soap('publishv2', 'save_business',
-                     "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessEntity businessKey='uddi:hetzner.co.za:domain-#{name}'><name>#{name}</name></urn:businessEntity>") do | res|
+                     "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessEntity businessKey='#{@domain_urn}#{name}'><name>#{name}</name></urn:businessEntity>") do | res|
           extract_service(res.body)
         end
       end
@@ -114,6 +126,10 @@ module ServiceRegistry
         "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessKey>#{id}</urn:businessKey>") do |res|
           { 'errno' => extract_errno(res.body) }
         end
+      end
+
+      def business_eq?(business, comparison)
+        business == "#{@domain_urn}#{comparison}"
       end    
 
     private
@@ -216,7 +232,7 @@ module ServiceRegistry
       end
 
       def connection(service, action)
-        @uri = URI("http://localhost:8080/juddiv3/services/#{service}")
+        @uri = URI("#{@base_uri}/juddiv3/services/#{service}")
         req = Net::HTTP::Post.new(@uri)
         req.content_type = 'text/xml;charset=UTF-8'
         req['SOAPAction'] = action
@@ -255,7 +271,7 @@ module ServiceRegistry
       end
 
       def check_availability
-        result = `curl -S http://localhost:8080/juddiv3 2>&1`
+        result = `curl -S #{@base_uri}/juddiv3 2>&1`
         not(result.downcase.include?("fail"))
       end
     end

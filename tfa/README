@@ -41,15 +41,15 @@ Administer jUDDI here:
 juddiv3 REST API:
   https://juddi.apache.org/docs/3.x/devguide/html/ch09.html
 
-Publishers are issued auth tokens for making changes. Everyone can read by default. For more information on authentication with jUDDI (we can plug our own IDM and CAS in...) see https://juddi.apache.org/docs/3.x/userguide/html/ch04.html#_administering_users_and_access_control For the TFA, simply use the 'root' userid, no credential required with the default authentication provider.
+Publishers are issued auth tokens for making changes. Everyone can read by default. For more information on authentication with jUDDI (we can plug our own IDM and CAS in...) see https://juddi.apache.org/docs/3.x/userguide/html/ch04.html#_administering_users_and_access_control For the TFA, simply use the 'uddi' userid, password 'uddi'.
 
-tModels:
+tModels / seeding the database:
 
-In order to create services in jUDDI, a tModel hierarchy needs to be in place. Log into the gui and create the following tModels:
+In order to create services in jUDDI, a tModel hierarchy needs to be in place. Log into the gui as uddi (password uddi) and create the following tModels:
 
-uddi:hetzner.co.za:keygenerator
-uddi:hetzner.co.za:service (in the categories section add a reference key and select uddi:hetzner.co.za:keygenerator)
-uddi:hetzner.co.za:service-components (in the categories section add a reference key and select uddi:hetzner.co.za:keygenerator)
+uddi:hetzner.co.za:hetzner (select Create-Business)
+uddi:hetzner.co.za:keygenerator (select Create-tModel Partion)
+uddi:hetzner.co.za:services:keygenerator (select Create-tModel Partion)
 
 Businesses represent companies and departments in the company. They allow services to be associated with them as well as contact details. Domain perspectives are like departments, but purely from a grouping of services perspective. They do how-ever also have contact associated, and of course services. This makes the businesses type a good fit for domain perspectives.
 
@@ -68,7 +68,7 @@ tfa/soap/get_authToken.xml
      xmlns:urn="urn:uddi-org:api_v3">
 <soapenv:Header/>
 <soapenv:Body>
-    <urn:get_authToken userID="root" cred="root"/>
+    <urn:get_authToken userID="uddi" cred="uddi"/>
 </soapenv:Body>
 </soapenv:Envelope>
 
@@ -86,3 +86,23 @@ http://localhost:8080/juddiv3/services/inquiryRest/JSON/businessList (broken)
 http://localhost:8080/juddiv3/services/inquiryRest/XML/businessList (works)
 
 I have not been able to resolve this, so whether REST or SOAP, we have to work with the XML anyway. For now I've opted for the TFA to use SOAP.
+
+Persistence:
+------------
+
+If you want to use something other then embedded derby, see http://juddi.apache.org/docs/3.2/juddi-guide/html_single/#_derby_out_of_the_box
+
+For working with the embedded Derby database, install the derby tools:
+http://db.apache.org/derby/releases/release-10.12.1.1.cgi
+http://db.apache.org/derby/papers/DerbyTut/install_software.html
+
+juddi in test mode creates its database here: juddi-distro-3.3.1/juddi-tomcat-3.3.1/target/juddi-derby-test-db
+To connect to the database:
+
+$ cd juddi-distro-3.3.1/juddi-tomcat-3.3.1/target/
+$ java org.apache.derby.tools.ij
+ij version 10.12
+ij> connect 'jdbc:derby:./juddi-derby-test-db';
+ij> select * from J3_SERVICE_NAME;
+
+To clear the database, simply stop tomcat, delete the juddi-derby-test-db directory and start tomcat again. Note: after clearing the database you will need to seed it again as detailed above.

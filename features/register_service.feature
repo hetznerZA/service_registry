@@ -6,6 +6,7 @@ Feature: Registering services
 
   Scenario: Not authorized
     Given unauthorized publisher
+    And a new service identifier
     When I request registration of the service
     Then I receive 'not authorized' notification
 

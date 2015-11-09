@@ -47,6 +47,17 @@ module ServiceRegistry
         message ||= 'success'
         report('success', message, data)
       end
+
+      def self.has_data?(result, key = nil)
+        return false if (result.nil?) or (result['data'].nil?)
+        return false if (not key.nil?) and (result['data'][key].nil?)
+        true
+      end
+
+      def self.notifications_include?(result, pattern)
+        return false if not ServiceRegistry::Providers::JSendProvider.has_data?(result, 'notifications')
+        result['data']['notifications'].to_s.include?(pattern)
+      end      
     end
   end
 end

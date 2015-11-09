@@ -43,8 +43,8 @@ module ServiceRegistry
       end
 
       def associate_services_with_service_component
-        process_result(@iut.associate_service_with_service_component(@service_component, @service_1['id']))
-        process_result(@iut.associate_service_with_service_component(@service_component, @service_2['id']))
+        process_result(@iut.associate_service_with_service_component(@service_component, @service_1['name']))
+        process_result(@iut.associate_service_with_service_component(@service_component, @service_2['name']))
       end
 
       def received_list_of_all_service_components?

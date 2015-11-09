@@ -18,7 +18,7 @@ module ServiceRegistry
 
       def self.build_iut
         return ServiceRegistry::Test::StubServiceRegistry.new if ENV["TEST_ORCHESTRATION_PROVIDER"] == "stub"
-        return ServiceRegistry::Providers::JUDDIProvider.new if ENV["TEST_ORCHESTRATION_PROVIDER"] == "tfa"
+        return ServiceRegistry::Test::TfaServiceRegistry.new if ENV["TEST_ORCHESTRATION_PROVIDER"] == "tfa"
         raise TestOrchestrationProviderNotSupported.new("Could not build iut for #{ENV["TEST_ORCHESTRATION_PROVIDER"]}")
       end
     end

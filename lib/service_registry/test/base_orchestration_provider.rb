@@ -8,17 +8,17 @@ module ServiceRegistry
         @domain_perspective_associations = []
         @service_component_domain_perspective_associations = []
 
-        @service_1 = { 'id' => 'valid_service_id_1', 'description' => 'valid service A', 'definition' => nil }
         @domain_perspective_1 = 'domain_perspective_1'
         @domain_perspective_2 = 'domain_perspective_2'
         @valid_uri = 'http://127.0.0.1'
         @configuration_service = ServiceRegistry::Test::StubConfigurationService.new
-        @valid_service = { 'id' => 'valid_service_id_1', 'description' => 'valid service A', 'definition' => nil }
-        @service_2 = { 'id' => 'valid_service_id_2', 'description' => 'valid service B', 'definition' => nil }
-        @service_3 = { 'id' => 'entropy_service_id_3', 'description' => 'entropy service C', 'definition' => nil }
-        @service_4 = { 'id' => 'service_id_4', 'description' => 'entropy service D', 'definition' => nil }
-        @service_5 = { 'id' => 'service_id_5', 'description' => 'service E', 'definition' => nil }
-        @secure_service = { 'id' => 'secure_service', 'description' => 'secure service B' }
+        @valid_service = { 'name' => 'valid_service_id_1', 'description' => 'valid service A', 'definition' => nil }
+        @service_1 = { 'name' => 'valid_service_id_1', 'description' => 'valid service A', 'definition' => nil }
+        @service_2 = { 'name' => 'valid_service_id_2', 'description' => 'valid service B', 'definition' => nil }
+        @service_3 = { 'name' => 'entropy_service_id_3', 'description' => 'entropy service C', 'definition' => nil }
+        @service_4 = { 'name' => 'service_id_4', 'description' => 'entropy service D', 'definition' => nil }
+        @service_5 = { 'name' => 'service_id_5', 'description' => 'service E', 'definition' => nil }
+        @secure_service = { 'name' => 'secure_service', 'description' => 'secure service B' }
         @service_component = nil
         @uri = nil
         @service_component_1 = 'sc1.dev.auto-h.net'
@@ -47,7 +47,7 @@ module ServiceRegistry
       end
 
       def service_included_in_results?
-        success? and (data['services'][@service['id']] == @service)
+        success? and (data['services'][@service['name']] == @service)
       end
 
       def given_a_new_domain_perspective
@@ -130,7 +130,7 @@ module ServiceRegistry
       end
 
       def register_service_definition
-        process_result(@iut.register_service_definition(@service.is_a?(Hash) ? @service['id'] : @service, @service_definition))
+        process_result(@iut.register_service_definition(@service.is_a?(Hash) ? @service['name'] : @service, @service_definition))
       end
 
       def associate_service_with_two_service_components
@@ -143,7 +143,7 @@ module ServiceRegistry
       end
 
       def given_a_valid_service
-        @service = @valid_service['id']
+        @service = @valid_service['name']
         @iut.register_service(@valid_service)
         result = @iut.service_definition_for_service(@service)
         @pre_service_definition = result['status'] == 'fail' ? nil : result['data']['definition']

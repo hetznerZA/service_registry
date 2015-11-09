@@ -25,17 +25,17 @@ module ServiceRegistry
       def register_service(service)
         return fail('not authorized') if not @authorized
         return fail('failure registering service') if @broken
-        return fail('no service identifier provided') if service.nil? or service['id'].nil?
-        return fail('invalid service identifier provided') if ((not service.is_a? Hash) or (service['id'].strip == ""))
-        return fail('service already exists') if not @services[service['id']].nil?
-        @services[service['id']] = service
+        return fail('no service identifier provided') if service.nil? or service['name'].nil?
+        return fail('invalid service identifier provided') if ((not service.is_a? Hash) or (service['name'].strip == ""))
+        return fail('service already exists') if not @services[service['name']].nil?
+        @services[service['name']] = service
         success('service registered')
       end
 
       def query_service_by_pattern(pattern)
         result = {}
         @services.each do |key, service|
-          result[service['id']] = service if service['description'].include?(pattern) and check_dss(service)
+          result[service['name']] = service if service['description'].include?(pattern) and check_dss(service)
         end
         success_data({ 'services' => result })
       end
@@ -334,7 +334,7 @@ service component has domain perspective associations
 
       def check_dss(service)
         return true if not service['meta'].include?('dss')
-        result = @dss.query(service['id'])
+        result = @dss.query(service['name'])
         return false if result.nil? or result == 'error'
         result
       end
@@ -370,7 +370,7 @@ service component has domain perspective associations
           matches << service if (id == pattern) or (service['description'] and service['description'].include?(pattern)) or (service['definition'] and service['definition'].include?(pattern))
         end
         matches.each do |service|
-          service['service_components'] = service_service_component_associations(service['id'])
+          service['service_components'] = service_service_component_associations(service['name'])
         end
         matches
       end
