@@ -23,8 +23,11 @@ module ServiceRegistry
       def report(status, message, result = nil)
         data ||= {}
         result = { 'result' => result} if not result.is_a? Hash
+        result.each do |key, value|
+          data[key] = value
+        end
         data['notifications'] = message.is_a?(Array) ? message : [ message ] 
-        { 'status' => status, 'data' => result }
+        { 'status' => status, 'data' => data }
       end
 
       def fail(message = nil, data = nil)

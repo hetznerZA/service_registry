@@ -111,7 +111,7 @@ module ServiceRegistry
       end
 
       def services_found?
-        not data['services'].empty?
+        (not data.nil?) and (not data['services'].nil?) and (not data['services'].empty?)
       end
 
       def single_service_match?
