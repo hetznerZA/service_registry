@@ -18,7 +18,7 @@ module ServiceRegistry
       end
 
       def fix
-        @juddi.set_host(@tfa_uri)
+        @juddi.set_uri(@tfa_uri)
         @broken = false
       end
 
@@ -39,6 +39,7 @@ module ServiceRegistry
         success('service registered')
 
         rescue => ex
+          fix if @broken
           fail('failure registering service')
       end
 
@@ -51,15 +52,28 @@ module ServiceRegistry
           end
         end
         success_data({'registered' => registered})
-
-        rescue => ex
-          return success_data({'registered' => false}) if (not @juddi.available?['available']) and @broken
-          raise ex
       end
 
       def deregister_service(service)
         authorize
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service identifier provided') if service.strip == ""
+        registered = service_registered?(service)
+        return success('unknown service') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
         result = @juddi.delete_service(service)
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        success('service deregistered')
+
+      rescue => ex
+        fix if @broken
+        fail('failure deregistering service')        
+      end
+
+      def register_service_definition(service, definition)
+        service = @juddi.get_service(service)
+        service['definition'] = definition
+        @juddi.save_service(service['name'], service['description'], service['definition'])
       end
 
       private

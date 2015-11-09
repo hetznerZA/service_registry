@@ -7,6 +7,7 @@ Feature: De-registering a service
 
   Scenario: Not authorized
     Given unauthorized publisher
+    And a registered service   
     When I request deregistration of the service
     Then I receive 'not authorized' notification
 
