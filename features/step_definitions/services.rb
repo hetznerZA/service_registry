@@ -258,3 +258,7 @@ end
 Given(/^no service definition associated with it$/) do
   @test.no_service_definition_associated
 end
+
+Then(/^I receive 'service definition deregistered' notification$/) do
+  expect(@test.has_received_notification?('service definition deregistered')).to eq(true)
+end

@@ -15,7 +15,7 @@ module ServiceRegistry
       end
 
       def given_a_pattern
-        @need = 'entropy'
+        @need = 'hetznerZA'
       end
 
       def given_service_with_pattern_in_id

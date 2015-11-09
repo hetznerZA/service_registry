@@ -6,6 +6,7 @@ Feature: Deregistering a service definition
 
   Scenario: Not authorized
     Given unauthorized publisher
+    And a registered service
     When I deregister the service definition
     Then I receive 'not authorized' notification
 
@@ -19,5 +20,5 @@ Feature: Deregistering a service definition
     And a valid service definition
     And the service definition describes the service
     When I deregister the service definition
-    Then I receive 'success' notification
+    Then I receive 'service definition deregistered' notification
     And the service is no longer described by the service definition

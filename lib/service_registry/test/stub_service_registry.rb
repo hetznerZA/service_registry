@@ -275,7 +275,7 @@ service component has domain perspective associations
         return fail('invalid service identifier provided') if service.nil? or (service.strip == "")
         return fail('unknown service identifier provided') if @services[service].nil?
         @services[service].delete('definition')
-        success
+        success('service definition deregistered')
       end
 
       def service_registered?(service)

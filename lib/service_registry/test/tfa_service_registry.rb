@@ -71,9 +71,34 @@ module ServiceRegistry
       end
 
       def register_service_definition(service, definition)
-        service = @juddi.get_service(service)
+        result = @juddi.get_service(service)
+        service = result['data']
         service['definition'] = definition
         @juddi.save_service(service['name'], service['description'], service['definition'])
+      end
+
+      def service_definition_for_service(service)
+        return fail('no service provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        registered = service_registered?(service)
+        return success('unknown service') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        result = @juddi.get_service(service)['data']
+        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('service has no definition') if (result['definition'].nil?) or (result['definition'] == "")
+        return success_data({'definition' => result['definition']}) if (not result.nil?) and (not result['definition'].nil?)
+      end
+
+      def deregister_service_definition(service)
+        return fail('no service provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        registered = service_registered?(service)
+        return success('unknown service') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        result = @juddi.get_service(service)
+        service = result['data']
+        service['definition'] = ""
+        result = @juddi.save_service(service['name'], service['description'], service['definition'])
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        success('service definition deregistered')
       end
 
       private

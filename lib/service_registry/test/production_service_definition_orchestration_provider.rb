@@ -1,6 +1,9 @@
 module ServiceRegistry
   module Test
     class ProductionServiceDefinitionOrchestrationProvider < BaseServiceDefinitionOrchestrationProvider
+      def no_service_definition_associated
+    	@iut.deregister_service_definition(@service.is_a?(Hash) ? @service['name'] : @service)
+      end
     end
   end
 end
