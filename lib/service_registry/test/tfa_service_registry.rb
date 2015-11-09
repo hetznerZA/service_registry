@@ -179,7 +179,7 @@ module ServiceRegistry
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
 
         registered = domain_perspective_registered?(domain_perspective)
-        return fail('domain perspective unknown') if (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return fail('domain perspective unknown') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
         # return fail('domain perspective has associations') if does_domain_perspective_have_service_components_associated?(domain_perspective)
 
         result = @juddi.delete_business(domain_perspective)
@@ -190,6 +190,13 @@ module ServiceRegistry
       rescue => ex
         fix if @broken
         fail('failure deregistering domain perspective')        
+      end
+
+      # ---- associations ----
+      def associate_service_component_with_domain_perspective(domain_perspective, service_component)
+      end
+
+      def delete_domain_perspective_service_component_associations(domain_perspective)
       end
 
       private
