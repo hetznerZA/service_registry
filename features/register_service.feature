@@ -5,8 +5,8 @@ Feature: Registering services
   I want to register the service
 
   Scenario: Not authorized
-    Given unauthorized publisher
-    And a new service identifier
+    Given a new service identifier
+    And unauthorized publisher
     When I request registration of the service
     Then I receive 'not authorized' notification
 

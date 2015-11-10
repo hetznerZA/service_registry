@@ -50,6 +50,7 @@ In order to create services in jUDDI, a tModel hierarchy needs to be in place. L
 uddi:hetzner.co.za:hetzner (select Create-Business)
 uddi:hetzner.co.za:keygenerator (select Create-tModel Partion)
 uddi:hetzner.co.za:services:keygenerator (select Create-tModel Partion)
+uddi:hetzner.co.za:service-components:keygenerator (select Create-tModel Partion)
 
 Businesses represent companies and departments in the company. They allow services to be associated with them as well as contact details. Domain perspectives are like departments, but purely from a grouping of services perspective. They do how-ever also have contact associated, and of course services. This makes the businesses type a good fit for domain perspectives.
 

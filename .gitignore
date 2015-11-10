@@ -1,3 +1,4 @@
+test_tfa.sh
 iut-list
 juddi-distro-3.3.1
 *.zip

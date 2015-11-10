@@ -8,10 +8,12 @@ module ServiceRegistry
 
       def initialize
         @tfa_uri = "http://localhost:8080"
-        @juddi = ServiceRegistry::Providers::JUDDIProvider.new(ServiceRegistry::HETZNER_BASE_URN,
-                                                               ServiceRegistry::HETZNER_URN,
-                                                               ServiceRegistry::HETZNER_DOMAINS_URN,
-                                                               ServiceRegistry::HETZNER_SERVICES_URN)
+        urns = { 'base' => ServiceRegistry::HETZNER_BASE_URN,
+                 'company' => ServiceRegistry::HETZNER_URN,
+                 'domains' => ServiceRegistry::HETZNER_DOMAINS_URN,
+                 'services' => ServiceRegistry::HETZNER_SERVICES_URN,
+                 'service-components' => ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}
+        @juddi = ServiceRegistry::Providers::JUDDIProvider.new(urns)
         @juddi.set_uri(@tfa_uri)
         @authorized = true
         @credentials = { 'username' => 'uddi', 'password' => 'uddi' }
@@ -143,6 +145,10 @@ module ServiceRegistry
           end
         end
         result
+
+      rescue => ex
+        fix if @broken
+        fail('failure listing domain perspectives')          
       end
 
       def domain_perspective_registered?(domain_perspective)
@@ -158,14 +164,17 @@ module ServiceRegistry
 
       def register_domain_perspective(domain_perspective)
         authorize
+
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective') if (domain_perspective and domain_perspective.strip == "")
         registered = domain_perspective_registered?(domain_perspective)
         return fail('domain perspective already exists') if (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
 
         result = @juddi.save_business(domain_perspective)
+
         return fail('invalid domain perspective') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+
         success('domain perspective registered')
 
       rescue => ex
@@ -192,6 +201,60 @@ module ServiceRegistry
         fail('failure deregistering domain perspective')        
       end
 
+      # ---- service components ----
+
+      def list_service_components(domain_perspective = nil)
+        result = @juddi.find_service_components
+        result['data']['service_components'] = {}.merge!(result['data']['services']) if ServiceRegistry::Providers::JSendProvider::has_data?(result) and result['data']['services']
+        #return fail('failure retrieving service components') if @broken
+        #return success_data({ 'service_components' => @service_components }) if domain_perspective.nil?
+        #result = domain_perspective_associations(domain_perspective)
+        #success_data({ 'service_components' => result['data']['associations'] })
+      end
+
+      def register_service_component(service_component)
+        authorize
+        return fail('no service component identifier provided') if service_component.nil?
+        return fail('invalid service component identifier') if service_component.strip == ""
+        registered = service_component_registered?(service_component)
+        return fail('service component already exists') if (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        result = @juddi.save_service_component(service_component)
+        return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        success('service component registered')
+
+        rescue => ex
+          fix if @broken
+          fail('failure registering service component')
+      end
+
+      def deregister_service_component(service_component)
+      #   authorize
+      #   return fail('no service identifier provided') if service.nil?
+      #   return fail('invalid service identifier provided') if service.strip == ""
+      #   registered = service_registered?(service)
+      #   return success('unknown service') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+      #   result = @juddi.delete_service(service)
+      #   return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+      #   return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+      #   success('service deregistered')
+
+      def service_component_registered?(service_component)
+        result = @juddi.find_service_components(service_component)
+        registered = false
+        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
+          result['data']['services'].each do |service_key, description|
+            registered = (service_component.downcase == service_key.downcase)
+          end
+        end
+        success_data({'registered' => registered})
+      end
+
+
+      # rescue => ex
+      #   fix if @broken
+      #   fail('failure deregistering service')        
+      end
       # ---- associations ----
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)
       end

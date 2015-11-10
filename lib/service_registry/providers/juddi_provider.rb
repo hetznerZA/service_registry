@@ -4,13 +4,10 @@ require 'byebug'
 module ServiceRegistry
   module Providers
     class JUDDIProvider < JSendProvider
-      def initialize(base_urn, company_urn, domain_urn, services_urn)
+      def initialize(urns)
         @auth_user = ''
         @auth_password = ''
-        @base_urn = base_urn
-        @company_urn = company_urn
-        @domain_urn = domain_urn
-        @services_urn = services_urn
+        @urns = urns
       end
 
       def set_uri(uri)
@@ -31,7 +28,7 @@ module ServiceRegistry
             url_type = 'https' if binding.include?('https')
             url_type = 'http' if (not binding.include?('https') and binding.include?('http'))
             url_type ||= 'unknown'
-            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='#{@services_urn}:#{service}'><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
+            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='#{@urns['services']}:#{service}'><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
           end
         end
         request_soap('publishv2', 'save_binding', body) do | res|
@@ -40,7 +37,7 @@ module ServiceRegistry
       end
 
       def find_bindings(name)
-        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{@services_urn}:#{name}</urn:serviceKey>") do |res|
+        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{@urns['services']}:#{name}</urn:serviceKey>") do |res|
           extract_bindings(res.body)
         end
       end
@@ -53,23 +50,15 @@ module ServiceRegistry
       end
 
       def get_service(name)
-        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{@services_urn}:#{name}</urn:serviceKey>") do |res|
-          { 'name' => extract_name(res.body),
-            'description' => extract_description(res.body),
-            'definition' => extract_service_definition(res.body) }
-        end
+        get_service_element(name, @urns['services'])
       end
 
       def save_service(name, description = nil, definition = nil)
-        authorize
-        body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessService businessKey='#{@company_urn}' serviceKey='#{@services_urn}:#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
-        body = body + "<urn:description xml:lang='en'>#{description}</urn:description>" if description and not (description == "")
-        body = body + "<urn:categoryBag><urn:keyedReference tModelKey='uddi:uddi.org:wadl:types' keyName='service-definition' keyValue='#{definition}'></urn:keyedReference></urn:categoryBag>" if definition and not (definition.strip == "")
-        body = body + "</urn:businessService>"
+        save_service_element(name, description, definition, @urns['services'])
+      end
 
-        request_soap('publishv2', 'save_service', body) do | res|
-          extract_service(res.body)
-        end
+      def delete_service(name)
+        delete_service_element(name, @urns['services'])
       end
 
       def find_services(pattern = nil)
@@ -77,23 +66,29 @@ module ServiceRegistry
 
         request_soap('inquiryv2', 'find_service',
         "<findQualifiers> <findQualifier>approximateMatch</findQualifier> <findQualifier>orAllKeys</findQualifier> </findQualifiers> <name>#{pattern}</name>") do |res|
-          extract_service_entries(res.body)
+          extract_service_entries_elements(res.body, @urns['services'])
         end
       end
 
-      def delete_service(name)
-        authorize
-        request_soap('publishv2', 'delete_service', "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:serviceKey>#{@services_urn}:#{name}</urn:serviceKey>") do |res|
-          { 'errno' => extract_errno(res.body) }
+      def get_service_component(name)
+        get_service_element(name, @urns['service-components'])
+      end
+
+      def save_service_component(name, description = nil, definition = nil)
+        save_service_element(name, description, definition, @urns['service-components'])
+      end
+
+      def delete_service_component(name)
+        delete_service_element(name, @urns['service-components'])
+      end
+
+      def find_service_components(pattern = nil)
+        pattern = pattern.nil? ? '%' : "%#{pattern}%"
+
+        request_soap('inquiryv2', 'find_service',
+        "<findQualifiers> <findQualifier>approximateMatch</findQualifier> <findQualifier>orAllKeys</findQualifier> </findQualifiers> <name>#{pattern}</name>") do |res|
+          extract_service_entries_elements(res.body, @urns['service-components'])
         end
-      end
-
-      def service_urn(service)
-        "#{@services_urn}:#{service}"
-      end
-
-      def business_urn(business)
-        "#{@domain_urn}#{business}"
       end
 
       def available?
@@ -103,8 +98,8 @@ module ServiceRegistry
       def save_business(name)
         authorize
         request_soap('publishv2', 'save_business',
-                     "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessEntity businessKey='#{@domain_urn}#{name}'><name>#{name}</name></urn:businessEntity>") do | res|
-          extract_service(res.body)
+                     "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessEntity businessKey='#{@urns['domains']}#{name}'><name>#{name}</name></urn:businessEntity>") do | res|
+          extract_business(res.body)
         end
       end
 
@@ -119,29 +114,61 @@ module ServiceRegistry
       def delete_business(name)
         authorize
         request_soap('publishv2', 'delete_business',
-        "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessKey>#{@domain_urn}#{name}</urn:businessKey>") do |res|
+        "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessKey>#{@urns['domains']}#{name}</urn:businessKey>") do |res|
           { 'errno' => extract_errno(res.body) }
         end
       end
 
       def business_eq?(business, comparison)
-        business == "#{@domain_urn}#{comparison}"
+        business == "#{@urns['domains']}#{comparison}"
       end    
 
     private
+      def get_service_element(name, urn)
+        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{urn}:#{name}</urn:serviceKey>") do |res|
+          { 'name' => extract_name(res.body),
+            'description' => extract_description(res.body),
+            'definition' => extract_service_definition(res.body) }
+        end
+      end
+
+      def save_service_element(name, description, definition, urn)
+        authorize
+        body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessService businessKey='#{@urns['company']}' serviceKey='#{urn}:#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
+        body = body + "<urn:description xml:lang='en'>#{description}</urn:description>" if description and not (description == "")
+        body = body + "<urn:categoryBag><urn:keyedReference tModelKey='uddi:uddi.org:wadl:types' keyName='service-definition' keyValue='#{definition}'></urn:keyedReference></urn:categoryBag>" if definition and not (definition.strip == "")
+        body = body + "</urn:businessService>"
+
+        request_soap('publishv2', 'save_service', body) do | res|
+          extract_service(res.body)
+        end
+      end
+
+      def delete_service_element(name, urn)
+        authorize
+        request_soap('publishv2', 'delete_service', "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:serviceKey>#{urn}:#{name}</urn:serviceKey>") do |res|
+          { 'errno' => extract_errno(res.body) }
+        end
+      end
+
       def extract_service(soap)
         entries = {}
         entries[extract_service_id(soap)] = extract_name(soap)
         entries
       end
 
-      def extract_service_entries(soap)
+      def extract_service_entries_elements(soap, urn)
         entries = {}
-        entry = soap[/<ns2:serviceInfos>(.*?)<\/ns2:serviceInfos>/, entries.size + 1]
+        entry = soap[/<ns2:serviceInfos>(.*?)<\/ns2:serviceInfos>/, 1]
 
         while entry do
-          entries[extract_service_id(entry).gsub(@services_urn + ":", "")] = extract_name(entry)
-          entry = soap[/<ns2:serviceInfos>(.*?)<\/ns2:serviceInfos>/, entries.size + 1]
+          service = entry[/<ns2:serviceInfo (.*?)<\/ns2:serviceInfo>/, 1]
+          break if service.nil?
+          id = extract_service_id(service)
+          entries[id.gsub(urn + ":", "")] = extract_name(service) if id.include?(urn)
+          entry[/<ns2:serviceInfo (.*?)<\/ns2:serviceInfo>/, 1] = ""
+          entry.gsub!("<ns2:serviceInfo </ns2:serviceInfo>", "")
+          entry = nil if entry.strip == ""
         end
         { 'services' => entries }
       end
@@ -156,21 +183,22 @@ module ServiceRegistry
 
       def extract_business(soap)
         entries = {}
-        entries[extract_business_id(soap).gsub(@domain_urn, "")] = extract_name(soap)
+        entries[extract_business_id(soap).gsub(@urns['domains'], "")] = extract_name(soap)
         entries
       end
 
       def extract_business_entries(soap)
         entries = {}
-        entry = soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1]
-
+        entry = soap[/<ns2:businessList (.*?)<\/ns2:businessList>/, 1]
         while entry do
-          entry[/<ns2:serviceInfos(.*?)<\/ns2:serviceInfos>/, 1] = "" if entry[/<ns2:serviceInfos(.*?)<\/ns2:serviceInfos>/, 1]
-          # only include Hetzner entries
-          entries[extract_business_id(entry).gsub(@domain_urn, "")] = extract_name(entry) if extract_business_id(entry).include?(@domain_urn)
-          soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1] = "" if soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1]
-          soap.gsub!("<ns2:businessInfo </ns2:businessInfo>", "")
-          entry = soap[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1]
+          business = entry[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1]
+          break if business.nil?
+          business[/<ns2:serviceInfos(.*?)<\/ns2:serviceInfos>/, 1] = "" if business[/<ns2:serviceInfos(.*?)<\/ns2:serviceInfos>/, 1]
+          id = extract_business_id(entry)
+          entries[id.gsub(@urns['domains'], "")] = extract_name(entry) if id.include?(@urns['domains'])
+          entry[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1] = ""
+          entry.gsub!("<ns2:businessInfo </ns2:businessInfo>", "")
+          entry = nil if entry.strip == ""
         end
         { 'businesses' => entries }
       end
@@ -190,6 +218,7 @@ module ServiceRegistry
           soap[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1] = ""
           soap.gsub!("<ns2:bindingTemplate </ns2:bindingTemplate>", "")
           entry = soap[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1]
+          entry = nil if entry.strip == ""
         end
         { 'bindings' => entries }
       end
@@ -251,6 +280,7 @@ module ServiceRegistry
       end
 
       def authorize
+        @auth_token = '' # clear any existing token
         req = connection('security', 'get_authToken')
         req.body = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:urn='urn:uddi-org:api_v3'> <soapenv:Header/> <soapenv:Body> <urn:get_authToken userID='#{@auth_user}' cred='#{@auth_password}'/> </soapenv:Body> </soapenv:Envelope>"
         result = execute(req) do |res|
