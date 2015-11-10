@@ -76,6 +76,8 @@ module ServiceRegistry
 
       def given_existing_service_component_identifier
         @iut.register_service_component(@service_component_1)
+        process_result(@iut.service_component_uri(@service_component_1))
+        @pre_uri = data['uri']
         @service_component = @service_component_1
       end
 

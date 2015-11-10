@@ -249,7 +249,6 @@ module ServiceRegistry
          authorize
          return fail('no service component identifier provided') if service_component.nil?
          return fail('invalid service component identifier') if service_component.strip == ""
-         # byebug
          return success('service component unknown') if not is_registered?(service_component_registered?(service_component))
          result = @juddi.delete_business(service_component)
          return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
@@ -260,6 +259,33 @@ module ServiceRegistry
          fix if @broken
          fail('failure deregistering service component')        
       end
+
+      def configure_service_component_uri(service_component, uri)
+        authorize
+        return fail('no service component provided') if service_component.nil?
+        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('no URI provided') if uri.nil?
+        return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
+        result = @juddi.save_service_component_uri(service_component, uri)
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service component identifier or URI') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        success
+
+       rescue => ex
+         fix if @broken
+         fail('failure configuring service component')
+      end
+
+      def service_component_uri(service_component)
+        return fail('no service component provided') if service_component.nil?
+        return fail('invalid service component identifier') if (service_component.strip == "")
+        result = @juddi.find_service_component_uri(service_component)
+        return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        uri = (ServiceRegistry::Providers::JSendProvider::has_data?(result, 'bindings') and result['data']['bindings'].first) ? result['data']['bindings'].first[1] : nil
+        result['data']['uri'] = uri
+        result
+      end      
+
       # ---- associations ----
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)
       end

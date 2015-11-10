@@ -19,36 +19,6 @@ module ServiceRegistry
         @auth_password =auth_password
       end
 
-      def save_bindings(service, bindings)
-        authorize
-        body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo>"
-        if (not bindings.nil?) and (not (bindings.size == 0))
-          bindings.each do |binding|
-            url_type = nil
-            url_type = 'https' if binding.include?('https')
-            url_type = 'http' if (not binding.include?('https') and binding.include?('http'))
-            url_type ||= 'unknown'
-            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='#{@urns['services']}:#{service}'><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
-          end
-        end
-        request_soap('publishv2', 'save_binding', body) do | res|
-          extract_bindings(res.body)
-        end
-      end
-
-      def find_bindings(name)
-        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{@urns['services']}:#{name}</urn:serviceKey>") do |res|
-          extract_bindings(res.body)
-        end
-      end
-
-      def delete_binding(binding)
-        authorize
-        request_soap('publishv2', 'delete_binding', "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:bindingKey>#{binding}</urn:bindingKey>") do |res|
-          { 'errno' => extract_errno(res.body) }
-        end
-      end
-
       def get_service(name)
         get_service_element(name, @urns['services'])
       end
@@ -123,7 +93,52 @@ module ServiceRegistry
         business == "#{@urns['domains']}#{comparison}"
       end    
 
+      def save_service_component_uri(service_component, uri)
+        result = find_element_bindings(service_component, @urns['service-components'])
+        # only one binding for service components
+        if result and result['data'] and result['data']['bindings'] and (result['data']['bindings'].size > 0)
+          result['data']['bindings'].each do |binding, uri|
+            delete_binding(binding)
+          end
+        end
+        save_element_bindings(service_component, [uri], @urns['service-components'])
+      end
+
+      def find_service_component_uri(service_component)
+        find_element_bindings(service_component, @urns['service-components'])
+      end
+
     private
+      def save_element_bindings(service, bindings, urn)
+        authorize
+        body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo>"
+        if (not bindings.nil?) and (not (bindings.size == 0))
+          bindings.each do |binding|
+            url_type = nil
+            url_type = 'https' if binding.include?('https')
+            url_type = 'http' if (not binding.include?('https') and binding.include?('http'))
+            url_type ||= 'unknown'
+            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='#{urn}:#{service}'><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
+          end
+        end
+        request_soap('publishv2', 'save_binding', body) do | res|
+          res.body
+        end
+      end
+
+      def find_element_bindings(name, urn)
+        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{urn}:#{name}</urn:serviceKey>") do |res|
+          extract_bindings(res.body)
+        end
+      end
+
+      def delete_binding(binding)
+        authorize
+        request_soap('publishv2', 'delete_binding', "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:bindingKey>#{binding}</urn:bindingKey>") do |res|
+          { 'errno' => extract_errno(res.body) }
+        end
+      end
+
       def get_service_element(name, urn)
         request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{urn}:#{name}</urn:serviceKey>") do |res|
           { 'name' => extract_name(res.body),
@@ -209,15 +224,14 @@ module ServiceRegistry
 
       def extract_bindings(soap)
         entries = {}
-        entry = soap[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1]
-
+        entry = soap[/<ns2:bindingTemplates>(.*?)<\/ns2:bindingTemplates>/, 1]
         while entry do
-          # only include Hetzner entries
-          entries[extract_binding_id(entry)] = extract_access_point(entry)
-          # this trickery here is required as the regex match gets in trouble
-          soap[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1] = ""
-          soap.gsub!("<ns2:bindingTemplate </ns2:bindingTemplate>", "")
-          entry = soap[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1]
+          binding = entry[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1]
+          break if binding.nil?
+          id = extract_binding_id(binding)
+          entries[id] = extract_access_point(binding)
+          entry[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1] = ""
+          entry.gsub!("<ns2:bindingTemplate </ns2:bindingTemplate>", "")
           entry = nil if entry.strip == ""
         end
         { 'bindings' => entries }
