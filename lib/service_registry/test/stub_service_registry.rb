@@ -45,10 +45,6 @@ module ServiceRegistry
         success
       end
 
-      def reset_service_components
-        @service_components = []
-      end
-
       def list_domain_perspectives
         return fail('failure listing domain perspectives') if @broken
         success_data({ 'domain_perspectives' => @domain_perspectives })

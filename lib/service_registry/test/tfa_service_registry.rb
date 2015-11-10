@@ -198,16 +198,27 @@ module ServiceRegistry
       def list_service_components(domain_perspective = nil)
         result = @juddi.find_service_components
         service_components = ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services') ? result['data']['services'] : {}
-        result['data']['service_components'] = {}.merge!(service_components)
+
+        if (domain_perspective)
+          list = service_components
+          service_components.each do |service_component|
+            list.delete(service_component) if false #check service component - domain perspective association here by businessKey
+          end
+          service_components = list
+        end
+        result['data']['service_components'] = []
+        service_components.each do |service_component, description|
+          result['data']['service_components'] << service_component
+        end
         result['data'].delete('services')
         result
-        #return fail('failure retrieving service components') if @broken
-        #return success_data({ 'service_components' => @service_components }) if domain_perspective.nil?
-        #result = domain_perspective_associations(domain_perspective)
-        #success_data({ 'service_components' => result['data']['associations'] })
+
+      rescue => ex
+        fix if @broken
+        fail('failure retrieving service components')           
       end
 
-      def reset_service_components
+      def delete_all_service_components
         authorize
         return if not @authorized
         result = list_service_components
@@ -284,7 +295,7 @@ module ServiceRegistry
         uri = (ServiceRegistry::Providers::JSendProvider::has_data?(result, 'bindings') and result['data']['bindings'].first) ? result['data']['bindings'].first[1] : nil
         result['data']['uri'] = uri
         result
-      end      
+      end   
 
       # ---- associations ----
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)

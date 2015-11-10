@@ -33,9 +33,9 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/associate_service_component_with_domain_perspective.feature associating service components with domain perspectives} when modelling the domain.
 * {file:features/associate_service_component_with_domain_perspective.feature changing domain perspective service component associations} when modelling the domain.
 * {file:features/remove_service_component_domain_perspective_association.feature removing domain perspective service component associations} when modelling the domain.
-* Not supported by design: {file:features/service_domain_perspective_association.feature associating services with domain perspectives} when modelling the domain.
-* Not supported by design: {file:features/service_domain_perspective_association.feature changing domain perspective service associations} when modelling the domain.
-* Not supported by design: {file:features/service_domain_perspective_association.feature removing domain perspective service associations} when modelling the domain.
+* Not supported by design: {file:features/service_domain_perspective_association.readme associating services with domain perspectives} when modelling the domain.
+* Not supported by design: {file:features/service_domain_perspective_association.readme changing domain perspective service associations} when modelling the domain.
+* Not supported by design: {file:features/service_domain_perspective_association.readme removing domain perspective service associations} when modelling the domain.
 * {file:features/associate_service_component_with_service.feature associating service components with services} when provisioning services.
 * {file:features/associate_service_component_with_service.feature changing service associations} when provisioning services.
 * {file:features/remove_service_component_service_association.feature removing service associations} when provisioning services.
