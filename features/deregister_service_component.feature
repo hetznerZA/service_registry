@@ -6,7 +6,8 @@ Feature: De-registering a service component
   I want to deregister the service component
 
   Scenario: Not authorized
-    Given unauthorized publisher
+    Given existing service component identifier
+    And unauthorized publisher
     When I request deregistration of the service component
     Then I receive 'not authorized' notification
 

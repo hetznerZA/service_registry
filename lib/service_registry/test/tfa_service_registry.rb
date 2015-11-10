@@ -246,18 +246,19 @@ module ServiceRegistry
       end
 
       def deregister_service_component(service_component)
-      #   authorize
-      #   return fail('no service identifier provided') if service.nil?
-      #   return fail('invalid service identifier provided') if service.strip == ""
-      #   return success('unknown service') if not is_registered?(service_registered?(service))
-      #   result = @juddi.delete_service(service)
-      #   return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-      #   return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
-      #   success('service deregistered')
+         authorize
+         return fail('no service component identifier provided') if service_component.nil?
+         return fail('invalid service component identifier') if service_component.strip == ""
+         # byebug
+         return success('service component unknown') if not is_registered?(service_component_registered?(service_component))
+         result = @juddi.delete_business(service_component)
+         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+         return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+         success('service component deregistered')
 
-      # rescue => ex
-      #   fix if @broken
-      #   fail('failure deregistering service')        
+       rescue => ex
+         fix if @broken
+         fail('failure deregistering service component')        
       end
       # ---- associations ----
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)
