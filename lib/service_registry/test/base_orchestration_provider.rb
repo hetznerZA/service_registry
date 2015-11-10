@@ -105,6 +105,7 @@ module ServiceRegistry
       end
 
       def given_new_service_component_identifier
+        @iut.reset_service_components
         @service_component = @service_component_1
       end
 

@@ -5,7 +5,8 @@ Feature: Registering service components
   I want to register the service component
 
   Scenario: Not authorized
-    Given unauthorized publisher
+    Given a new service component identifier
+    And unauthorized publisher
     When I request registration of the service component
     Then I receive 'not authorized' notification
 

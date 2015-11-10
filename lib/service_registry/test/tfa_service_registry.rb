@@ -35,8 +35,7 @@ module ServiceRegistry
         authorize
         return fail('no service identifier provided') if service.nil? or service['name'].nil?
         return fail('invalid service identifier provided') if ((not service.is_a? Hash) or (service['name'].strip == ""))
-        registered = service_registered?(service['name'])
-        return fail('service already exists') if (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return fail('service already exists') if is_registered?(service_registered?(service['name']))
         result = @juddi.save_service(service['name'], service['description'], service['definition'])
         return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
@@ -62,8 +61,7 @@ module ServiceRegistry
         authorize
         return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if service.strip == ""
-        registered = service_registered?(service)
-        return success('unknown service') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return success('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.delete_service(service)
         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
         return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
@@ -80,8 +78,7 @@ module ServiceRegistry
         authorize       
         return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
-        registered = service_registered?(service)
-        return success('unknown service identifier provided') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return success('unknown service identifier provided') if not is_registered?(service_registered?(service))
         return fail('no service definition provided') if definition.nil?
         return fail('invalid service definition provided') if not definition.include?("wadl")
 
@@ -100,8 +97,7 @@ module ServiceRegistry
       def service_definition_for_service(service)
         return fail('no service provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
-        registered = service_registered?(service)
-        return success('unknown service') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return success('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)['data']
         return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
         return fail('service has no definition') if (result['definition'].nil?) or (result['definition'] == "")
@@ -112,8 +108,7 @@ module ServiceRegistry
         authorize
         return fail('no service provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
-        registered = service_registered?(service)
-        return success('unknown service') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return success('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)
         service = result['data']
         service['definition'] = ""
@@ -167,8 +162,7 @@ module ServiceRegistry
 
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective') if (domain_perspective and domain_perspective.strip == "")
-        registered = domain_perspective_registered?(domain_perspective)
-        return fail('domain perspective already exists') if (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return fail('domain perspective already exists') if is_registered?(domain_perspective_registered?(domain_perspective))
 
         result = @juddi.save_business(domain_perspective)
 
@@ -187,8 +181,7 @@ module ServiceRegistry
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
 
-        registered = domain_perspective_registered?(domain_perspective)
-        return fail('domain perspective unknown') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return fail('domain perspective unknown') if not is_registered?(domain_perspective_registered?(domain_perspective))
         # return fail('domain perspective has associations') if does_domain_perspective_have_service_components_associated?(domain_perspective)
 
         result = @juddi.delete_business(domain_perspective)
@@ -202,22 +195,46 @@ module ServiceRegistry
       end
 
       # ---- service components ----
-
       def list_service_components(domain_perspective = nil)
         result = @juddi.find_service_components
-        result['data']['service_components'] = {}.merge!(result['data']['services']) if ServiceRegistry::Providers::JSendProvider::has_data?(result) and result['data']['services']
+        service_components = ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services') ? result['data']['services'] : {}
+        result['data']['service_components'] = {}.merge!(service_components)
+        result['data'].delete('services')
+        result
         #return fail('failure retrieving service components') if @broken
         #return success_data({ 'service_components' => @service_components }) if domain_perspective.nil?
         #result = domain_perspective_associations(domain_perspective)
         #success_data({ 'service_components' => result['data']['associations'] })
       end
 
+      def reset_service_components
+        authorize
+        return if not @authorized
+        result = list_service_components
+        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'service_components') 
+          result['data']['service_components'].each do |service_component, description|
+            @juddi.delete_service_component(service_component)
+          end
+        end
+      end
+
+      def service_component_registered?(service_component)
+        result = @juddi.find_service_components(service_component)
+        registered = false
+        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
+          result['data']['services'].each do |service_key, description|
+            registered = (service_component.downcase == service_key.downcase)
+          end
+        end
+        success_data({'registered' => registered})
+      end
+
       def register_service_component(service_component)
         authorize
         return fail('no service component identifier provided') if service_component.nil?
         return fail('invalid service component identifier') if service_component.strip == ""
-        registered = service_component_registered?(service_component)
-        return fail('service component already exists') if (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+        return fail('service component already exists') if is_registered?(service_component_registered?(service_component))
+
         result = @juddi.save_service_component(service_component)
         return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
@@ -232,24 +249,11 @@ module ServiceRegistry
       #   authorize
       #   return fail('no service identifier provided') if service.nil?
       #   return fail('invalid service identifier provided') if service.strip == ""
-      #   registered = service_registered?(service)
-      #   return success('unknown service') if not (ServiceRegistry::Providers::JSendProvider::has_data?(registered) and registered['data']['registered'])
+      #   return success('unknown service') if not is_registered?(service_registered?(service))
       #   result = @juddi.delete_service(service)
       #   return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
       #   return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
       #   success('service deregistered')
-
-      def service_component_registered?(service_component)
-        result = @juddi.find_service_components(service_component)
-        registered = false
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
-          result['data']['services'].each do |service_key, description|
-            registered = (service_component.downcase == service_key.downcase)
-          end
-        end
-        success_data({'registered' => registered})
-      end
-
 
       # rescue => ex
       #   fix if @broken
@@ -267,6 +271,10 @@ module ServiceRegistry
       def authorize
         @juddi.authenticate(@credentials['username'], @credentials['password']) if @authorized
         @juddi.authenticate('', '') if not @authorized
+      end
+
+      def is_registered?(result)
+        ServiceRegistry::Providers::JSendProvider::has_data?(result, 'registered') and result['data']['registered']
       end
     end
   end
