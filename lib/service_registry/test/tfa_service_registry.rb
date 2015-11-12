@@ -36,7 +36,12 @@ module ServiceRegistry
         return fail('no service identifier provided') if service.nil? or service['name'].nil?
         return fail('invalid service identifier provided') if ((not service.is_a? Hash) or (service['name'].strip == ""))
         return fail('service already exists') if is_registered?(service_registered?(service['name']))
-        result = @juddi.save_service(service['name'], service['description'], service['definition'])
+
+        description = []
+        description << service ['description'] if service['description']
+        description << service ['meta'] if service['meta']
+
+        result = @juddi.save_service(service['name'], description, service['definition'])
         return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
         success('service registered')
@@ -75,7 +80,7 @@ module ServiceRegistry
       # ---- service definition ----
 
       def register_service_definition(service, definition)
-        authorize       
+        authorize 
         return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
         return success('unknown service identifier provided') if not is_registered?(service_registered?(service))
@@ -292,10 +297,38 @@ module ServiceRegistry
         return fail('invalid service component identifier') if (service_component.strip == "")
         result = @juddi.find_service_component_uri(service_component)
         return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
-        uri = (ServiceRegistry::Providers::JSendProvider::has_data?(result, 'bindings') and result['data']['bindings'].first) ? result['data']['bindings'].first[1] : nil
+        uri = (ServiceRegistry::Providers::JSendProvider::has_data?(result, 'bindings') and (result['data']['bindings'].size > 0)) ? result['data']['bindings'].first[1]['access_point'] : nil
         result['data']['uri'] = uri
         result
       end   
+
+      # ---- search ----
+      def check_dss(name)
+        result = @dss.query(name)
+        return false if result.nil? or result == 'error'
+        result
+      end
+
+      def query_service_by_pattern(pattern)
+        result = @juddi.find_services
+        list = {}        
+        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
+          result['data']['services'].each do |service, name|
+            detail = @juddi.get_service(service)
+            if ServiceRegistry::Providers::JSendProvider::has_data?(detail, 'description')
+              found = false
+              dss = nil
+              detail['data']['description'].each do |description|
+                found = true if (description and description.include?(pattern))
+                dss = description.gsub("dss:", "").strip if (description and description.include?('dss:'))
+              end
+              list[service] = detail if ((dss and (@dss and check_dss(service))) or (not dss)) and found
+            end
+          end
+        end
+        
+        success_data({ 'services' => list })
+      end
 
       # ---- associations ----
       def associate_service_component_with_domain_perspective(domain_perspective, service_component)

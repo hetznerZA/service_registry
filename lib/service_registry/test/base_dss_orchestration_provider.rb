@@ -10,7 +10,7 @@ module ServiceRegistry
 
         @dss = ServiceRegistry::Test::StubDSS.new
         @iut.associate_dss(@dss)
-        @dss_decorated_service = { 'name' => 'dss_decorated_service_id', 'description' => 'secure service A', 'meta' => 'dss', 'definition' => nil }
+        @dss_decorated_service = { 'name' => 'dss_decorated_service_id', 'description' => 'secure service A', 'meta' => 'dss: http://localhost:9393/dss', 'definition' => nil }
       end
 
       def given_a_service_decorated_with_dss_meta

@@ -48,7 +48,7 @@ module ServiceRegistry
       end
 
       def service_included_in_results?
-        success? and (data['services'][@service['name']] == @service)
+        success? and not (data['services'][@service['name']]).nil?
       end
 
       def given_a_new_domain_perspective

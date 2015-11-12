@@ -24,7 +24,7 @@ module ServiceRegistry
       end
 
       def save_service(name, description = nil, definition = nil)
-        save_service_element(name, description, definition, @urns['services'])
+        save_service_element(name, description.is_a?(Array) ? description : [description], definition, @urns['services'])
       end
 
       def delete_service(name)
@@ -45,7 +45,7 @@ module ServiceRegistry
       end
 
       def save_service_component(name, description = nil, definition = nil)
-        save_service_element(name, description, definition, @urns['service-components'])
+        save_service_element(name, description.is_a?(Array) ? description : [description], definition, @urns['service-components'])
       end
 
       def delete_service_component(name)
@@ -97,11 +97,11 @@ module ServiceRegistry
         result = find_element_bindings(service_component, @urns['service-components'])
         # only one binding for service components
         if result and result['data'] and result['data']['bindings'] and (result['data']['bindings'].size > 0)
-          result['data']['bindings'].each do |binding, uri|
+          result['data']['bindings'].each do |binding, detail|
             delete_binding(binding)
           end
         end
-        save_element_bindings(service_component, [uri], @urns['service-components'])
+        save_element_bindings(service_component, [uri], @urns['service-components'], "service component")
       end
 
       def find_service_component_uri(service_component)
@@ -109,7 +109,7 @@ module ServiceRegistry
       end
 
     private
-      def save_element_bindings(service, bindings, urn)
+      def save_element_bindings(service, bindings, urn, description)
         authorize
         body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo>"
         if (not bindings.nil?) and (not (bindings.size == 0))
@@ -118,7 +118,7 @@ module ServiceRegistry
             url_type = 'https' if binding.include?('https')
             url_type = 'http' if (not binding.include?('https') and binding.include?('http'))
             url_type ||= 'unknown'
-            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='#{urn}:#{service}'><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
+            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='#{urn}:#{service}'><description>#{description}</description><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
           end
         end
         request_soap('publishv2', 'save_binding', body) do | res|
@@ -142,7 +142,7 @@ module ServiceRegistry
       def get_service_element(name, urn)
         request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{urn}:#{name}</urn:serviceKey>") do |res|
           { 'name' => extract_name(res.body),
-            'description' => extract_description(res.body),
+            'description' => extract_descriptions(res.body),
             'definition' => extract_service_definition(res.body) }
         end
       end
@@ -150,7 +150,11 @@ module ServiceRegistry
       def save_service_element(name, description, definition, urn)
         authorize
         body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessService businessKey='#{@urns['company']}' serviceKey='#{urn}:#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
-        body = body + "<urn:description xml:lang='en'>#{description}</urn:description>" if description and not (description == "")
+        if description
+          description.each do |desc|
+            body = body + "<urn:description xml:lang='en'>#{desc}</urn:description>" if desc and not (desc == "")
+          end
+        end
         body = body + "<urn:categoryBag><urn:keyedReference tModelKey='uddi:uddi.org:wadl:types' keyName='service-definition' keyValue='#{definition}'></urn:keyedReference></urn:categoryBag>" if definition and not (definition.strip == "")
         body = body + "</urn:businessService>"
 
@@ -175,7 +179,6 @@ module ServiceRegistry
       def extract_service_entries_elements(soap, urn)
         entries = {}
         entry = soap[/<ns2:serviceInfos>(.*?)<\/ns2:serviceInfos>/, 1]
-
         while entry do
           service = entry[/<ns2:serviceInfo (.*?)<\/ns2:serviceInfo>/, 1]
           break if service.nil?
@@ -229,7 +232,7 @@ module ServiceRegistry
           binding = entry[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1]
           break if binding.nil?
           id = extract_binding_id(binding)
-          entries[id] = extract_access_point(binding)
+          entries[id] = {'access_point' => extract_access_point(binding), 'description' => extract_description(binding)}
           entry[/<ns2:bindingTemplate (.*?)<\/ns2:bindingTemplate>/, 1] = ""
           entry.gsub!("<ns2:bindingTemplate </ns2:bindingTemplate>", "")
           entry = nil if entry.strip == ""
@@ -255,6 +258,17 @@ module ServiceRegistry
         description = soap[/<ns2:description xml:lang="en">(.*?)<\/ns2:description>/, 1]
         description ||= soap[/<ns2:description>(.*?)<\/ns2:description>/, 1]
         description
+      end
+
+      def extract_descriptions(soap)
+        descriptions = []
+        description = soap[/<ns2:description xml:lang="en">(.*?)<\/ns2:description>/, 1]
+        while description do
+          descriptions << description
+          soap.gsub!("<ns2:description xml:lang=\"en\">#{description}<\/ns2:description>", "")
+          description = soap[/<ns2:description xml:lang="en">(.*?)<\/ns2:description>/, 1]
+        end
+        descriptions
       end
 
       def extract_errno(soap)
