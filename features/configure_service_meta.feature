@@ -5,7 +5,9 @@ Feature: Configuring meta for a service
   I want to configure meta for the service
 
   Scenario: Not authorized
-    Given unauthorized publisher
+    Given a registered service
+    And valid meta
+    And unauthorized publisher
     When I request configuration of the service with meta
     Then I receive 'not authorized' notification
 
@@ -25,6 +27,7 @@ Feature: Configuring meta for a service
 
   Scenario: No meta
     Given a registered service
+    And the service has meta configured
     And no meta
     When I request configuration of the service with meta
     Then I receive 'no meta provided' notification
@@ -45,6 +48,7 @@ Feature: Configuring meta for a service
   Scenario: Failure
     Given valid meta
     And a registered service
+    And the service has meta configured
     And a failure
     When I request configuration of the service with meta
     Then I receive 'failure configuring service with meta' notification

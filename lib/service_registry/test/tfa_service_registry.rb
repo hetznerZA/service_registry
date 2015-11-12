@@ -1,5 +1,6 @@
 require 'uri'
 require 'service_registry'
+require 'json'
 
 module ServiceRegistry
   module Test
@@ -301,6 +302,56 @@ module ServiceRegistry
         result['data']['uri'] = uri
         result
       end   
+
+      # ---- meta ----
+      def configure_meta_for_service(service, meta)
+        authorize
+
+        return fail('no service provided') if service.nil?
+        return fail('invalid service provided') if (service.strip == "")
+
+        return fail('no meta provided') if meta.nil?
+        return fail('invalid meta') if not meta.is_a?(Hash)
+
+        descriptions = []
+        detail = @juddi.get_service(service)['data']['description']
+        detail.each do |desc|
+          descriptions << desc if not description_is_meta?(desc)
+        end
+
+        descriptions << CGI.escape(meta.to_json)
+
+        detail = @juddi.get_service(service)['data']
+        detail['description'] = descriptions
+
+        result = @juddi.save_service(detail['name'], detail['description'], detail['definition'])
+
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid meta') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+
+        success_data('meta updated', result['data'])
+       rescue => ex
+         fix if @broken
+         fail('failure configuring service with meta')
+      end
+
+      def description_is_meta?(meta)
+        JSON.parse(CGI.unescape(meta))
+        true
+      rescue => ex
+        false
+      end
+
+      def meta_for_service(service)
+        detail = @juddi.get_service(service)['data']
+        if detail['description']
+          detail['description'].each do |desc|
+            return JSON.parse(CGI.unescape(desc)) if (description_is_meta?(desc))
+          end
+        end
+
+        {}
+      end
 
       # ---- search ----
       def check_dss(name)
