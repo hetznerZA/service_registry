@@ -17,6 +17,10 @@ module ServiceRegistry
         process_result(@iut.list_domain_perspectives)
       end
 
+      def register_team
+        process_result(@iut.register_team(@team))
+      end
+
       def register_domain_perspective
         process_result(@iut.register_domain_perspective(@domain_perspective))
       end
@@ -39,8 +43,17 @@ module ServiceRegistry
       def is_domain_perspective_available?
         @iut.fix
         process_result(@iut.list_domain_perspectives)
-        success? and data['domain_perspectives'].include?(@domain_perspective)
+        found = false
+        data['domain_perspectives'].each do |id, detail|
+          found = true if (detail['name'] == @domain_perspective)
+        end
+        success? and found
       end
+
+      def is_team_available?
+        @domain_perspective = @team
+        is_domain_perspective_available?
+      end  
 
       def received_one_domain_perspective?
         success? and (data['domain_perspectives'].size == 1) and (data['domain_perspectives'].include?(@domain_perspective_1))
@@ -51,7 +64,7 @@ module ServiceRegistry
       end
 
       def received_an_empty_list_of_domain_perspectives?
-        success? and (data['domain_perspectives'] == [])
+        success? and (data['domain_perspectives'] == {})
       end
     end
   end

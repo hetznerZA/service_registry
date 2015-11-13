@@ -8,6 +8,7 @@ module ServiceRegistry
         @domain_perspective_associations = []
         @service_component_domain_perspective_associations = []
 
+        @team = 'teamA'
         @domain_perspective_1 = 'domain_perspective_1'
         @domain_perspective_2 = 'domain_perspective_2'
         @valid_uri = 'http://127.0.0.1'
@@ -54,6 +55,10 @@ module ServiceRegistry
       def given_a_new_domain_perspective
         @iut.reset_domain_perspectives
         @domain_perspective = @domain_perspective_1
+      end
+
+      def given_a_new_team
+        @iut.reset_domain_perspectives
       end
 
       def given_no_domain_perspective

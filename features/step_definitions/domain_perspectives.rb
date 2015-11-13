@@ -66,6 +66,10 @@ Then(/^the domain perspective should be available$/) do
   expect(@test.is_domain_perspective_available?).to eq(true)
 end
 
+Then(/^the team should be available$/) do
+  expect(@test.is_team_available?).to eq(true)
+end
+
 Given(/^an existing domain perspective$/) do
   @test.given_an_existing_domain_perspective
 end
@@ -132,4 +136,19 @@ end
 
 Then(/^I receive 'failure deregistering domain perspective' notification$/) do
   expect(@test.has_received_notification?('failure deregistering domain perspective')).to eq(true)
+end
+
+Given(/^valid domain perspectives are one of \['domains', 'services', 'service\-components', team's\]$/) do
+end
+
+When(/^I request registration of a 'teams' domain perspective$/) do
+  @test.register_team
+end
+
+When(/^I request registration of a 'domains' domain perspective$/) do
+  @test.register_domain_perspective
+end
+
+Given(/^a new team$/) do
+  @test.given_a_new_team
 end

@@ -43,7 +43,11 @@ module ServiceRegistry
 
       def list_domain_perspectives
         return fail('failure listing domain perspectives') if @broken
-        success_data({ 'domain_perspectives' => @domain_perspectives })
+        domain_perspectives = {}
+        @domain_perspectives.each do |name|
+          domain_perspectives[name] = {'id' => name, 'name' => name}
+        end
+        success_data({ 'domain_perspectives' => @domain_perspectives == [] ? {} : domain_perspectives})
       end
 
       def list_service_components(domain_perspective = nil)
@@ -61,6 +65,10 @@ module ServiceRegistry
       def fix
         @broken = false
         success
+      end
+
+      def register_team(team)
+        register_domain_perspective(team)
       end
 
       def register_domain_perspective(domain_perspective)

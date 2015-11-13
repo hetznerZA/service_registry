@@ -1,55 +1,21 @@
 require '../lib/service_registry/providers/jsend_provider.rb'
 require '../lib/service_registry/providers/juddi_provider.rb'
 
-iut = ServiceRegistry::Providers::JUDDIProvider.new
-iut.authenticate('root', 'root')
+HETZNER_BASE_URN = "uddi:hetzner.co.za" unless defined? HETZNER_BASE_URN; HETZNER_BASE_URN.freeze
+HETZNER_URN = "#{HETZNER_BASE_URN}:hetzner" unless defined? HETZNER_URN; HETZNER_URN.freeze
+HETZNER_DOMAINS_URN = "#{HETZNER_BASE_URN}:domain-" unless defined? HETZNER_DOMAINS_URN; HETZNER_DOMAINS_URN.freeze
+HETZNER_SERVICES_URN = "#{HETZNER_BASE_URN}:services" unless defined? HETZNER_SERVICES_URN; HETZNER_SERVICES_URN.freeze
+HETZNER_SERVICE_COMPONENTS_URN = "#{HETZNER_BASE_URN}:service-components" unless defined? HETZNER_SERVICE_COMPONENTS_URN; HETZNER_SERVICE_COMPONENTS_URN.freeze
+urns = { 'base' => HETZNER_BASE_URN,
+                 'company' => HETZNER_URN,
+                 'domains' => HETZNER_DOMAINS_URN,
+                 'services' => HETZNER_SERVICES_URN,
+                 'service-components' => HETZNER_SERVICE_COMPONENTS_URN}
+iut = ServiceRegistry::Providers::JUDDIProvider.new(urns)
+iut.set_uri("http://localhost:8080")
+iut.authenticate('uddi', 'uddi')
 
-test = 1
-
-if test == 1
-  result = iut.save_service('temporary', 'A temporary service', 'http://github.com/temp/one.wadl')
-  result = iut.save_bindings('temporary', ['http://sc1.dev.auto-h/net/temporary', 'http://sc2.dev.auto-h/net/temporary'])
-  ##check in juddi
-
-  service = iut.get_service('temporary')
-
-  puts service
-
-  bindings = iut.find_bindings('temporary')
-
-  puts "BINDINGS"
-  puts bindings
-  puts "--------"
-  #services = iut.find_services['data']['services']
-  #puts services
-
-  services = iut.find_services('empo')['data']['services']
-  #puts services
-
-  result = iut.delete_binding(bindings['data']['bindings'].first[0])
-
-  bindings = iut.find_bindings('temporary')
-
-  puts "BINDINGS after delete"
-  puts bindings
-  puts "---------------------"
-
-  result = iut.delete_service('temporary')
-  puts result
-end
-
-if test == 2
-  result = iut.save_business('billing')
-  sleep 10
-  ##check in juddi
-  result = iut.find_businesses
-  puts result
-
-  businesses = iut.find_businesses('billing')['data']['businesses']
-  businesses.each do |id, name|
-    @business = id if name == 'billing'
-  end
-
-  result = iut.delete_business(@business)
-  puts result
-end
+#result = iut.save_business('billing')
+#result = iut.save_service('temporary', 'A temporary service', 'http://github.com/temp/one.wadl')
+result = iut.find_businesses
+puts result

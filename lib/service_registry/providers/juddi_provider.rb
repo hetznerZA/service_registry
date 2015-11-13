@@ -65,10 +65,10 @@ module ServiceRegistry
         { 'available' => check_availability }
       end
 
-      def save_business(name)
+      def save_business(key, name)
         authorize
         request_soap('publishv2', 'save_business',
-                     "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessEntity businessKey='#{@urns['domains']}#{name}'><name>#{name}</name></urn:businessEntity>") do | res|
+                     "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessEntity businessKey='#{key}'><name>#{name}</name></urn:businessEntity>") do | res|
           extract_business(res.body)
         end
       end
@@ -81,10 +81,10 @@ module ServiceRegistry
         end
       end
 
-      def delete_business(name)
+      def delete_business(key)
         authorize
         request_soap('publishv2', 'delete_business',
-        "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessKey>#{@urns['domains']}#{name}</urn:businessKey>") do |res|
+        "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessKey>#{key}</urn:businessKey>") do |res|
           { 'errno' => extract_errno(res.body) }
         end
       end
@@ -213,7 +213,7 @@ module ServiceRegistry
           break if business.nil?
           business[/<ns2:serviceInfos(.*?)<\/ns2:serviceInfos>/, 1] = "" if business[/<ns2:serviceInfos(.*?)<\/ns2:serviceInfos>/, 1]
           id = extract_business_id(entry)
-          entries[id.gsub(@urns['domains'], "")] = extract_name(entry) if id.include?(@urns['domains'])
+          entries[id.gsub(@urns['domains'], "")] = { 'id' => id, 'name' => extract_name(business) }
           entry[/<ns2:businessInfo (.*?)<\/ns2:businessInfo>/, 1] = ""
           entry.gsub!("<ns2:businessInfo </ns2:businessInfo>", "")
           entry = nil if entry.strip == ""

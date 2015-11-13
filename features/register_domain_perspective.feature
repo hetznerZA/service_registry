@@ -18,7 +18,7 @@ Feature: Registering domain perspectives
 
   Scenario: New domain perspective
     Given a new domain perspective
-    When I request registration of the domain perspective
+    When I request registration of a 'domains' domain perspective
     Then I receive 'domain perspective registered' notification
     And the domain perspective should be available
 
@@ -30,6 +30,7 @@ Feature: Registering domain perspectives
 
   Scenario: Invalid domain perspective
     Given invalid domain perspective
+    And valid domain perspectives are one of ['domains', 'services', 'service-components', team's]
     When I request registration of the domain perspective
     Then I receive 'invalid domain perspective' notification
     And the domain perspective should not be available
