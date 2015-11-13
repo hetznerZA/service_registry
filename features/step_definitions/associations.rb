@@ -110,6 +110,10 @@ Then(/^I receive 'not associated' notification$/) do
   expect(@test.has_received_notification?('not associated')).to eq(true)
 end
 
+Then(/^I receive 'failure disassociating service component from domain perspective' notification$/) do
+  expect(@test.has_received_notification?('failure disassociating service component from domain perspective')).to eq(true)
+end
+
 Then(/^the service component is no longer associated with the domain perspective$/) do
   expect(@test.is_service_component_associated_with_domain_perspective?).to eq(false)
 end

@@ -438,10 +438,28 @@ module ServiceRegistry
          fail('failure associating service component with domain perspective')        
       end
 
-      def delete_domain_perspective_service_component_associations(domain_perspective)
+      def disassociate_service_component_from_domain_perspective(domain_perspective, service_component)
+        # byebug
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
+
+        return fail('no service component provided') if service_component.nil?
+        return fail('invalid service component identifier') if (not is_registered?(service_component_registered?(service_component)))
+
+        service_component_id = compile_domain_id('service-components', service_component)
         meta = meta_for_domain_perspective('domains', domain_perspective)
-        meta['service-components'] = {}
-        configure_meta_for_domain_perspective('domains', domain_perspective, meta)
+        meta['associations'] ||= {}
+        meta['associations']['service_components'] ||= {}
+        meta['associations']['services'] ||= {}
+
+        return fail('not associated') if not meta['associations']['service_components'][service_component_id]
+
+        meta['associations']['service_components'].delete(service_component_id)
+        result = configure_meta_for_domain_perspective('domains', domain_perspective, meta)
+
+       rescue => ex
+         fix if @broken
+         fail('failure disassociating service component from domain perspective')        
       end
 
       def domain_perspective_associations(domain_perspective)
