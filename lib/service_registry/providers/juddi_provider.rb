@@ -19,6 +19,25 @@ module ServiceRegistry
         @auth_password =auth_password
       end
 
+      def available?
+        { 'available' => check_availability }
+      end
+
+      # ---- assignments ----
+      def assign_service_to_business(name, business_key)
+        result = @juddi.get_service(name)
+        service = result['data']
+        save_service_element(service['name'], ervice['description'], service['definition'], @urns['services'], business_key)
+      end
+
+      def assign_service_component_to_business(name, business_key)
+        result = @juddi.get_service_component(name)
+        service = result['data']
+        save_service_element(service['name'], ervice['description'], service['definition'], @urns['service-components'], business_key)
+      end
+
+      # ---- services ----
+
       def get_service(name)
         get_service_element(name, @urns['services'])
       end
@@ -39,6 +58,8 @@ module ServiceRegistry
           extract_service_entries_elements(res.body, @urns['services'])
         end
       end
+
+      # ---- service components ----
 
       def get_service_component(name)
         get_service_element(name, @urns['service-components'])
@@ -61,9 +82,22 @@ module ServiceRegistry
         end
       end
 
-      def available?
-        { 'available' => check_availability }
+      def save_service_component_uri(service_component, uri)
+        result = find_element_bindings(service_component, @urns['service-components'])
+        # only one binding for service components
+        if result and result['data'] and result['data']['bindings'] and (result['data']['bindings'].size > 0)
+          result['data']['bindings'].each do |binding, detail|
+            delete_binding(binding)
+          end
+        end
+        save_element_bindings(service_component, [uri], @urns['service-components'], "service component")
       end
+
+      def find_service_component_uri(service_component)
+        find_element_bindings(service_component, @urns['service-components'])
+      end
+
+      # ---- businesses ----
 
       def save_business(key, name)
         authorize
@@ -92,21 +126,6 @@ module ServiceRegistry
       def business_eq?(business, comparison)
         business == "#{@urns['domains']}#{comparison}"
       end    
-
-      def save_service_component_uri(service_component, uri)
-        result = find_element_bindings(service_component, @urns['service-components'])
-        # only one binding for service components
-        if result and result['data'] and result['data']['bindings'] and (result['data']['bindings'].size > 0)
-          result['data']['bindings'].each do |binding, detail|
-            delete_binding(binding)
-          end
-        end
-        save_element_bindings(service_component, [uri], @urns['service-components'], "service component")
-      end
-
-      def find_service_component_uri(service_component)
-        find_element_bindings(service_component, @urns['service-components'])
-      end
 
     private
       def save_element_bindings(service, bindings, urn, description)
@@ -147,9 +166,9 @@ module ServiceRegistry
         end
       end
 
-      def save_service_element(name, description, definition, urn)
+      def save_service_element(name, description, definition, urn, business_key = @urns['company'])
         authorize
-        body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessService businessKey='#{@urns['company']}' serviceKey='#{urn}:#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
+        body = "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessService businessKey='#{business_key}' serviceKey='#{urn}:#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
         if description
           description.each do |desc|
             body = body + "<urn:description xml:lang='en'>#{desc}</urn:description>" if desc and not (desc == "")

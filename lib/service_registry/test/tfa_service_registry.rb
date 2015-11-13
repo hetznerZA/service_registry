@@ -369,11 +369,26 @@ module ServiceRegistry
       end
 
       # ---- associations ----
-      def associate_service_component_with_domain_perspective(domain_perspective, service_component)
+      def associate_service_component_with_domain_perspective(service_component, domain_perspective)
       end
 
       def delete_domain_perspective_service_component_associations(domain_perspective)
       end
+
+      # def associate_service_with_business(name, business_key)
+      # end
+
+      # def disassociate_service_from_business(name, business_key)
+      # end
+
+      # def disassociate_service_component_from_business(name, business_key)
+      # end
+
+      # def associate_service_with_service_component(name, service_component)
+      # end
+
+      # def disassociate_service_from_service_component(name, service_component)
+      # end
 
       private
 
