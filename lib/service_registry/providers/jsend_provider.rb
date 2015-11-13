@@ -7,7 +7,12 @@ module ServiceRegistry
         @dss = dss
       end
 
+      def available?
+        success_data('available' => @available)
+      end      
+
       def bootstrap(configuration, configuration_service)
+        @available = false
         @configuration = configuration
         return fail('invalid configuration service') if @configuration.nil?
         return fail('no configuration service') if @configuration['CFGSRV_PROVIDER_ADDRESS'].nil?

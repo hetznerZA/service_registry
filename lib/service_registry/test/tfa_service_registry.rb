@@ -391,6 +391,7 @@ module ServiceRegistry
       private
 
       def authorize
+        raise RuntimeError.new("Not available / properly initialized") if not available?['data']['available']
         @juddi.authenticate(@credentials['username'], @credentials['password']) if @authorized
         @juddi.authenticate('', '') if not @authorized
       end

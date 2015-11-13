@@ -18,10 +18,6 @@ module ServiceRegistry
         @service_associations = {}
       end
 
-      def available?
-        success_data('available' => @available)
-      end
-
       def register_service(service)
         return fail('not authorized') if not @authorized
         return fail('failure registering service') if @broken
