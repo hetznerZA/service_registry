@@ -196,7 +196,7 @@ service component has domain perspective associations
         success
       end
 
-      def associate_service_component_with_domain_perspective(domain_perspective, service_component)
+      def associate_service_component_with_domain_perspective(service_component, domain_perspective)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component.strip == "")

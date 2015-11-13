@@ -175,6 +175,8 @@ module ServiceRegistry
         deregister_domain('domains', domain_perspective)
       end
 
+      # ---- teams ----
+
       def team_registered?(domain_perspective)
         domain_registered?('teams', domain_perspective)
       end
@@ -301,8 +303,9 @@ module ServiceRegistry
         return fail('invalid meta') if not meta.is_a?(Hash)
 
         descriptions = []
-        detail = @juddi.get_service(service)['data']['description']
-        detail.each do |desc|
+        detail = @juddi.get_service(service)['data']
+        detail['description'] ||= {}
+        detail['description'].each do |desc|
           descriptions << desc if not description_is_meta?(desc)
         end
 
@@ -322,15 +325,57 @@ module ServiceRegistry
          fail('failure configuring service with meta')
       end
 
-      def description_is_meta?(meta)
-        JSON.parse(CGI.unescape(meta))
-        true
-      rescue => ex
-        false
-      end
-
       def meta_for_service(service)
         detail = @juddi.get_service(service)['data']
+        if detail['description']
+          detail['description'].each do |desc|
+            return JSON.parse(CGI.unescape(desc)) if (description_is_meta?(desc))
+          end
+        end
+
+        {}
+      end
+
+      def configure_meta_for_domain_perspective(type, domain_perspective, meta)
+        authorize
+
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if (domain_perspective.strip == "")
+
+        return fail('no meta provided') if meta.nil?
+        return fail('invalid meta') if not meta.is_a?(Hash)
+
+        descriptions = []
+        detail = nil
+        id = compile_domain_id(type, domain_perspective)
+        detail = @juddi.get_business(id)['data'][domain_perspective]
+        detail ||= {}
+        detail['id'] = id
+        detail['description'] ||= []        
+        detail['description'].each do |desc|
+          descriptions << desc if not description_is_meta?(desc)
+        end
+
+        descriptions << CGI.escape(meta.to_json)
+
+        detail['description'] = descriptions
+
+        result = @juddi.save_business(detail['id'], detail['name'], detail['description'])
+
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid meta') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+
+        success_data('meta updated', result['data'])
+       rescue => ex
+         fix if @broken
+         fail('failure configuring domain perspective with meta')
+      end
+
+      def meta_for_domain_perspective(type, domain_perspective)
+        id = compile_domain_id(type, domain_perspective)
+        detail = @juddi.get_business(id)['data'][domain_perspective]
+        detail ||= {}
+
         if detail['description']
           detail['description'].each do |desc|
             return JSON.parse(CGI.unescape(desc)) if (description_is_meta?(desc))
@@ -370,9 +415,41 @@ module ServiceRegistry
 
       # ---- associations ----
       def associate_service_component_with_domain_perspective(service_component, domain_perspective)
+        #byebug
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
+
+        return fail('no service component provided') if service_component.nil?
+        return fail('invalid service component identifier') if (not is_registered?(service_component_registered?(service_component)))
+
+        service_component_id = compile_domain_id('service-components', service_component)
+        meta = meta_for_domain_perspective('domains', domain_perspective)
+        meta['associations'] ||= {}
+        meta['associations']['service_components'] ||= {}
+        meta['associations']['services'] ||= {}
+
+        return fail('already associated') if meta['associations']['service_components'][service_component_id]
+
+        meta['associations']['service_components'][service_component_id] = true
+        result = configure_meta_for_domain_perspective('domains', domain_perspective, meta)
+
+       rescue => ex
+         fix if @broken
+         fail('failure associating service component with domain perspective')        
       end
 
       def delete_domain_perspective_service_component_associations(domain_perspective)
+        meta = meta_for_domain_perspective('domains', domain_perspective)
+        meta['service-components'] = {}
+        configure_meta_for_domain_perspective('domains', domain_perspective, meta)
+      end
+
+      def domain_perspective_associations(domain_perspective)
+        meta = meta_for_domain_perspective('domains', domain_perspective)
+        meta['associations'] ||= {}
+        meta['associations']['service_components'] ||= {}
+        meta['associations']['services'] ||= {}
+        success_data(meta)
       end
 
       # def associate_service_with_business(name, business_key)
@@ -453,6 +530,14 @@ module ServiceRegistry
       def is_registered?(result)
         ServiceRegistry::Providers::JSendProvider::has_data?(result, 'registered') and result['data']['registered']
       end
+
+      def description_is_meta?(meta)
+        JSON.parse(CGI.unescape(meta))
+        true
+      rescue => ex
+        false
+      end
+
     end
   end
 end

@@ -1,6 +1,10 @@
 module ServiceRegistry
   module Test
     class StubAssociationOrchestrationProvider < BaseAssociationOrchestrationProvider
+      def is_service_component_associated_with_domain_perspective?
+        process_result(@iut.service_component_domain_perspective_associations(@service_component))
+        data['associations'].include?(@domain_perspective)
+      end
     end
   end
 end

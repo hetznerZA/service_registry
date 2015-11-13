@@ -1,6 +1,14 @@
 module ServiceRegistry
   module Test
     class ProductionAssociationOrchestrationProvider < BaseAssociationOrchestrationProvider
+      def is_service_component_associated_with_domain_perspective?
+      	associations = @iut.domain_perspective_associations(@domain_perspective)['data']['associations']['service_components']
+      	found = false
+      	associations.each do |id, associated|
+      	  found = true if (id.include?(@service_component) and associated)
+      	end
+      	found
+      end
     end
   end
 end

@@ -133,8 +133,8 @@ module ServiceRegistry
       end
 
       def associate_domain_perspective_with_service_component
-        process_result(@iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component))
-        perspective_associations = process_result(@iut.domain_perspective_associations(@domain_perspective))
+        process_result(@iut.associate_service_component_with_domain_perspective(@service_component, @domain_perspective))
+        process_result(@iut.domain_perspective_associations(@domain_perspective))
         @domain_perspective_associations = data['associations']
       end
 

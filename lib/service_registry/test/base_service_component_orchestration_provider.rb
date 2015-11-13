@@ -11,7 +11,7 @@ module ServiceRegistry
         process_result(@iut.delete_all_service_components)
         process_result(@iut.register_service_component(@service_component_1))
         process_result(@iut.register_service_component(@service_component_2))
-        process_result(@iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component_1))
+        process_result(@iut.associate_service_component_with_domain_perspective(@service_component_1, @domain_perspective))
       end
 
       def given_no_service_components_exist

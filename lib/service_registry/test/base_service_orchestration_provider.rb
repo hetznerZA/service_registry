@@ -89,8 +89,8 @@ module ServiceRegistry
       end
 
       def service_components_registered_in_different_domain_perspectives
-        @iut.associate_service_component_with_domain_perspective(@domain_perspective_2, @service_component_1)
-        @iut.associate_service_component_with_domain_perspective(@domain_perspective_1, @service_component_2)
+        @iut.associate_service_component_with_domain_perspective(@service_component_1, @domain_perspective_2)
+        @iut.associate_service_component_with_domain_perspective(@service_component_2, @domain_perspective_1)
       end
 
       def match_pattern_in_domain_perspective

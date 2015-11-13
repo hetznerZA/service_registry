@@ -26,12 +26,7 @@ module ServiceRegistry
 
       def domain_perspective_associations_changed?
         process_result(@iut.domain_perspective_associations(@domain_perspective))
-        not arrays_the_same?(data['associations'], @domain_perspective_associations)
-      end
-
-      def is_service_component_associated_with_domain_perspective?
-        process_result(@iut.service_component_domain_perspective_associations(@service_component))
-        data['associations'].include?(@domain_perspective)
+        not arrays_the_same?(data['associations'].to_a, @domain_perspective_associations.to_a)
       end
 
       def is_service_component_associated_with_service?

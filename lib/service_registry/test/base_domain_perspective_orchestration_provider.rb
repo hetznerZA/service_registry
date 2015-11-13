@@ -6,7 +6,7 @@ module ServiceRegistry
       end
 
       def given_service_components_associated_with_domain_perspective
-        @iut.associate_service_component_with_domain_perspective(@domain_perspective, @service_component_1)
+        @iut.associate_service_component_with_domain_perspective(@service_component_1, @domain_perspective)
       end
 
       def clear_all_domain_perspectives
