@@ -15,6 +15,12 @@ module ServiceRegistry
         @domain_perspective_associations = data['associations']
       end
 
+      def disassociate_domain_perspective_from_service
+        process_result(@iut.disassociate_service_from_domain_perspective(@domain_perspective, @service.is_a?(Hash) ? @service['name'] : @service))
+        process_result(@iut.domain_perspective_associations(@domain_perspective))
+        @domain_perspective_associations = data['associations']
+      end
+
       def disassociate_service_from_service_component
         process_result(@iut.disassociate_service_component_from_service(@service, @service_component))
       end

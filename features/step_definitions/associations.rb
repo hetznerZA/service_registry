@@ -116,12 +116,20 @@ Then(/^I receive 'invalid service provided' notification$/) do
   expect(@test.has_received_notification?('invalid service provided')).to eq(true)
 end
 
-When(/^I remove the service component association$/) do
+When(/^I remove the service component association from the domain perspective$/) do
   @test.disassociate_domain_perspective_from_service_component
 end
 
+When(/^I remove the service association from the domain perspective$/) do
+  @test.disassociate_domain_perspective_from_service
+end
+
 Given(/^the domain perspective is not associated with the service component$/) do
-  expect(@test.is_service_component_associated_with_domain_perspective?).to eq(false)
+  @test.disassociate_domain_perspective_from_service_component
+end
+
+Given(/^the domain perspective is not associated with the service$/) do
+  @test.disassociate_domain_perspective_from_service
 end
 
 Then(/^I receive 'not associated' notification$/) do
@@ -149,4 +157,8 @@ end
 
 When(/^I remove the service association$/) do
   @test.disassociate_service_from_service_component
+end
+
+Then(/^I receive 'failure disassociating service from domain perspective' notification$/) do
+  expect(@test.has_received_notification?('failure disassociating service from domain perspective')).to eq(true)
 end

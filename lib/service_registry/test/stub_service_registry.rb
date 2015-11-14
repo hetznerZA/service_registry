@@ -231,7 +231,6 @@ service component has domain perspective associations
         success
       end
 
-
       def disassociate_service_component_from_domain_perspective(domain_perspective, service_component)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
@@ -244,6 +243,21 @@ service component has domain perspective associations
         @service_component_associations[service_component]['domain_perspectives'] ||= []
         return fail('not associated') if not @service_component_associations[service_component]['domain_perspectives'].include?(domain_perspective)
         @service_component_associations[service_component]['domain_perspectives'].delete(domain_perspective)
+        success
+      end
+
+      def disassociate_service_from_domain_perspective(domain_perspective, service)
+        return fail('not authorized') if not @authorized
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service provided') if (service.strip == "")
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if (domain_perspective.strip == "")
+        return fail('failure disassociating service from domain perspective') if @broken
+
+        @service_associations[service] ||= {}
+        @service_associations[service]['domain_perspectives'] ||= []
+        return fail('not associated') if not @service_associations[service]['domain_perspectives'].include?(domain_perspective)
+        @service_associations[service]['domain_perspectives'].delete(domain_perspective)
         success
       end
 
