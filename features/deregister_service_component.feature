@@ -7,6 +7,8 @@ Feature: De-registering a service component
 
   Scenario: Not authorized
     Given existing service component identifier
+    And a domain perspective
+    And no domain perspectives associated with the service component
     And unauthorized publisher
     When I request deregistration of the service component
     Then I receive 'not authorized' notification

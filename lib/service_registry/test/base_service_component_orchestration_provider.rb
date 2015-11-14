@@ -27,7 +27,7 @@ module ServiceRegistry
       end
 
       def given_no_domain_perspectives_associated_with_service_component
-        # do nothing, when the test starts none of these exist
+        @iut.disassociate_service_component_from_domain_perspective(@domain_perspective, @service_component)
       end
 
       def list_service_components

@@ -251,11 +251,23 @@ module ServiceRegistry
           fail('failure registering service component')
       end
 
+      def service_component_has_domain_perspective_associations?(service_component)
+        domain_perspectives = list_domain_perspectives['data']['domain_perspectives']
+        domain_perspectives.each do |name, detail|
+          service_components = domain_perspective_associations(name)['data']['associations']['service_components']
+          service_components.each do |id, value|
+            return true if (id == compile_domain_id('service-components', service_component)) and (value)
+          end
+        end
+        false
+      end
+
       def deregister_service_component(service_component)
          authorize
          return fail('no service component identifier provided') if service_component.nil?
          return fail('invalid service component identifier') if service_component.strip == ""
          return success('service component unknown') if not is_registered?(service_component_registered?(service_component))
+         return fail('service component has domain perspective associations') if service_component_has_domain_perspective_associations?(service_component)
          result = @juddi.delete_service_component(service_component)
          return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
          return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
