@@ -7,8 +7,9 @@ Feature: Removing service component associations from domain perspectives
   I want to deregister the service component from the domain perspective
 
   Scenario: Not authorized
-    Given existing service component identifier
-    And an existing domain perspective
+    Given an existing domain perspective
+    And existing service component identifier
+    And the service component is already associated with the domain perspective
     And unauthorized publisher
     When I remove the service component association
     Then I receive 'not authorized' notification
@@ -26,14 +27,14 @@ Feature: Removing service component associations from domain perspectives
     Then I receive 'invalid domain perspective provided' notification
 
   Scenario: no service component
-    Given no service component identifier
-    And an existing domain perspective
+    Given an existing domain perspective
+    And no service component identifier
     When I remove the service component association
     Then I receive 'no service component provided' notification
 
   Scenario: invalid service component
-    Given invalid service component identifier
-    And an existing domain perspective
+    Given an existing domain perspective
+    And invalid service component identifier
     When I remove the service component association
     Then I receive 'invalid service component identifier' notification
 
@@ -58,5 +59,6 @@ Feature: Removing service component associations from domain perspectives
     And the service component is already associated with the domain perspective
     And a failure
     When I remove the service component association
-    Then I receive 'failure disassociating service from domain perspective' notification
+    Then I receive 'failure disassociating service component from domain perspective' notification
     And the domain perspective associations should not change
+

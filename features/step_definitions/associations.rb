@@ -10,8 +10,12 @@ And (/^Some or no associations of service components with the domain perspective
   @test.given_some_or_no_associations_of_service_components_with_domain_perspective
 end
 
-When(/^I request association with the domain perspective$/) do
+When(/^I request association of the service component with the domain perspective$/) do
   @test.associate_domain_perspective_with_service_component
+end
+
+When(/^I request association of the service with the domain perspective$/) do
+  @test.associate_domain_perspective_with_service
 end
 
 Then(/^I receive 'no service component provided' notification$/) do
@@ -42,13 +46,27 @@ Then(/^the service component should be associated with the domain perspective$/)
   expect(@test.is_service_component_associated_with_domain_perspective?).to eq(true)
 end
 
+Then(/^the service should be associated with the domain perspective$/) do
+  expect(@test.is_service_associated_with_domain_perspective?).to eq(true)
+end
+
 Then(/^I receive 'failure associating service component with domain perspective' notification$/) do
   expect(@test.has_received_notification?('failure associating service component with domain perspective')).to eq(true)
 end
 
+Then(/^I receive 'failure associating service with domain perspective' notification$/) do
+  expect(@test.has_received_notification?('failure associating service with domain perspective')).to eq(true)
+end
+
+
 Given(/^the service component is already associated with the domain perspective$/) do
   @test.associate_domain_perspective_with_service_component
 end
+
+Given(/^the service is already associated with the domain perspective$/) do
+  @test.associate_domain_perspective_with_service
+end
+
 
 Then(/^I receive 'already associated' notification$/) do
   expect(@test.has_received_notification?('already associated')).to eq(true)

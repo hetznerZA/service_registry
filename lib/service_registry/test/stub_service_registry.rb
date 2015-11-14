@@ -103,6 +103,11 @@ module ServiceRegistry
         success_data({'associations' => []})
       end
 
+      def service_domain_perspective_associations(service)
+        return success_data({'associations' => @service_associations[service]['domain_perspectives']}) if @service_associations[service] and @service_associations[service]['domain_perspectives']
+        success_data({'associations' => []})
+      end
+
       def does_service_component_have_service_associated?(service_component, service)
         return success_data({'associated' => false}) if not @service_component_associations[service_component]
         return success_data({'associated' => false}) if not @service_component_associations[service_component]['services']
@@ -210,6 +215,22 @@ service component has domain perspective associations
         @service_component_associations[service_component]['domain_perspectives'] << domain_perspective
         success
       end
+
+      def associate_service_with_domain_perspective(service, domain_perspective)
+        return fail('not authorized') if not @authorized
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service provided') if (service.strip == "")
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if (domain_perspective.strip == "")
+        return fail('failure associating service with domain perspective') if @broken
+
+        @service_associations[service] ||= {}
+        @service_associations[service]['domain_perspectives'] ||= []
+        return fail('already associated') if @service_associations[service]['domain_perspectives'].include?(domain_perspective)
+        @service_associations[service]['domain_perspectives'] << domain_perspective
+        success
+      end
+
 
       def disassociate_service_component_from_domain_perspective(domain_perspective, service_component)
         return fail('not authorized') if not @authorized

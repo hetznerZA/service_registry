@@ -138,6 +138,12 @@ module ServiceRegistry
         @domain_perspective_associations = data['associations']
       end
 
+      def associate_domain_perspective_with_service
+        process_result(@iut.associate_service_with_domain_perspective(@service.is_a?(Hash) ? @service['name'] : @service, @domain_perspective))
+        process_result(@iut.domain_perspective_associations(@domain_perspective))
+        @domain_perspective_associations = data['associations']
+      end
+
       def register_service_definition
         process_result(@iut.register_service_definition(@service.is_a?(Hash) ? @service['name'] : @service, @service_definition))
       end
