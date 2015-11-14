@@ -344,7 +344,7 @@ module ServiceRegistry
 
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)
-
+# byebug
         descriptions = []
         detail = nil
         id = compile_domain_id(type, domain_perspective)
@@ -356,7 +356,18 @@ module ServiceRegistry
           descriptions << desc if not description_is_meta?(desc)
         end
 
-        descriptions << CGI.escape(meta.to_json)
+        associations = {}.merge!(meta['associations']) if meta['associations']
+        associations['service_components'] ||= {}
+        associations['services'] ||= {}
+        meta.delete('associations')
+        associations['service_components'].each do |id, value|
+          descriptions << CGI.escape({'associations' => {'service_components' => {id => value}}}.to_json)
+        end
+        associations['services'].each do |id, value|
+          descriptions << CGI.escape({'associations' => {'services' => {id => value}}}.to_json)
+        end
+
+        descriptions << CGI.escape(meta.to_json) if meta.count > 0
 
         detail['description'] = descriptions
 
@@ -375,14 +386,15 @@ module ServiceRegistry
         id = compile_domain_id(type, domain_perspective)
         detail = @juddi.get_business(id)['data'][domain_perspective]
         detail ||= {}
-
+        meta = {}
+# byebug
         if detail['description']
           detail['description'].each do |desc|
-            return JSON.parse(CGI.unescape(desc)) if (description_is_meta?(desc))
+            meta.merge!(JSON.parse(CGI.unescape(desc))) if (description_is_meta?(desc))
           end
         end
 
-        {}
+        meta
       end
 
       # ---- search ----
