@@ -7,6 +7,7 @@ Feature: Deregistering domain perspectives
   Scenario: Not authorized
     Given unauthorized publisher
     And an existing domain perspective    
+    And the domain perspective has no associations
     When I request deregistration of the domain perspective
     Then I receive 'not authorized' notification
 
@@ -17,7 +18,7 @@ Feature: Deregistering domain perspectives
 
   Scenario: Existing domain perspective
     Given an existing domain perspective
-    And no service components associated with the domain perspective
+    And the domain perspective has no associations
     When I request deregistration of the domain perspective
     Then I receive 'domain perspective deregistered' notification
     And the domain perspective should no longer be available
@@ -31,7 +32,7 @@ Feature: Deregistering domain perspectives
 
   Scenario: failure
     Given an existing domain perspective
-    And no service components associated with the domain perspective
+    And the domain perspective has no associations
     And a failure
     When I request deregistration of the domain perspective
     Then I receive 'failure deregistering domain perspective' notification

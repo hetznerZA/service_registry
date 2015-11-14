@@ -426,6 +426,24 @@ module ServiceRegistry
       end
 
       # ---- associations ----
+      def domain_perspective_associations(domain_perspective)
+        meta = meta_for_domain_perspective('domains', domain_perspective)
+
+        meta['associations'] ||= {}
+        meta['associations']['services'] ||= {}
+        meta['associations']['service_components'] ||= {}
+        success_data(associations)
+      end
+
+
+      def delete_all_domain_perspective_associations(domain_perspective)
+        associations = domain_perspective_associations(domain_perspective)['data']['associations']
+        associations.each do |id, value|
+          disassociate_service_component_from_domain_perspective(domain_perspective, id)
+        end
+        success
+      end
+
       def associate_service_component_with_domain_perspective(service_component, domain_perspective)
         #byebug
         return fail('no domain perspective provided') if domain_perspective.nil?
@@ -580,13 +598,18 @@ module ServiceRegistry
         "#{@urns[type]}#{domain_perspective}"
       end
 
+      def domain_perspective_has_associations?(domain_perspective)
+        associations = domain_perspective_associations(domain_perspective)['data']['associations']
+        (associations['service_components'].size > 0) or (associations['services'].size > 0)
+      end
+
       def deregister_domain(type, domain_perspective)
         authorize
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
 
         return fail('domain perspective unknown') if not is_registered?(domain_perspective_registered?(domain_perspective))
-        # return fail('domain perspective has associations') if does_domain_perspective_have_service_components_associated?(domain_perspective)
+        return fail('domain perspective has associations') if domain_perspective_has_associations?(domain_perspective)
 
         result = @juddi.delete_business(compile_domain_id(type, domain_perspective))
         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')

@@ -278,6 +278,11 @@ service component has domain perspective associations
         success
       end
 
+      def delete_all_domain_perspective_associations(domain_perspective)
+        @service_component_associations = {}
+        @service_associations = {}
+      end
+
       def configure_service_component_uri(service_component, uri)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?

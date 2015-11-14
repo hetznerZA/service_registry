@@ -152,3 +152,7 @@ end
 Given(/^a new team$/) do
   @test.given_a_new_team
 end
+
+Given(/^the domain perspective has no associations$/) do
+  @test.delete_all_domain_perspective_associations
+end
