@@ -291,7 +291,7 @@ Then(/^I receive 'failure configuring service' notification$/) do
 end
 
 When(/^I request a list of service URIs$/) do
-  @test.request_service_uria
+  @test.request_service_uris
 end
 
 Given(/^the service has URIs configured$/) do

@@ -354,6 +354,11 @@ service component has domain perspective associations
       end
 
       def service_uris(service)
+        return fail('not authorized') if not @authorized
+        return fail('no service provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return fail('failure listing service URIs') if @broken
+
         @service_uris[service] ||= []
         success_data({ 'uris' => @service_uris[service] } )
       end

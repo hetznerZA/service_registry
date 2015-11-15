@@ -27,5 +27,6 @@ Feature: Listing endpoints for a service
 
   Scenario: Failure
     Given a registered service
+    And a failure
     When I request a list of service URIs
     Then I receive 'failure listing service URIs' notification

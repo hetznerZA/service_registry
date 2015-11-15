@@ -78,6 +78,14 @@ module ServiceRegistry
         process_result(@iut.remove_uri_from_service(@service.is_a?(Hash) ? @service['name'] : @service, @uri))
       end
 
+      def request_service_uris
+        process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
+      end
+
+      def has_received_service_uris?
+        arrays_the_same?(@pre_uris, data['uris'])
+      end
+
       def remember_uri?
         process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
         uris = data['uris']
@@ -186,6 +194,7 @@ module ServiceRegistry
       end
 
       def service_uris_changed?
+        @iut.fix
         process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
         not arrays_the_same?(@pre_uris, data['uris'])
       end
