@@ -71,7 +71,7 @@ module ServiceRegistry
 
       def configure_some_service_uris
         @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_1)
-        @pre_uris = [@service_uri_1]
+        @pre_uris = extract_service_uris
       end
 
       def remove_uri_from_service
@@ -198,14 +198,17 @@ module ServiceRegistry
       end
 
       def service_uris_changed?
-        byebug
         @iut.fix
+        not arrays_the_same?(@pre_uris, extract_service_uris)
+      end
+
+      def extract_service_uris
         process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
         uris = []
         data['bindings'].each do |binding, detail|
           uris << detail['access_point']
         end
-        not arrays_the_same?(@pre_uris, uris)
+        uris
       end
     end
   end
