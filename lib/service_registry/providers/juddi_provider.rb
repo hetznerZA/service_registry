@@ -67,6 +67,21 @@ module ServiceRegistry
         save_element_bindings(service, bindinfs, @urns['services'], description)
       end
 
+      def add_service_uri(service, uri)
+        result = service_uris(service)
+        existing_id = nil
+        result['data']['bindings'] ||= {}
+        result['data']['bindings'].each do |binding, detail|
+          existing_id = binding if detail['access_point'] == uri
+        end
+        result = delete_binding(existing_id) if existing_id
+        result = save_element_bindings(service, [uri], @urns['services'], "service uri") if result['status'] == 'success'
+        result
+      end
+
+      def service_uris(service)
+        find_element_bindings(service, @urns['services'])
+      end
 
       # ---- service components ----
 

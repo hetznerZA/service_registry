@@ -83,14 +83,18 @@ module ServiceRegistry
       end
 
       def has_received_service_uris?
-        arrays_the_same?(@pre_uris, data['uris'])
+        uris = []
+        data['bindings'].each do |binding, detail|
+          uris << detail['access_point']
+        end        
+        arrays_the_same?(@pre_uris, uris)
       end
 
       def remember_uri?
         process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
-        uris = data['uris']
-        uris.each do |uri|
-          return true if uri == @uri
+        uris = data['bindings']
+        uris.each do |binding, detail|
+          return true if detail['access_point'] == @uri
         end
         false
       end
@@ -194,9 +198,14 @@ module ServiceRegistry
       end
 
       def service_uris_changed?
+        byebug
         @iut.fix
         process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
-        not arrays_the_same?(@pre_uris, data['uris'])
+        uris = []
+        data['bindings'].each do |binding, detail|
+          uris << detail['access_point']
+        end
+        not arrays_the_same?(@pre_uris, uris)
       end
     end
   end

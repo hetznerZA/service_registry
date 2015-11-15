@@ -85,6 +85,40 @@ module ServiceRegistry
         fail('failure deregistering service')        
       end
 
+      def add_service_uri(service, uri)
+        authorize
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service identifier provided') if service.strip == ""
+        return fail('no URI provided') if uri.nil?
+        return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
+
+        return fail('unknown service') if not is_registered?(service_registered?(service))
+        result = @juddi.add_service_uri(service, uri)
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        success
+
+      rescue => ex
+        fix if @broken
+        fail('failure deregistering service')        
+      end
+
+      def service_uris(service)
+        authorize
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service identifier provided') if service.strip == ""
+
+        return fail('unknown service') if not is_registered?(service_registered?(service))
+        result = @juddi.service_uris(service)
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        success_data(result['data'])
+
+      rescue => ex
+        fix if @broken
+        fail('failure listing service URIs')        
+      end
+
       # ---- service definition ----
 
       def register_service_definition(service, definition)

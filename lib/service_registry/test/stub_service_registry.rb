@@ -360,7 +360,11 @@ service component has domain perspective associations
         return fail('failure listing service URIs') if @broken
 
         @service_uris[service] ||= []
-        success_data({ 'uris' => @service_uris[service] } )
+        result = {'bindings' => {}}
+        @service_uris.each do |service, uri|
+          result['bindings'][uri[0]] = {'access_point' => uri[0]}
+        end
+        success_data(result)
       end
 
       def remove_uri_from_service(service, uri)
