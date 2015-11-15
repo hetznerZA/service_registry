@@ -110,10 +110,6 @@ Then(/^I receive 'service component deregistered' notification$/) do
   expect(@test.has_received_notification?('service component deregistered')).to eq(true)
 end
 
-Given(/^services associated with the service component$/) do
-  @test.associate_services_with_service_component
-end
-
 Then(/^I receive 'service component has service associations' notification$/) do
   expect(@test.has_received_notification?('service component has service associations')).to eq(true)
 end

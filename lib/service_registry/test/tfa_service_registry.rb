@@ -278,6 +278,22 @@ module ServiceRegistry
          fail('failure deregistering service component')        
       end
 
+      def associate_service_component_with_service(service, service_component_endpoint, description = '')
+        authorize
+        return fail('no service component provided') if service_component.nil?
+        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('no service provided') if service.nil?
+        return fail('invalid service provided') if (service.strip == "")
+        result = @juddi.save_service_endpoint(service, service_component_endpoint, description)
+        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service component identifier or service') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        success
+
+       rescue => ex
+         fix if @broken
+         fail('failure associating service component with service')
+      end
+
       def configure_service_component_uri(service_component, uri)
         authorize
         return fail('no service component provided') if service_component.nil?
@@ -558,21 +574,6 @@ module ServiceRegistry
         meta['associations']['services'] ||= {}
         success_data(meta)
       end
-
-      # def associate_service_with_business(name, business_key)
-      # end
-
-      # def disassociate_service_from_business(name, business_key)
-      # end
-
-      # def disassociate_service_component_from_business(name, business_key)
-      # end
-
-      # def associate_service_with_service_component(name, service_component)
-      # end
-
-      # def disassociate_service_from_service_component(name, service_component)
-      # end
 
       private
 

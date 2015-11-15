@@ -59,6 +59,15 @@ module ServiceRegistry
         end
       end
 
+      def save_service_endpoint(service, service_component_endpoint, description = "")
+        result = find_element_bindings(service, @urns['services'])
+        result['data']['bindings'] ||= []
+        bindings = result['data']['bindings']
+        bindings << service_component_endpoint if not bindings.include?(service_component_endpoint)
+        save_element_bindings(service, bindinfs, @urns['services'], description)
+      end
+
+
       # ---- service components ----
 
       def get_service_component(name)

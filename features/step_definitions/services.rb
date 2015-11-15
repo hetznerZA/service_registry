@@ -10,10 +10,6 @@ When(/^I register the service definition with the service$/) do
   @test.register_service_definition
 end
 
-Given(/^the service is already associated with the service component$/) do
-  @test.associate_service_with_service_component
-end
-
 Then(/^I receive 'unknown service identifier provided' notification$/) do
   expect(@test.has_received_notification?('unknown service identifier provided')).to eq(true)
 end

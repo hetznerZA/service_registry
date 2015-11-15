@@ -22,10 +22,6 @@ module ServiceRegistry
         process_result(@iut.delete_all_service_components)
       end
 
-      def given_no_services_associated_with_service_component
-        process_result(@iut.deregister_all_services_for_service_component(@service_component))
-      end
-
       def given_no_domain_perspectives_associated_with_service_component
         @iut.disassociate_service_component_from_domain_perspective(@domain_perspective, @service_component)
       end
@@ -40,11 +36,6 @@ module ServiceRegistry
 
       def deregister_service_component
         process_result(@iut.deregister_service_component(@service_component))
-      end
-
-      def associate_services_with_service_component
-        process_result(@iut.associate_service_with_service_component(@service_component, @service_1['name']))
-        process_result(@iut.associate_service_with_service_component(@service_component, @service_2['name']))
       end
 
       def received_list_of_all_service_components?

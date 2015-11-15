@@ -30,18 +30,10 @@ Feature: De-registering a service component
 
   Scenario: Existing service component
     Given existing service component identifier
-    And no services associated with the service component
     And no domain perspectives associated with the service component
     When I request deregistration of the service component
     Then I receive 'service component deregistered' notification
     And the service component should not be available
-
-  Scenario: Associated services
-    Given existing service component identifier
-    And services associated with the service component
-    When I request deregistration of the service component
-    Then I receive 'service component has service associations' notification
-    And the service component should be available
 
   Scenario: Associated domain perspectives
     Given existing service component identifier
@@ -53,7 +45,6 @@ Feature: De-registering a service component
 
   Scenario: failure
     Given existing service component identifier
-    And no services associated with the service component
     And a failure
     When I request deregistration of the service component
     Then I receive 'failure deregistering service component' notification

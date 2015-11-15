@@ -51,7 +51,7 @@ Feature: Removing service associations from domain perspectives
     And the service is already associated with the domain perspective
     When I remove the service association from the domain perspective
     Then I receive 'success' notification
-    And the service is not associated with the service component
+    And the service is not associated with the domain perspective
 
   Scenario: failure
     Given a registered service

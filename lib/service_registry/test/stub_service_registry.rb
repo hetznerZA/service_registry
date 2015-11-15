@@ -108,12 +108,6 @@ module ServiceRegistry
         success_data({'associations' => []})
       end
 
-      def does_service_component_have_service_associated?(service_component, service)
-        return success_data({'associated' => false}) if not @service_component_associations[service_component]
-        return success_data({'associated' => false}) if not @service_component_associations[service_component]['services']
-        return success_data({'associated' => @service_component_associations[service_component]['services'].include?(service)})
-      end
-
       def deregister_domain_perspective(domain_perspective)
         return fail('not authorized') if not @authorized
         return fail('failure deregistering domain perspective') if @broken
@@ -186,21 +180,6 @@ service component has domain perspective associations
         success
       end
 
-      def disassociate_service_component_from_service(service, service_component)
-        return fail('not authorized') if not @authorized
-        return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
-        return fail('no service provided') if service.nil?
-        return fail('invalid service provided') if (service.strip == "")
-        return fail('failure disassociating service component with service') if @broken
-
-        @service_component_associations[service_component] ||= {}
-        @service_component_associations[service_component]['services'] ||= []
-        return fail('not associated') if not @service_component_associations[service_component]['services'].include?(service)
-        @service_component_associations[service_component]['services'].delete(service)
-        success
-      end
-
       def associate_service_component_with_domain_perspective(service_component, domain_perspective)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
@@ -263,18 +242,6 @@ service component has domain perspective associations
 
       def delete_all_service_components
         @service_components = []
-        success
-      end
-
-      def deregister_all_services_for_service_component(service_component)
-        @service_component_associations[service_component]['services'] = [] if @service_component_associations[service_component]
-        success
-      end
-
-      def associate_service_with_service_component(service_component, service)
-        @service_component_associations[service_component] ||= {}
-        @service_component_associations[service_component]['services'] ||= []
-        @service_component_associations[service_component]['services'] << service
         success
       end
 

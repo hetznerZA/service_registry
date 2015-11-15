@@ -80,14 +80,6 @@ Given(/^valid service$/) do
   @test.given_a_valid_service
 end
 
-When(/^I request association with the service$/) do
-  @test.associate_service_with_service_component
-end
-
-Then(/^the service associations should not change$/) do
-  expect(@test.service_component_associations_changed?).to eq(false)
-end
-
 Given(/^no service$/) do
   @test.given_no_service
 end
@@ -106,10 +98,6 @@ end
 
 Given(/^the service is associated with two service components$/) do
   @test.associate_service_with_two_service_components
-end
-
-Then(/^I receive 'failure associating service component with service' notification$/) do
-  expect(@test.has_received_notification?('failure associating service component with service')).to eq(true)
 end
 
 Then(/^I receive 'invalid service provided' notification$/) do
@@ -144,19 +132,11 @@ Then(/^the service component is no longer associated with the domain perspective
   expect(@test.is_service_component_associated_with_domain_perspective?).to eq(false)
 end
 
-Given(/^the service is not associated with the service component$/) do
+Given(/^the service is not associated with the domain perspective$/) do
 end
 
 Given(/^the service is associated with the service component$/) do
   @test.associate_service_with_service_component
-end
-
-Then(/^the service component is no longer associated with the service$/) do
-  expect(@test.is_service_component_associated_with_service?).to eq(false)
-end
-
-When(/^I remove the service association$/) do
-  @test.disassociate_service_from_service_component
 end
 
 Then(/^I receive 'failure disassociating service from domain perspective' notification$/) do

@@ -9,3 +9,5 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Registering services", ServiceRegistry::Test::StubServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Searching for a service", ServiceRegistry::Test::StubServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Map service components to services", ServiceRegistry::Test::StubServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Configuring URI for a service", ServiceRegistry::Test::StubServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Removing URI from a service", ServiceRegistry::Test::StubServiceOrchestrationProvider)
