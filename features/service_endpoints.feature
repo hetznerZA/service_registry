@@ -19,32 +19,37 @@ Feature: Configuring URI for a service
 
   Scenario: Invalid URI
     Given a registered service
+    And some configured service URIs
     And invalid URI
     When I request configuration of the service URI
     Then I receive 'invalid URI' notification
-    And the service URI should remain unchanged
+    And the service URIs should remain unchanged
 
   Scenario: No URI
     Given a registered service
+    And some configured service URIs
     And no URI
     When I request configuration of the service URI
     Then I receive 'no URI provided' notification
-    And the service URI should remain unchanged
+    And the service URIs should remain unchanged
 
   Scenario: No service
-    Given no service identifier
+    Given no service
+    And valid URI
     When I request configuration of the service URI
     Then I receive 'no service provided' notification
 
   Scenario: Invalid service
     Given invalid service identifier
+    And valid URI
     When I request configuration of the service URI
-    Then I receive 'invalid service identifier' notification
+    Then I receive 'invalid service identifier provided' notification
 
   Scenario: Failure
-    Given valid URI
     Given a registered service
+    And valid URI
+    And some configured service URIs
     And a failure
     When I request configuration of the service URI
     Then I receive 'failure configuring service' notification
-    And the service URI should remain unchanged
+    And the service URIs should remain unchanged

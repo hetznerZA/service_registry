@@ -65,6 +65,24 @@ module ServiceRegistry
         @iut.register_service_definition(@service_2['name'], @service_definition_1)
       end
 
+      def configure_service_uri
+        process_result(@iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @uri))
+      end
+
+      def configure_some_service_uris
+        @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_1)
+        @pre_uris = [@service_uri_1]
+      end
+
+      def remember_uri?
+        process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
+        uris = data['uris']
+        uris.each do |uri|
+          return true if uri == @uri
+        end
+        false
+      end
+
       def service_by_id
         process_result(@iut.service_by_id(@service))
       end
@@ -161,6 +179,11 @@ module ServiceRegistry
       def has_status_of_service_component_providing_service?
         sc = data['services'][0]['service_components'][@service_component]
         sc['status'] == '100'
+      end
+
+      def service_uris_changed?
+        process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
+        not arrays_the_same?(@pre_uris, data['uris'])
       end
     end
   end

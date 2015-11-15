@@ -261,3 +261,51 @@ end
 Then(/^I receive 'service definition registered' notification$/) do
   expect(@test.has_received_notification?('service definition registered')).to eq(true)
 end
+
+When(/^I request removal of a URI for the service$/) do
+  @test.remove_uri_from_service
+end
+
+Then(/^the service should no longer about the URI$/) do
+  expect(@test.remember_uri?).to eq(false)
+end
+
+Then(/^I receive 'failure removing URI from service' notification$/) do
+  expect(@test.has_received_notification?('failure removing URI from service')).to eq(true)
+end
+
+When(/^I request configuration of the service URI$/) do
+  @test.configure_service_uri
+end
+
+Then(/^the service should know about the URI$/) do
+  expect(@test.remember_uri?).to eq(true)
+end
+
+Then(/^the service URIs should remain unchanged$/) do
+  expect(@test.service_uris_changed?).to eq(false)
+end
+
+Then(/^I receive 'failure configuring service' notification$/) do
+  expect(@test.has_received_notification?('failure configuring service')).to eq(true)
+end
+
+When(/^I request a list of service URIs$/) do
+  @test.request_service_uria
+end
+
+Given(/^the service has URIs configured$/) do
+  @test.service_has_uris_configured
+end
+
+Then(/^I receive the list of URIs$/) do
+  expect(@test.has_received_service_uris?).to eq(true)
+end
+
+Then(/^I receive 'failure listing service URIs' notification$/) do
+  expect(@test.has_received_notification?('failure listing service URIs')).to eq(true)
+end
+
+Given(/^some configured service URIs$/) do
+  @test.configure_some_service_uris
+end

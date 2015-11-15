@@ -32,14 +32,14 @@ Feature: Removing URI from a service
     And the service URIs should remain unchanged
 
   Scenario: No service
-    Given no service identifier
+    Given no service
     When I request removal of a URI for the service
     Then I receive 'no service provided' notification
 
   Scenario: Invalid service
     Given invalid service identifier
     When I request removal of a URI for the service
-    Then I receive 'invalid service identifier' notification
+    Then I receive 'invalid service identifier provided' notification
 
   Scenario: Failure
     Given valid URI

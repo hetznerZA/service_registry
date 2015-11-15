@@ -16,6 +16,7 @@ module ServiceRegistry
         @broken = false
         @service_component_associations = {}
         @service_associations = {}
+        @service_uris = {}
       end
 
       def register_service(service)
@@ -338,6 +339,22 @@ service component has domain perspective associations
 
       def meta_for_service(service)
         @meta[service]
+      end
+
+      def add_service_uri(service, uri)
+        return fail('not authorized') if not @authorized
+        return fail('no URI provided') if uri.nil?
+        return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
+        return fail('no service provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return fail('failure configuring service') if @broken
+        @service_uris[service] ||= []
+        @service_uris[service] << uri
+        success
+      end
+
+      def service_uris(service)
+        success_data({ 'uris' => @service_uris[service] } )
       end
 
       private

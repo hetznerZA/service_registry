@@ -10,6 +10,7 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("producti
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Searching for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Map service components to services", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Configuring URI for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Listing endpoints for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Removing URI from a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "De-registering a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
@@ -17,4 +18,5 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "R
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Searching for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Map service components to services", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Configuring URI for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Listing endpoints for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Removing URI from a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
