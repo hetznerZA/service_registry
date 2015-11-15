@@ -3,12 +3,6 @@ Feature: Listing endpoints for a service
   In order to access a service
   I want a list of the service's URIs
 
-  Scenario: Not authorized
-    Given a registered service
-    And unauthorized publisher
-    When I request a list of service URIs
-    Then I receive 'not authorized' notification
-
   Scenario: Valid service with URIs
     Given a registered service
     And the service has URIs configured
