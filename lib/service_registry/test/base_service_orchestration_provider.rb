@@ -74,6 +74,10 @@ module ServiceRegistry
         @pre_uris = [@service_uri_1]
       end
 
+      def remove_uri_from_service
+        process_result(@iut.remove_uri_from_service(@service.is_a?(Hash) ? @service['name'] : @service, @uri))
+      end
+
       def remember_uri?
         process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
         uris = data['uris']

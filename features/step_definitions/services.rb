@@ -266,7 +266,7 @@ When(/^I request removal of a URI for the service$/) do
   @test.remove_uri_from_service
 end
 
-Then(/^the service should no longer about the URI$/) do
+Then(/^the service should no longer know about the URI$/) do
   expect(@test.remember_uri?).to eq(false)
 end
 
@@ -295,7 +295,7 @@ When(/^I request a list of service URIs$/) do
 end
 
 Given(/^the service has URIs configured$/) do
-  @test.service_has_uris_configured
+  @test.configure_some_service_uris
 end
 
 Then(/^I receive the list of URIs$/) do
@@ -304,8 +304,4 @@ end
 
 Then(/^I receive 'failure listing service URIs' notification$/) do
   expect(@test.has_received_notification?('failure listing service URIs')).to eq(true)
-end
-
-Given(/^some configured service URIs$/) do
-  @test.configure_some_service_uris
 end

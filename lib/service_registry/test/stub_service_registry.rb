@@ -354,7 +354,19 @@ service component has domain perspective associations
       end
 
       def service_uris(service)
+        @service_uris[service] ||= []
         success_data({ 'uris' => @service_uris[service] } )
+      end
+
+      def remove_uri_from_service(service, uri)
+        return fail('not authorized') if not @authorized
+        return fail('no URI provided') if uri.nil?
+        return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
+        return fail('no service provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return fail('failure removing URI from service') if @broken
+        @service_uris.delete(uri)
+        success
       end
 
       private

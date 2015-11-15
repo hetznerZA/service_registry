@@ -19,7 +19,7 @@ Feature: Configuring URI for a service
 
   Scenario: Invalid URI
     Given a registered service
-    And some configured service URIs
+    And the service has URIs configured
     And invalid URI
     When I request configuration of the service URI
     Then I receive 'invalid URI' notification
@@ -27,7 +27,7 @@ Feature: Configuring URI for a service
 
   Scenario: No URI
     Given a registered service
-    And some configured service URIs
+    And the service has URIs configured
     And no URI
     When I request configuration of the service URI
     Then I receive 'no URI provided' notification
@@ -48,7 +48,7 @@ Feature: Configuring URI for a service
   Scenario: Failure
     Given a registered service
     And valid URI
-    And some configured service URIs
+    And the service has URIs configured
     And a failure
     When I request configuration of the service URI
     Then I receive 'failure configuring service' notification
