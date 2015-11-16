@@ -207,7 +207,8 @@ module ServiceRegistry
       end
 
       def get_service_element(name, urn)
-        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{urn}#{name}</urn:serviceKey>") do |res|
+        key = name.include?(urn) ? name : "#{urn}#{name}"
+        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{key}</urn:serviceKey>") do |res|
           { 'name' => extract_name(res.body),
             'description' => extract_descriptions(res.body),
             'definition' => extract_service_definition(res.body) }
@@ -250,7 +251,7 @@ module ServiceRegistry
           service = entry[/<ns2:serviceInfo (.*?)<\/ns2:serviceInfo>/, 1]
           break if service.nil?
           id = extract_service_id(service)
-          entries[id.gsub(urn, "")] = extract_name(service) if id.include?(urn)
+          entries[id.gsub(urn, "")] = { 'id' => id, 'name' => extract_name(service) } if id.include?(urn)
           entry[/<ns2:serviceInfo (.*?)<\/ns2:serviceInfo>/, 1] = ""
           entry.gsub!("<ns2:serviceInfo </ns2:serviceInfo>", "")
           entry = nil if entry.strip == ""

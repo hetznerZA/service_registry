@@ -174,8 +174,8 @@ Given(/^multiple existing domain perspectives$/) do
   @test.multiple_existing_domain_perspectives
 end
 
-Given(/^the service components registered in different domain perspectives$/) do
-  @test.service_components_registered_in_different_domain_perspectives
+Given(/^the services are associated with different domain perspectives$/) do
+  @test.services_associated_with_different_domain_perspectives
 end
 
 Then(/^I receive a list of services matching the pattern$/) do

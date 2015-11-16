@@ -321,7 +321,7 @@ service component has domain perspective associations
       end
 
       def service_by_id(id)
-        @services[id].nil? ? success_data({'services' => []}) : success_data({'services' => [@services[id]]})
+        @services[id].nil? ? success_data({'services' => {}}) : success_data({'services' => { id => @services[id]}})
       end
 
       def service_definition(service)
@@ -413,11 +413,11 @@ service component has domain perspective associations
       end
 
       def search_for_service_in_services(list, pattern)
-        matches = []
+        matches = {}
         list.each do |id, service|
-          matches << service if (id == pattern) or (service['description'] and service['description'].include?(pattern)) or (service['definition'] and service['definition'].include?(pattern))
+          matches[id] = service if (id == pattern) or (service['description'] and service['description'].include?(pattern)) or (service['definition'] and service['definition'].include?(pattern))
         end
-        matches.each do |service|
+        matches.each do |id, service|
           service['service_components'] = service_service_component_associations(service['name'])
         end
         matches

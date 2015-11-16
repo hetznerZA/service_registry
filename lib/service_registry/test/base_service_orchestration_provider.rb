@@ -15,7 +15,7 @@ module ServiceRegistry
       end
 
       def given_a_pattern
-        @need = 'hetznerZA'
+        @need = 'id_3'
       end
 
       def given_service_with_pattern_in_id
@@ -56,6 +56,7 @@ module ServiceRegistry
         @service = @service_1['name']
         @iut.register_service(@service_1)
         @iut.register_service_definition(@service_1['name'], @service_definition_1)
+        @iut.deregister_service(@service_2['name']) if @iut.service_registered?(@service_2['name'])
       end
 
       def provide_two_matching_services
@@ -122,9 +123,12 @@ module ServiceRegistry
         @iut.register_domain_perspective(@domain_perspective_2)
       end
 
-      def service_components_registered_in_different_domain_perspectives
-        @iut.associate_service_component_with_domain_perspective(@service_component_1, @domain_perspective_2)
-        @iut.associate_service_component_with_domain_perspective(@service_component_2, @domain_perspective_1)
+      def services_associated_with_different_domain_perspectives
+        byebug
+        @iut.register_service(@service_3)
+        @iut.associate_service_with_domain_perspective(@service_3['name'], @domain_perspective_1)
+        @iut.register_service(@service_4)
+        @iut.associate_service_with_domain_perspective(@service_4['name'], @domain_perspective_2)
       end
 
       def match_pattern_in_domain_perspective
@@ -150,24 +154,38 @@ module ServiceRegistry
       end
 
       def single_service_match?
-        (data['services'].count == 1) and (data['services'].first['name'] == @service_1['name'])
+        (data['services'].count == 1) and (data['services'].first[1]['name'] == @service_1['name'])
       end
 
       def multiple_services_match?
-        (data['services'].count == 2) and ((data['services'][0]['name'] == @service_1['name']) or (data['services'][0]['name'] == @service_2['name'])) and ((data['services'][1]['name'] == @service_1['name']) or (data['services'][1]['name'] == @service_2['name']))
+        return false if not (data['services'].count == 2)
+        found_1 = false
+        found_2 = false
+        data['services'].each do |id, service|
+          return false if not ((service['name'] == @service_1['name']) or (service['name'] == @service_2['name']))
+          found_1 = true if (not(found_1) and (service['name'] == @service_1['name']))
+          found_2 = true if (not(found_2) and (service['name'] == @service_2['name']))
+        end
+        found_1 and found_2
       end
 
       def entry_matches?
-        data['services'].first['name'].include?(@need) == true
+        data['services'].first[1]['name'].include?(@need) == true
       end
 
       def both_entries_match?
-        data['services'][0]['name'].include?(@need) == true
-        data['services'][1]['name'].include?(@need) == true
+        return false if not (data['services'].count == 2)
+        found_1 = false
+        found_2 = false
+        data['services'].each do |id, service|
+          found_2 = true if (found_1 and not(found_2) and (service['name'].include?(@need)))
+          found_1 = true if (not(found_1) and (service['name'].include?(@need)))
+        end
+        found_1 and found_2
       end
 
       def service_matched_pattern?
-        (data['services'].count == 1) and (data['services'].first['name'] == @expected_pattern_service['name'])
+        (data['services'].count == 1) and (data['services'].first[1]['name'] == @expected_pattern_service['name'])
       end
 
       def matched_pattern_in_domain_perspectice?
@@ -175,25 +193,25 @@ module ServiceRegistry
       end
 
       def matched_only_in_domain_perspective?
-        data['services'][0] == @service_4
+        data['services'].first[1] == @service_3
       end
 
       def has_list_of_service_components_providing_service?
-        data['services'][0]['service_components'].count > 0
+        data['services'].first[1]['service_components'].count > 0
       end
 
       def has_list_of_both_service_components_providing_service?
-        scs = data['services'][0]['service_components']
+        scs = data['services'].first[1]['service_components']
         (scs.count > 0) and (not scs[@service_component_1].nil?) and (not scs[@service_component_2].nil?)
       end
 
       def has_uri_to_service_component_providing_service?
-        sc = data['services'][0]['service_components'][@service_component]
+        sc = data['services'].first[1]['service_components'][@service_component]
         sc['uri'] == @valid_uri
       end
 
       def has_status_of_service_component_providing_service?
-        sc = data['services'][0]['service_components'][@service_component]
+        sc = data['services'].first[1]['service_components'][@service_component]
         sc['status'] == '100'
       end
 

@@ -505,6 +505,48 @@ module ServiceRegistry
         success_data({ 'services' => list })
       end
 
+      def search_for_service(pattern)
+        return fail('invalid pattern') if pattern.nil?
+        return fail('pattern too short') if (pattern.size < 4)
+
+        services = @juddi.find_services(pattern)['data']['services']
+        service_components = @juddi.find_service_components(pattern)['data']['services']
+        services ||= {}
+        service_components ||= {}
+        found = services.merge!(service_components)
+        # byebug
+
+        success_data({'services' => found})
+      end     
+
+      def service_by_id(id)
+        return fail('invalid pattern') if id.nil? or (id.strip == "")
+
+        result = search_for_service(id)
+        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
+          result['data']['services'].each do |sid, service|
+            compare_service = "#{ServiceRegistry::HETZNER_SERVICES_URN}#{id}" == sid
+            compare_service_component = "#{ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}#{id}" == sid
+            return success_data({ 'services' => { sid => service }}) if compare_service or compare_service_component or (id == sid)
+          end
+          success_data({ 'services' => {}})
+        else
+          fail('failure finding service by id')
+        end
+      end 
+
+      def search_domain_perspective(domain_perspective, pattern)
+        found = {}
+        data = domain_perspective_associations(domain_perspective)['data']['associations']
+        service_components = data['service_components']
+        services = data['services']
+        associations = service_components.merge(services)
+        associations.each do |service|
+          found[service[0]] = @juddi.get_service(service[0])
+        end
+        success_data({'services' => found})
+      end
+
       # ---- associations ----
       def domain_perspective_associations(domain_perspective)
         meta = meta_for_domain_perspective('domains', domain_perspective)
