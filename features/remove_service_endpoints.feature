@@ -6,6 +6,7 @@ Feature: Removing URI from a service
 
   Scenario: Not authorized
     Given a registered service
+    And the service has URIs configured    
     And valid URI
     And unauthorized publisher
     When I request removal of a URI for the service

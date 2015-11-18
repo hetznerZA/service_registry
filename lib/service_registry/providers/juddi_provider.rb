@@ -59,14 +59,6 @@ module ServiceRegistry
         end
       end
 
-      def save_service_endpoint(service, service_component_endpoint, description = "")
-        result = find_element_bindings(service, @urns['services'])
-        result['data']['bindings'] ||= []
-        bindings = result['data']['bindings']
-        bindings << service_component_endpoint if not bindings.include?(service_component_endpoint)
-        save_element_bindings(service, bindinfs, @urns['services'], description)
-      end
-
       def add_service_uri(service, uri)
         result = service_uris(service)
         existing_id = nil
@@ -118,6 +110,7 @@ module ServiceRegistry
       end
 
       def save_service_component_uri(service_component, uri)
+        authorize
         result = find_element_bindings(service_component, @urns['service-components'])
         # only one binding for service components
         if result and result['data'] and result['data']['bindings'] and (result['data']['bindings'].size > 0)

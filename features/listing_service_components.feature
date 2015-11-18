@@ -23,7 +23,7 @@ Feature: Listing service components
     Then I receive an empty list of service components
 
   Scenario: One or more service components and a domain perspective
-    Given a domain perspective
+    Given an existing domain perspective
     And one or more service components exist in the domain perspective
     When service components are listed
     Then I receive a list with all the service components in the domain perspective

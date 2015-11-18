@@ -25,9 +25,10 @@ module ServiceRegistry
       end
 
       def given_service_with_pattern_in_description
-        @expected_pattern_service = @service_4
-        @iut.register_service(@service_4)
-        @iut.register_service_definition(@service_4['name'], @service_definition_1)
+        @expected_pattern_service = @service_3
+        # byebug
+        @iut.register_service(@service_3)
+        @iut.register_service_definition(@service_3['name'], @service_definition_1)
       end
 
       def given_service_with_pattern_in_definition
@@ -49,6 +50,7 @@ module ServiceRegistry
       end
 
       def match_need
+        # byebug
         process_result(@iut.search_for_service(@need))
       end
 
@@ -105,7 +107,7 @@ module ServiceRegistry
       end
 
       def multiple_existing_services
-        @iut.register_service(@service_1)
+        @iut.register_service(@service_3)
         @iut.register_service(@service_4)
         @expected_pattern_service = @service_4
         @iut.register_service_definition(@service_4['name'], @service_definition_1)
@@ -114,8 +116,8 @@ module ServiceRegistry
       def multiple_existing_service_components
         @iut.register_service_component(@service_component_1)
         @iut.register_service_component(@service_component_2)
-        @iut.associate_service_component_with_service(@service_4['name'], @service_component_2)
-        @iut.associate_service_component_with_service(@service_1['name'], @service_component_1)
+        @iut.associate_service_component_with_service(@service_4['name'], @service_uri_2)
+        @iut.associate_service_component_with_service(@service_1['name'], @service_uri_1)
       end
 
       def multiple_existing_domain_perspectives
@@ -124,7 +126,6 @@ module ServiceRegistry
       end
 
       def services_associated_with_different_domain_perspectives
-        byebug
         @iut.register_service(@service_3)
         @iut.associate_service_with_domain_perspective(@service_3['name'], @domain_perspective_1)
         @iut.register_service(@service_4)
@@ -132,6 +133,7 @@ module ServiceRegistry
       end
 
       def match_pattern_in_domain_perspective
+        # byebug
         process_result(@iut.search_domain_perspective(@domain_perspective_1, @need))
       end
 
@@ -193,21 +195,34 @@ module ServiceRegistry
       end
 
       def matched_only_in_domain_perspective?
-        data['services'].first[1] == @service_3
+        # byebug
+        data['services'].first[1]['name'] == @service_3['name']
       end
 
       def has_list_of_service_components_providing_service?
-        data['services'].first[1]['service_components'].count > 0
+        data['services'].first[1]['uris'].count > 0
+      end
+
+      def received_empty_list_of_service_components?
+        data['services'].first[1]['uris'].count == 0
       end
 
       def has_list_of_both_service_components_providing_service?
-        scs = data['services'].first[1]['service_components']
-        (scs.count > 0) and (not scs[@service_component_1].nil?) and (not scs[@service_component_2].nil?)
+        access_points = []
+        data['services'].first[1]['uris'].each do |id, uri|
+          access_points << uri['access_point']
+        end
+
+        (access_points.count > 0) and (access_points.include?(@service_uri_1) and access_points.include?(@service_uri_2))
       end
 
       def has_uri_to_service_component_providing_service?
-        sc = data['services'].first[1]['service_components'][@service_component]
-        sc['uri'] == @valid_uri
+        access_points = []
+        data['services'].first[1]['uris'].each do |id, uri|
+          access_points << uri['access_point']
+        end
+
+        (access_points.count > 0) and (access_points.include?(@service_uri_1))
       end
 
       def has_status_of_service_component_providing_service?

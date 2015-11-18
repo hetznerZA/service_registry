@@ -26,6 +26,7 @@ module ServiceRegistry
         @service_component_2 = 'sc2.dev.auto-h.net'
         @service_definition = nil
         @service_uri_1 = 'http://localhost/1'
+        @service_uri_2 = 'http://localhost/2'
         #@service_definition_1 = "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type='text/xsl' href='/wadl/wadl.xsl'?><wadl:application xmlns:wadl='http://wadl.dev.java.net/2009/02'    xmlns:jr='http://jasperreports.sourceforge.net/xsd/jasperreport.xsd'    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://wadl.dev.java.net/2009/02 wadl.xsd '><wadl:resources base='/'><wadl:resource path='/available-policies'>  <wadl:method name='GET' id='_available-policies'>    <wadl:doc>      Lists the policies available against which this service can validate credentials    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/validate-credential-using-policy'>  <wadl:method name='POST' id='_validate-credential-using-policy'>    <wadl:doc>      Given a credential string, examine the entropy against a security paradigm    </wadl:doc>    <wadl:request>      <wadl:param name='credential' type='xsd:string' required='true' style='query'>      </wadl:param>      <wadl:param name='policy' type='xsd:string' required='true' style='query'>      </wadl:param>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/generate-credential'>  <wadl:method name='GET' id='_generate-credential'>    <wadl:doc>      Generates a strong credential given a policy to adhere to    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status'>  <wadl:method name='GET' id='_status'>    <wadl:doc>      Returns 100 if capable of validating credentials against a policy and returns 0 if policy dependencies have failed and unable to validate credentials against policies    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status-detail'>  <wadl:method name='GET' id='_status-detail'>    <wadl:doc>      This endpoint provides detail of the status measure available on the /status endpoint    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/lexicon'>  <wadl:method name='GET' id='_lexicon'>    <wadl:doc>      Description of all the services available on this service component    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource></wadl:resources></wadl:application>"
         @service_definition_1 = "https://github.com/hetznerZA/some/service/wadl/definition.xml"
         @valid_meta = {'dss' => 'http://my.dss.host-h.net/qid=should_this_service_be_included&service=SERVICE-ID'}
@@ -56,6 +57,12 @@ module ServiceRegistry
       def given_a_new_domain_perspective
         @iut.reset_domain_perspectives
         @domain_perspective = @domain_perspective_1
+      end
+
+      def given_an_existing_domain_perspective
+        @iut.reset_domain_perspectives
+        @domain_perspective = @domain_perspective_1
+        @iut.register_domain_perspective(@domain_perspective)
       end
 
       def given_a_new_team
@@ -97,7 +104,7 @@ module ServiceRegistry
       end
 
       def given_valid_URI
-        @uri = @valid_uri
+        @uri = 'http://localhost/1'
       end
 
       def given_invalid_URI
@@ -150,12 +157,12 @@ module ServiceRegistry
       end
 
       def associate_service_with_two_service_components
-        process_result(@iut.associate_service_component_with_service(@service, @service_component_1))
-        process_result(@iut.associate_service_component_with_service(@service, @service_component_2))
+        process_result(@iut.associate_service_component_with_service(@service, @service_uri_1))
+        process_result(@iut.associate_service_component_with_service(@service, @service_uri_2))
       end
 
       def associate_service_with_service_component
-        process_result(@iut.associate_service_component_with_service(@service, @service_component))
+        process_result(@iut.associate_service_component_with_service(@service, @service_uri_1))
       end
 
       def given_a_valid_service

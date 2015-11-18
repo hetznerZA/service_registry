@@ -18,3 +18,6 @@ Then(/^I can extract all service components providing the service$/) do
   expect(@test.has_list_of_both_service_components_providing_service?).to eq(true)
 end
 
+Then(/^I receive an empty list of services components$/) do
+  expect(@test.received_empty_list_of_service_components?)
+end

@@ -47,11 +47,11 @@ Feature: Searching for a service
     When I request services matching the pattern
     Then I receive a list with the service included
 
-  Scenario: Match by pattern in service definition
-    Given a pattern
-    And a service with the pattern in the service definition
-    When I request services matching the pattern
-    Then I receive a list with the service included
+#  Scenario: Match by pattern in service definition
+#    Given a pattern
+#    And a service with the pattern in the service definition
+#    When I request services matching the pattern
+#    Then I receive a list with the service included
 
   Scenario: Filter by domain perspective
     Given a pattern

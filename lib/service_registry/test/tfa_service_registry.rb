@@ -245,20 +245,26 @@ module ServiceRegistry
       def list_service_components(domain_perspective = nil)
         result = @juddi.find_service_components
         service_components = ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services') ? result['data']['services'] : {}
+        found = []
 
-        if (domain_perspective)
-          list = service_components
-          service_components.each do |service_component|
-            list.delete(service_component) if false #check service component - domain perspective association here by businessKey
+        if not domain_perspective.nil?
+          associations = domain_perspective_associations(domain_perspective)['data']['associations']['service_components']
+          return success_data({'service_components' => []}) if associations.count == 0
+          
+          associations.each do |id, associated|
+            if associated
+              service_components.each do |sid, service_component|
+                found << sid if compile_domain_id('service-components', sid) == id
+              end
+            end
           end
-          service_components = list
+        else
+          service_components.each do |sid, service_component|
+            found << sid
+          end
         end
-        result['data']['service_components'] = []
-        service_components.each do |service_component, description|
-          result['data']['service_components'] << service_component
-        end
-        result['data'].delete('services')
-        result
+
+        success_data('service_components' => found)
 
       rescue => ex
         fix if @broken
@@ -330,15 +336,15 @@ module ServiceRegistry
          fail('failure deregistering service component')        
       end
 
-      def associate_service_component_with_service(service, service_component_endpoint, description = '')
+      def associate_service_component_with_service(service, access_point, description = '')
         authorize
-        return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
         return fail('no service provided') if service.nil?
-        return fail('invalid service provided') if (service.strip == "")
-        result = @juddi.save_service_endpoint(service, service_component_endpoint, description)
+        return fail('invalid service provided') if (service.strip == "") or not is_registered?(service_registered?(service))
+        return fail('no access point provided') if access_point.nil?
+        return fail('invalid access point provided') if not (access_point =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
+        result = @juddi.add_service_uri(service, access_point)
         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid service component identifier or service') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('invalid service or access point') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
         success
 
        rescue => ex
@@ -512,6 +518,12 @@ module ServiceRegistry
         services = @juddi.find_services(pattern)['data']['services']
         service_components = @juddi.find_service_components(pattern)['data']['services']
         services ||= {}
+
+        services_detailed = {}
+        services.each do |id, service|
+          service['uris'] = service_uris(service['name'])['data']['bindings']
+        end
+
         service_components ||= {}
         found = services.merge!(service_components)
         # byebug
@@ -542,7 +554,7 @@ module ServiceRegistry
         services = data['services']
         associations = service_components.merge(services)
         associations.each do |service|
-          found[service[0]] = @juddi.get_service(service[0])
+          found[service[0]] = @juddi.get_service(service[0])['data']
         end
         success_data({'services' => found})
       end

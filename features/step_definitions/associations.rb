@@ -139,6 +139,10 @@ Given(/^the service is associated with the service component$/) do
   @test.associate_service_with_service_component
 end
 
+Given(/^the service is not associated with any service components$/) do
+  # do nothing, by default not associated
+end
+
 Then(/^I receive 'failure disassociating service from domain perspective' notification$/) do
   expect(@test.has_received_notification?('failure disassociating service from domain perspective')).to eq(true)
 end
