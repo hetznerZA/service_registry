@@ -176,6 +176,8 @@ service component has domain perspective associations
 
         @service_component_associations[service_component] ||= {}
         @service_component_associations[service_component]['services'] ||= []
+        @service_uris[service] ||= []
+        @service_uris[service] << service_component
         return fail('already associated') if @service_component_associations[service_component]['services'].include?(service)
         @service_component_associations[service_component]['services'] << service
         success
@@ -371,7 +373,7 @@ service component has domain perspective associations
         return fail('no service provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
         return fail('failure removing URI from service') if @broken
-        @service_uris.delete(uri)
+        @service_uris[service].delete(uri)
         success
       end
 
@@ -398,24 +400,17 @@ service component has domain perspective associations
         return @service_component_associations[service_component]['services'].count > 0
       end
 
-      def service_service_component_associations(service)
-        return nil if service.nil?
-        associated = {}
-        @service_component_associations.each do |id, service_component|
-          if service_component['services'] and service_component['services'].include?(service)
-            associated[id] = { 'uri' => service_component_uri(id)['data']['uri'], 'status' => '100' }
-          end
-        end
-        associated
-      end
-
       def search_for_service_in_services(list, pattern)
         matches = {}
         list.each do |id, service|
           matches[id] = service if (id.include?(pattern)) or (service['description'] and service['description'].include?(pattern)) or (service['definition'] and service['definition'].include?(pattern))
         end
         matches.each do |id, service|
-          service['service_components'] = service_service_component_associations(service['name'])
+          service['uris'] = {}
+          @service_uris[service['name']] ||= []
+          @service_uris[service['name']].each do |uri|
+            service['uris'][uri] = { 'access_point' => uri }
+          end
         end
         matches
       end

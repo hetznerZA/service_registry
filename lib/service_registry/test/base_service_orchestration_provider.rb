@@ -210,6 +210,7 @@ module ServiceRegistry
       def has_list_of_both_service_components_providing_service?
         access_points = []
         data['services'].first[1]['uris'].each do |id, uri|
+        # byebug
           access_points << uri['access_point']
         end
 
