@@ -2,8 +2,8 @@ require 'uri'
 
 module ServiceRegistry
   module Test
-    class StubServiceRegistry
-      attr_reader :dss, :services, :configuration, :available, :broken, :service_component_associations
+    class StubServiceRegistry < ServiceRegistry::Providers::JSendProvider
+      attr_reader :dss, :services, :broken, :service_component_associations
       attr_writer :authorized
 
       def initialize
@@ -16,56 +16,39 @@ module ServiceRegistry
         @broken = false
         @service_component_associations = {}
         @service_associations = {}
-      end
-
-      def bootstrap(configuration, configuration_service)
-        @configuration = configuration
-        return fail('invalid configuration service') if @configuration.nil?
-        return fail('no configuration service') if @configuration['CFGSRV_PROVIDER_ADDRESS'].nil?
-        return fail('no identifier') if @configuration['CFGSRV_IDENTIFIER'].nil?
-        return fail('invalid identifier') if @configuration['CFGSRV_IDENTIFIER'].strip == ""
-        return fail('configuration error') if configuration_service.broken?
-        return fail('no configuration') if configuration_service.configuration.nil?
-        return fail('invalid configuration') if configuration_service.configuration.empty?
-        @available = true
-        return success(['configuration valid', 'valid identifier']) if @configuration
-      end
-
-      def available?
-        success_data('available' => @available)
+        @service_uris = {}
       end
 
       def register_service(service)
         return fail('not authorized') if not @authorized
         return fail('failure registering service') if @broken
-        return fail('no service identifier provided') if service.nil? or service['id'].nil?
-        return fail('invalid service identifier provided') if ((not service.is_a? Hash) or (service['id'].strip == ""))
-        return fail('service already exists') if not @services[service['id']].nil?
-        @services[service['id']] = service
+        return fail('no service identifier provided') if service.nil? or service['name'].nil?
+        return fail('invalid service identifier provided') if ((not service.is_a? Hash) or (service['name'].strip == ""))
+        return fail('service already exists') if not @services[service['name']].nil?
+        @services[service['name']] = service
         success('service registered')
-      end
-
-      def associate_dss(dss)
-        @dss = dss
-        success
       end
 
       def query_service_by_pattern(pattern)
         result = {}
         @services.each do |key, service|
-          result[service['id']] = service if service['description'].include?(pattern) and check_dss(service)
+          result[service['name']] = service if service['description'].include?(pattern) and check_dss(service)
         end
         success_data({ 'services' => result })
       end
 
-      def delete_all_domain_perspectives
+      def reset_domain_perspectives
         @domain_perspectives = []
         success
       end
 
       def list_domain_perspectives
         return fail('failure listing domain perspectives') if @broken
-        success_data({ 'domain_perspectives' => @domain_perspectives })
+        domain_perspectives = {}
+        @domain_perspectives.each do |name|
+          domain_perspectives[name] = {'id' => name, 'name' => name}
+        end
+        success_data({ 'domain_perspectives' => @domain_perspectives == [] ? {} : domain_perspectives})
       end
 
       def list_service_components(domain_perspective = nil)
@@ -85,6 +68,10 @@ module ServiceRegistry
         success
       end
 
+      def register_team(team)
+        register_domain_perspective(team)
+      end
+
       def register_domain_perspective(domain_perspective)
         return fail('not authorized') if not @authorized
         return fail('failure registering domain perspective') if @broken
@@ -92,11 +79,10 @@ module ServiceRegistry
         return fail('invalid domain perspective') if (domain_perspective and domain_perspective.strip == "")
         if not @domain_perspectives.include?(domain_perspective)
           @domain_perspectives << domain_perspective
-          return fail('domain perspective registered')
         else
           return fail('domain perspective already exists')
         end
-        success
+        success('domain perspective registered')
       end
 
       def domain_perspective_associations(domain_perspective)
@@ -118,10 +104,9 @@ module ServiceRegistry
         success_data({'associations' => []})
       end
 
-      def does_service_component_have_service_associated?(service_component, service)
-        return success_data({'associated' => false}) if not @service_component_associations[service_component]
-        return success_data({'associated' => false}) if not @service_component_associations[service_component]['services']
-        return success_data({'associated' => @service_component_associations[service_component]['services'].include?(service)})
+      def service_domain_perspective_associations(service)
+        return success_data({'associations' => @service_associations[service]['domain_perspectives']}) if @service_associations[service] and @service_associations[service]['domain_perspectives']
+        success_data({'associations' => []})
       end
 
       def deregister_domain_perspective(domain_perspective)
@@ -191,27 +176,14 @@ service component has domain perspective associations
 
         @service_component_associations[service_component] ||= {}
         @service_component_associations[service_component]['services'] ||= []
+        @service_uris[service] ||= []
+        @service_uris[service] << service_component
         return fail('already associated') if @service_component_associations[service_component]['services'].include?(service)
         @service_component_associations[service_component]['services'] << service
         success
       end
 
-      def disassociate_service_component_from_service(service, service_component)
-        return fail('not authorized') if not @authorized
-        return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
-        return fail('no service provided') if service.nil?
-        return fail('invalid service provided') if (service.strip == "")
-        return fail('failure disassociating service component with service') if @broken
-
-        @service_component_associations[service_component] ||= {}
-        @service_component_associations[service_component]['services'] ||= []
-        return fail('not associated') if not @service_component_associations[service_component]['services'].include?(service)
-        @service_component_associations[service_component]['services'].delete(service)
-        success
-      end
-
-      def associate_service_component_with_domain_perspective(domain_perspective, service_component)
+      def associate_service_component_with_domain_perspective(service_component, domain_perspective)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component.strip == "")
@@ -223,6 +195,21 @@ service component has domain perspective associations
         @service_component_associations[service_component]['domain_perspectives'] ||= []
         return fail('already associated') if @service_component_associations[service_component]['domain_perspectives'].include?(domain_perspective)
         @service_component_associations[service_component]['domain_perspectives'] << domain_perspective
+        success
+      end
+
+      def associate_service_with_domain_perspective(service, domain_perspective)
+        return fail('not authorized') if not @authorized
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service provided') if (service.strip == "")
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if (domain_perspective.strip == "")
+        return fail('failure associating service with domain perspective') if @broken
+
+        @service_associations[service] ||= {}
+        @service_associations[service]['domain_perspectives'] ||= []
+        return fail('already associated') if @service_associations[service]['domain_perspectives'].include?(domain_perspective)
+        @service_associations[service]['domain_perspectives'] << domain_perspective
         success
       end
 
@@ -241,21 +228,29 @@ service component has domain perspective associations
         success
       end
 
+      def disassociate_service_from_domain_perspective(domain_perspective, service)
+        return fail('not authorized') if not @authorized
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service provided') if (service.strip == "")
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if (domain_perspective.strip == "")
+        return fail('failure disassociating service from domain perspective') if @broken
+
+        @service_associations[service] ||= {}
+        @service_associations[service]['domain_perspectives'] ||= []
+        return fail('not associated') if not @service_associations[service]['domain_perspectives'].include?(domain_perspective)
+        @service_associations[service]['domain_perspectives'].delete(domain_perspective)
+        success
+      end
+
       def delete_all_service_components
         @service_components = []
         success
       end
 
-      def deregister_all_services_for_service_component(service_component)
-        @service_component_associations[service_component]['services'] = [] if @service_component_associations[service_component]
-        success
-      end
-
-      def associate_service_with_service_component(service_component, service)
-        @service_component_associations[service_component] ||= {}
-        @service_component_associations[service_component]['services'] ||= []
-        @service_component_associations[service_component]['services'] << service
-        success
+      def delete_all_domain_perspective_associations(domain_perspective)
+        @service_component_associations = {}
+        @service_associations = {}
       end
 
       def configure_service_component_uri(service_component, uri)
@@ -285,7 +280,7 @@ service component has domain perspective associations
         return fail('invalid service definition provided') if service_definition.nil? or (not service_definition.include?("wadl"))
 
         @services[service]['definition'] = service_definition
-        success
+        success('service definition registered')
       end
 
       def deregister_service_definition(service)
@@ -293,7 +288,7 @@ service component has domain perspective associations
         return fail('invalid service identifier provided') if service.nil? or (service.strip == "")
         return fail('unknown service identifier provided') if @services[service].nil?
         @services[service].delete('definition')
-        success
+        success('service definition deregistered')
       end
 
       def service_registered?(service)
@@ -316,19 +311,16 @@ service component has domain perspective associations
       end
 
       def search_domain_perspective(domain_perspective, pattern)
-        domain_perspective_associations(domain_perspective)['data']['associations'].each do |service_component|
-          @service_component_associations[service_component] ||= {}
-          service_list = {}
-          @service_component_associations[service_component]['services'].each do |id|
-            service_list[id] = @services[id]
-          end
-          return success_data({'services' => search_for_service_in_services(service_list, pattern)})
+        services_list = search_for_service(pattern)['data']['services']
+        found = {}
+        services_list.each do |id, service|
+          found[id] = service if @service_associations[id]['domain_perspectives'].include?(domain_perspective)
         end
-        return success_data({'services' => {}})
+        return success_data({'services' => found})
       end
 
       def service_by_id(id)
-        @services[id].nil? ? success_data({'services' => []}) : success_data({'services' => [@services[id]]})
+        @services[id].nil? ? success_data({'services' => {}}) : success_data({'services' => { id => @services[id]}})
       end
 
       def service_definition(service)
@@ -348,31 +340,48 @@ service component has domain perspective associations
         @meta[service]
       end
 
+      def add_service_uri(service, uri)
+        return fail('not authorized') if not @authorized
+        return fail('no URI provided') if uri.nil?
+        return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
+        return fail('no service provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return fail('failure configuring service') if @broken
+        @service_uris[service] ||= []
+        @service_uris[service] << uri
+        success
+      end
+
+      def service_uris(service)
+        return fail('not authorized') if not @authorized
+        return fail('no service provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return fail('failure listing service URIs') if @broken
+
+        @service_uris[service] ||= []
+        result = {'bindings' => {}}
+        @service_uris.each do |service, uri|
+          result['bindings'][uri[0]] = {'access_point' => uri[0]}
+        end
+        success_data(result)
+      end
+
+      def remove_uri_from_service(service, uri)
+        return fail('not authorized') if not @authorized
+        return fail('no URI provided') if uri.nil?
+        return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
+        return fail('no service provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
+        return fail('failure removing URI from service') if @broken
+        @service_uris[service].delete(uri)
+        success
+      end
+
       private
-
-      def report(status, message, data = nil)
-        data ||= {}
-        data['notifications'] = message.is_a?(Array) ? message : [ message ] 
-        { 'status' => status, 'data' => data }
-      end
-
-      def fail(message = nil, data = nil)
-        message ||= 'fail'
-        report('fail', message, data)
-      end
-
-      def success_data(data = nil)
-        success(nil, data)
-      end
-
-      def success(message = nil, data = nil)
-        message ||= 'success'
-        report('success', message, data)
-      end
 
       def check_dss(service)
         return true if not service['meta'].include?('dss')
-        result = @dss.query(service['id'])
+        result = @dss.query(service['name'])
         return false if result.nil? or result == 'error'
         result
       end
@@ -391,24 +400,17 @@ service component has domain perspective associations
         return @service_component_associations[service_component]['services'].count > 0
       end
 
-      def service_service_component_associations(service)
-        return nil if service.nil?
-        associated = {}
-        @service_component_associations.each do |id, service_component|
-          if service_component['services'] and service_component['services'].include?(service)
-            associated[id] = { 'uri' => service_component_uri(id)['data']['uri'], 'status' => '100' }
-          end
-        end
-        associated
-      end
-
       def search_for_service_in_services(list, pattern)
-        matches = []
+        matches = {}
         list.each do |id, service|
-          matches << service if (id == pattern) or (service['description'] and service['description'].include?(pattern)) or (service['definition'] and service['definition'].include?(pattern))
+          matches[id] = service if (id.include?(pattern)) or (service['description'] and service['description'].include?(pattern)) or (service['definition'] and service['definition'].include?(pattern))
         end
-        matches.each do |service|
-          service['service_components'] = service_service_component_associations(service['id'])
+        matches.each do |id, service|
+          service['uris'] = {}
+          @service_uris[service['name']] ||= []
+          @service_uris[service['name']].each do |uri|
+            service['uris'][uri] = { 'access_point' => uri }
+          end
         end
         matches
       end

@@ -1,5 +1,4 @@
 Given(/^unknown service identifier$/) do
-  @test.register_service_definition
   @test.given_unknown_service
 end
 
@@ -9,10 +8,6 @@ end
 
 When(/^I register the service definition with the service$/) do
   @test.register_service_definition
-end
-
-Given(/^the service is already associated with the service component$/) do
-  @test.associate_service_with_service_component
 end
 
 Then(/^I receive 'unknown service identifier provided' notification$/) do
@@ -179,8 +174,8 @@ Given(/^multiple existing domain perspectives$/) do
   @test.multiple_existing_domain_perspectives
 end
 
-Given(/^the service components registered in different domain perspectives$/) do
-  @test.service_components_registered_in_different_domain_perspectives
+Given(/^the services are associated with different domain perspectives$/) do
+  @test.services_associated_with_different_domain_perspectives
 end
 
 Then(/^I receive a list of services matching the pattern$/) do
@@ -257,4 +252,56 @@ end
 
 Given(/^no service definition associated with it$/) do
   @test.no_service_definition_associated
+end
+
+Then(/^I receive 'service definition deregistered' notification$/) do
+  expect(@test.has_received_notification?('service definition deregistered')).to eq(true)
+end
+
+Then(/^I receive 'service definition registered' notification$/) do
+  expect(@test.has_received_notification?('service definition registered')).to eq(true)
+end
+
+When(/^I request removal of a URI for the service$/) do
+  @test.remove_uri_from_service
+end
+
+Then(/^the service should no longer know about the URI$/) do
+  expect(@test.remember_uri?).to eq(false)
+end
+
+Then(/^I receive 'failure removing URI from service' notification$/) do
+  expect(@test.has_received_notification?('failure removing URI from service')).to eq(true)
+end
+
+When(/^I request configuration of the service URI$/) do
+  @test.configure_service_uri
+end
+
+Then(/^the service should know about the URI$/) do
+  expect(@test.remember_uri?).to eq(true)
+end
+
+Then(/^the service URIs should remain unchanged$/) do
+  expect(@test.service_uris_changed?).to eq(false)
+end
+
+Then(/^I receive 'failure configuring service' notification$/) do
+  expect(@test.has_received_notification?('failure configuring service')).to eq(true)
+end
+
+When(/^I request a list of service URIs$/) do
+  @test.request_service_uris
+end
+
+Given(/^the service has URIs configured$/) do
+  @test.configure_some_service_uris
+end
+
+Then(/^I receive the list of URIs$/) do
+  expect(@test.has_received_service_uris?).to eq(true)
+end
+
+Then(/^I receive 'failure listing service URIs' notification$/) do
+  expect(@test.has_received_notification?('failure listing service URIs')).to eq(true)
 end

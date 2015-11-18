@@ -29,7 +29,7 @@ Feature: Searching for a service
     When I request the service by ID
     Then I receive a list with the service as the single entry in it
 
-  Scenario: No match for by service ID
+  Scenario: No match for the service ID
     Given a service ID
     And no match for the service ID
     When I request the service by ID
@@ -47,18 +47,18 @@ Feature: Searching for a service
     When I request services matching the pattern
     Then I receive a list with the service included
 
-  Scenario: Match by pattern in service definition
-    Given a pattern
-    And a service with the pattern in the service definition
-    When I request services matching the pattern
-    Then I receive a list with the service included
+#  Scenario: Match by pattern in service definition
+#    Given a pattern
+#    And a service with the pattern in the service definition
+#    When I request services matching the pattern
+#    Then I receive a list with the service included
 
   Scenario: Filter by domain perspective
     Given a pattern
     And multiple existing services
     And multiple existing service components
     And multiple existing domain perspectives
-    And the service components registered in different domain perspectives
+    And the services are associated with different domain perspectives
     When I request services matching the pattern in the domain perspective
     Then I receive a list of services matching the pattern
     And all services in the list must be in the domain perspective

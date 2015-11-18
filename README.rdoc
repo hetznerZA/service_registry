@@ -2,7 +2,7 @@
 
 == Features
 
-The service registry provides a variety of features supporting domain and service modelling, discovery and support.
+The service registry provides a variety of features supporting domain and service modelling, discovery and support. For a discussion on the model adopted (minimal SOA architectural without full-blown virtual services, but with domain perspectives as functional view implementations in minimal infrastructural virtual services (web applications)) {file:features/service_domain_perspective_association.readme see here.}
 
 === decision support system
 * {file:features/dss.feature decision support} when mapping services
@@ -11,6 +11,11 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/list_domain_perspectives.feature listing domain perspectives} when provisioning domain perspectives and service components
 * {file:features/register_domain_perspective.feature registering domain perspectives} when new domain perspectives become relevant
 * {file:features/deregister_domain_perspective.feature deregistering domain perspectives} when domain perspectives become irrelevant
+
+=== teams
+* {file:features/list_domain_perspectives.feature listing teams} when needing teams to model ownership in the domain
+* {file:features/register_domain_perspective.feature registering teams} new teams become relevant
+* {file:features/deregister_domain_perspective.feature deregistering teams} when teams become irrelevant
 
 === service components
 * {file:features/listing_service_components.feature listing service components} when provisioning service components and mapping service components to domain perspectives
@@ -31,15 +36,19 @@ The service registry provides a variety of features supporting domain and servic
 
 === accociations
 * {file:features/associate_service_component_with_domain_perspective.feature associating service components with domain perspectives} when modelling the domain.
-* {file:features/associate_service_component_with_domain_perspective.feature changing domain perspective associations} when modelling the domain.
-* {file:features/remove_service_component_domain_perspective_association.feature removing domain perspective associations} when modelling the domain.
-* {file:features/associate_service_component_with_service.feature associating service components with services} when provisioning services.
-* {file:features/associate_service_component_with_service.feature changing service associations} when provisioning services.
-* {file:features/remove_service_component_service_association.feature removing service associations} when provisioning services.
+* {file:features/associate_service_component_with_domain_perspective.feature changing domain perspective service component associations} when modelling the domain.
+* {file:features/remove_service_component_domain_perspective_association.feature removing domain perspective service component associations} when modelling the domain.
+* {file:features/associate_service_with_domain_perspective.feature associating services with domain perspectives} when modelling the domain.
+* {file:features/associate_service_with_domain_perspective.feature changing domain perspective service associations} when modelling the domain.
+* {file:features/remove_service_domain_perspective_association.feature removing domain perspective service associations} when modelling the domain.
+* {file:features/service_endpoints.feature adding service access points} when provisioning serviceses
+* {file:features/list_service_endpoints.feature listing services access points} when using services.
+* {file:features/remove_service_endpoints.feature removing service access points} when provisioning services
 
 === search and filters
 
 * {file:features/service_search.feature finding a list of services in a domain perspectives} when exploring a domain perspective
+* {file:features/service_search.feature finding a list of service components in a domain perspectives} when exploring provisining of a domain perspective
 * {file:features/service_search.feature finding a list of services  matching service search criteria} when exploring services
 * {file:features/service_service_components.feature querying service status} when deciding which service from a pool of candidate services are best to use
 * {file:features/service_service_components.feature finding a URI} for accessing the service on a service component

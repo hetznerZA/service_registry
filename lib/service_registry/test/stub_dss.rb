@@ -8,11 +8,11 @@ module ServiceRegistry
       end
 
       def select(service)
-        @selected[service['id']] = service
+        @selected[service['name']] = service
       end
 
       def deselect(service)
-        @selected.delete(service['id'])
+        @selected.delete(service['name'])
       end
 
       def query(id)

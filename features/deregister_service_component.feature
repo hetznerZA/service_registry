@@ -6,7 +6,10 @@ Feature: De-registering a service component
   I want to deregister the service component
 
   Scenario: Not authorized
-    Given unauthorized publisher
+    Given existing service component identifier
+    And a domain perspective
+    And no domain perspectives associated with the service component
+    And unauthorized publisher
     When I request deregistration of the service component
     Then I receive 'not authorized' notification
 
@@ -27,18 +30,10 @@ Feature: De-registering a service component
 
   Scenario: Existing service component
     Given existing service component identifier
-    And no services associated with the service component
     And no domain perspectives associated with the service component
     When I request deregistration of the service component
     Then I receive 'service component deregistered' notification
     And the service component should not be available
-
-  Scenario: Associated services
-    Given existing service component identifier
-    And services associated with the service component
-    When I request deregistration of the service component
-    Then I receive 'service component has service associations' notification
-    And the service component should be available
 
   Scenario: Associated domain perspectives
     Given existing service component identifier
@@ -50,7 +45,6 @@ Feature: De-registering a service component
 
   Scenario: failure
     Given existing service component identifier
-    And no services associated with the service component
     And a failure
     When I request deregistration of the service component
     Then I receive 'failure deregistering service component' notification

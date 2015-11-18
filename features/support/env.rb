@@ -1,12 +1,20 @@
-$LOAD_PATH.unshift File.expand_path("../../../lib", __FILE__)
+$LOAD_PATH.unshift File.expand_path("../../../lib/service_registry", __FILE__)
 require 'byebug'
-require 'service_registry/test'
+
+def require_files
+  require "providers/jsend_provider"
+  require "test/orchestration_provider_registry"
+  Dir.glob(File.expand_path("../../../lib/service_registry/providers/**/*.rb", __FILE__), &method(:require))
+  require "test/base_orchestration_provider"
+  Dir.glob(File.expand_path("../../../lib/service_registry/test/**/*.rb", __FILE__), &method(:require))
+end
+
+require_files
 
 Before do |scenario|
   begin
     feature = scenario.feature.short_name
     @test = ServiceRegistry::Test::OrchestratorEnvironmentFactory.build(feature)
-    @test.setup
   rescue
     Cucumber.wants_to_quit = true
     raise

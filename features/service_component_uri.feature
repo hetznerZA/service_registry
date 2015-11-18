@@ -4,6 +4,13 @@ Feature: Configuring a URI for a service component
   In order to have the service component be accessible
   I want to configure a URI for the service component
 
+  Scenario: Not authorized
+    Given existing service component identifier
+    And valid URI
+    And unauthorized publisher
+    When I request configuration of the service component
+    Then I receive 'not authorized' notification
+
   Scenario: Providing a URI for a service component
     Given valid URI
     And existing service component identifier
