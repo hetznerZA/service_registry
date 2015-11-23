@@ -4,9 +4,9 @@ require 'byebug'
 module ServiceRegistry
   module Providers
     class JUDDIProvider < BootstrappedProvider
-      def initialize(urns)
+      def initialize(urns, connector)
         @urns = urns
-        @connector = ServiceRegistry::Providers::JUDDISoapConnector.new(@urns)
+        @connector = connector
       end
 
       def set_uri(uri)
@@ -21,7 +21,6 @@ module ServiceRegistry
         { 'available' => @connector.check_availability }
       end
 
-      # ---- assignments ----
       def assign_service_to_business(name, business_key = @urns['company'])
         @connector.authorize
         result = @juddi.get_service(name)
@@ -35,8 +34,6 @@ module ServiceRegistry
         service = result['data']
         @connector.save_service_element(service['name'], service['description'], service['definition'], @urns['service-components'], business_key)
       end
-
-      # ---- services ----
 
       def get_service(name)
         @connector.get_service_element(name, @urns['services'])
@@ -87,8 +84,6 @@ module ServiceRegistry
         @connector.find_element_bindings(service, @urns['services'])
       end
 
-      # ---- service components ----
-
       def get_service_component(name)
         @connector.get_service_element(name, @urns['service-components'])
       end
@@ -124,8 +119,6 @@ module ServiceRegistry
       def find_service_component_uri(service_component)
         @connector.find_element_bindings(service_component, @urns['service-components'])
       end
-
-      # ---- businesses ----
 
       def save_business(key, name, description = nil)
         @connector.authorize

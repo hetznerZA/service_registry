@@ -18,7 +18,7 @@ module ServiceRegistry
                  'teams' => ServiceRegistry::HETZNER_TEAMS_URN,
                  'services' => ServiceRegistry::HETZNER_SERVICES_URN,
                  'service-components' => ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}
-        @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns)
+        @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns, ServiceRegistry::Providers::JUDDISoapConnector.new(@urns))
         @juddi.set_uri(@tfa_uri)
         @authorized = true
         @credentials = { 'username' => 'uddi', 'password' => 'uddi' }
