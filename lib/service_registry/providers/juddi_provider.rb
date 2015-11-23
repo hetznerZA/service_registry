@@ -6,7 +6,7 @@ module ServiceRegistry
     class JUDDIProvider < BootstrappedProvider
       def initialize(urns)
         @urns = urns
-        @connector = ServiceRegistry::Providers::JUDDISoapConnector.new(@urns['domains'])
+        @connector = ServiceRegistry::Providers::JUDDISoapConnector.new(@urns)
       end
 
       def set_uri(uri)
@@ -51,10 +51,7 @@ module ServiceRegistry
       def find_services(pattern = nil)
         pattern = pattern.nil? ? '%' : "%#{pattern}%"
 
-        @connector.request_soap('inquiryv2', 'find_service',
-        "<findQualifiers> <findQualifier>approximateMatch</findQualifier> <findQualifier>orAllKeys</findQualifier> </findQualifiers> <name>#{pattern}</name>") do |res|
-          @connector.extract_service_entries_elements(res.body, @urns['services'])
-        end
+        @connector.find_services(pattern)
       end
 
       def add_service_uri(service, uri)
@@ -101,10 +98,7 @@ module ServiceRegistry
       def find_service_components(pattern = nil)
         pattern = pattern.nil? ? '%' : "%#{pattern}%"
 
-        @connector.request_soap('inquiryv2', 'find_service',
-        "<findQualifiers> <findQualifier>approximateMatch</findQualifier> <findQualifier>orAllKeys</findQualifier> </findQualifiers> <name>#{pattern}</name>") do |res|
-          @connector.extract_service_entries_elements(res.body, @urns['service-components'])
-        end
+        @connector.find_service_components(pattern)
       end
 
       def save_service_component_uri(service_component, uri)
@@ -127,39 +121,29 @@ module ServiceRegistry
 
       def save_business(key, name, description = nil)
         authorize
-        body = "<name>#{name}</name>"
+        businessEntity = "<name>#{name}</name>"
         if description
           description.each do |desc|
-            body = body + "<urn:description xml:lang='en'>#{desc}</urn:description>" if desc and not (desc == "")
+            businessEntity = businessEntity + "<urn:description xml:lang='en'>#{desc}</urn:description>" if desc and not (desc == "")
           end
         end
 
-        @connector.request_soap('publishv2', 'save_business',
-                     "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessEntity businessKey='#{key}'>#{body}</urn:businessEntity>") do | res|
-          @connector.extract_business(res.body)
-        end
+        @connector.save_business(key, businessEntity)
       end
 
       def get_business(key)
-        @connector.request_soap('inquiryv2', 'get_businessDetail', "<urn:businessKey>#{key}</urn:businessKey>") do |res|
-          @connector.extract_business(res.body)
-        end
+        @connector.get_business(key)
       end
 
       def find_businesses(pattern = nil)
         pattern = pattern.nil? ? '%' : "%#{pattern}%"
-        @connector.request_soap('inquiryv2', 'find_business',
-        "<findQualifiers> <findQualifier>approximateMatch</findQualifier></findQualifiers> <name>#{pattern}</name>") do |res|
-          @connector.extract_business_entries(res.body)
-        end
+
+        @connector.find_business(pattern)
       end
 
       def delete_business(key)
         authorize
-        @connector.request_soap('publishv2', 'delete_business',
-        "<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo> <urn:businessKey>#{key}</urn:businessKey>") do |res|
-          { 'errno' => @connector.extract_errno(res.body) }
-        end
+        @connector.delete_business(key)
       end
 
       def business_eq?(business, comparison)
