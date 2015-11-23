@@ -23,12 +23,14 @@ module ServiceRegistry
 
       # ---- assignments ----
       def assign_service_to_business(name, business_key = @urns['company'])
+        @connector.authorize
         result = @juddi.get_service(name)
         service = result['data']
         @connector.save_service_element(service['name'], service['description'], service['definition'], @urns['services'], business_key)
       end
 
       def assign_service_component_to_business(name, business_key = @urns['company'])
+        @connector.authorize
         result = @juddi.get_service_component(name)
         service = result['data']
         @connector.save_service_element(service['name'], service['description'], service['definition'], @urns['service-components'], business_key)
@@ -41,10 +43,12 @@ module ServiceRegistry
       end
 
       def save_service(name, description = nil, definition = nil)
+        @connector.authorize
         @connector.save_service_element(name, description.is_a?(Array) ? description : [description], definition, @urns['services'], @urns['company'])
       end
 
       def delete_service(name)
+        @connector.authorize
         @connector.delete_service_element(name, @urns['services'])
       end
 
@@ -55,6 +59,7 @@ module ServiceRegistry
       end
 
       def add_service_uri(service, uri)
+        @connector.authorize
         result = service_uris(service)
         existing_id = nil
         result['data']['bindings'] ||= {}
@@ -67,6 +72,7 @@ module ServiceRegistry
       end
 
       def remove_service_uri(service, uri)
+        @connector.authorize
         result = service_uris(service)
         existing_id = nil
         result['data']['bindings'] ||= {}
@@ -88,10 +94,12 @@ module ServiceRegistry
       end
 
       def save_service_component(name, description = nil, definition = nil)
+        @connector.authorize
         @connector.save_service_element(name, description.is_a?(Array) ? description : [description], definition, @urns['service-components'], @urns['company'])
       end
 
       def delete_service_component(name)
+        @connector.authorize
         @connector.delete_service_element(name, @urns['service-components'])
       end
 
@@ -102,7 +110,7 @@ module ServiceRegistry
       end
 
       def save_service_component_uri(service_component, uri)
-        authorize
+        @connector.authorize
         result = @connector.find_element_bindings(service_component, @urns['service-components'])
         # only one binding for service components
         if result and result['data'] and result['data']['bindings'] and (result['data']['bindings'].size > 0)
@@ -120,15 +128,8 @@ module ServiceRegistry
       # ---- businesses ----
 
       def save_business(key, name, description = nil)
-        authorize
-        businessEntity = "<name>#{name}</name>"
-        if description
-          description.each do |desc|
-            businessEntity = businessEntity + "<urn:description xml:lang='en'>#{desc}</urn:description>" if desc and not (desc == "")
-          end
-        end
-
-        @connector.save_business(key, businessEntity)
+        @connector.authorize
+        @connector.save_business(key, name, description)
       end
 
       def get_business(key)
@@ -142,17 +143,13 @@ module ServiceRegistry
       end
 
       def delete_business(key)
-        authorize
+        @connector.authorize
         @connector.delete_business(key)
       end
 
       def business_eq?(business, comparison)
         business == "#{@urns['domains']}#{comparison}"
       end    
-
-      def authorize
-        @auth_token = @connector.authorize
-      end
     end
   end
 end

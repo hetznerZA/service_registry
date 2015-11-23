@@ -21,7 +21,6 @@ module ServiceRegistry
       end
 
       def save_element_bindings(service, bindings, urn, description)
-        authorize
         body = auth_body
         if (not bindings.nil?) and (not (bindings.size == 0))
           bindings.each do |binding|
@@ -37,9 +36,16 @@ module ServiceRegistry
         end
       end
 
-      def save_business(key, businessEntity)
+      def save_business(key, name, description)
+      	body = "<name>#{name}</name>"
+        if description
+          description.each do |desc|
+            body = body + "<urn:description xml:lang='en'>#{desc}</urn:description>" if desc and not (desc == "")
+          end
+        end
+
         request_soap('publishv2', 'save_business',
-                     "#{auth_body} <urn:businessEntity businessKey='#{key}'>#{businessEntity}</urn:businessEntity>") do | res|
+                     "#{auth_body} <urn:businessEntity businessKey='#{key}'>#{body}</urn:businessEntity>") do | res|
           extract_business(res.body)
         end
       end
@@ -85,7 +91,6 @@ module ServiceRegistry
       end
 
       def delete_binding(binding)
-        authorize
         request_soap('publishv2', 'delete_binding', "#{auth_body} <urn:bindingKey>#{binding}</urn:bindingKey>") do |res|
           { 'errno' => extract_errno(res.body) }
         end
@@ -101,7 +106,6 @@ module ServiceRegistry
       end
 
       def save_service_element(name, description, definition, urn, business_key)
-        authorize
         body = "#{auth_body} <urn:businessService businessKey='#{business_key}' serviceKey='#{urn}#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
         if description
           description.each do |desc|
@@ -117,7 +121,6 @@ module ServiceRegistry
       end
 
       def delete_service_element(name, urn)
-        authorize
         request_soap('publishv2', 'delete_service', "#{auth_body} <urn:serviceKey>#{urn}#{name}</urn:serviceKey>") do |res|
           { 'errno' => extract_errno(res.body) }
         end
