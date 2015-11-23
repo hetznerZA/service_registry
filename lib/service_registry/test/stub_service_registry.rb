@@ -2,7 +2,7 @@ require 'uri'
 
 module ServiceRegistry
   module Test
-    class StubServiceRegistry < ServiceRegistry::Providers::JSendProvider
+    class StubServiceRegistry < ServiceRegistry::Providers::BootstrappedProvider
       attr_reader :dss, :services, :broken, :service_component_associations
       attr_writer :authorized
 

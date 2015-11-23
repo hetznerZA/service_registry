@@ -3,7 +3,7 @@ require 'byebug'
 
 module ServiceRegistry
   module Providers
-    class JUDDIProvider < JSendProvider
+    class JUDDIProvider < BootstrappedProvider
       def initialize(urns)
         @auth_user = ''
         @auth_password = ''

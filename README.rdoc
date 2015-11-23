@@ -34,7 +34,7 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/deregister_service_definition.feature deregistering service definitions} when provisioning services
 * {file:features/service_definition.feature obtaining a service definition} given a service identifier
 
-=== accociations
+=== associations
 * {file:features/associate_service_component_with_domain_perspective.feature associating service components with domain perspectives} when modelling the domain.
 * {file:features/associate_service_component_with_domain_perspective.feature changing domain perspective service component associations} when modelling the domain.
 * {file:features/remove_service_component_domain_perspective_association.feature removing domain perspective service component associations} when modelling the domain.

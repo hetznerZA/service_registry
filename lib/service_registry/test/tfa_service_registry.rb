@@ -4,7 +4,9 @@ require 'json'
 
 module ServiceRegistry
   module Test
-    class TfaServiceRegistry < ServiceRegistry::Providers::JSendProvider
+    class TfaServiceRegistry < ServiceRegistry::Providers::BootstrappedProvider
+      include ServiceRegistry::Providers::JSender
+      
       attr_writer :authorized
 
       def initialize
@@ -50,8 +52,8 @@ module ServiceRegistry
         description << service ['meta'] if service['meta']
 
         result = @juddi.save_service(service['name'], description, service['definition'])
-        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
         success('service registered')
 
         rescue => ex
@@ -62,7 +64,7 @@ module ServiceRegistry
       def service_registered?(service)
         result = @juddi.find_services(service)
         registered = false
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
+        if has_data?(result, 'services')
           result['data']['services'].each do |service_key, description|
             registered = (service.downcase == service_key.downcase)
           end
@@ -76,8 +78,8 @@ module ServiceRegistry
         return fail('invalid service identifier provided') if service.strip == ""
         return success('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.delete_service(service)
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
         success('service deregistered')
 
       rescue => ex
@@ -94,8 +96,8 @@ module ServiceRegistry
 
         return fail('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.add_service_uri(service, uri)
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
         success
 
       rescue => ex
@@ -110,8 +112,8 @@ module ServiceRegistry
 
         return fail('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.service_uris(service)
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
         success_data(result['data'])
 
       rescue => ex
@@ -128,8 +130,8 @@ module ServiceRegistry
 
         return fail('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.remove_service_uri(service, uri)
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
         success
 
       rescue => ex
@@ -151,8 +153,8 @@ module ServiceRegistry
         service = result['data']
         service['definition'] = definition
         result = @juddi.save_service(service['name'], service['description'], service['definition'])
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')        
-        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')        
+        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
         success('service definition registered')
       rescue => ex
         fix if @broken
@@ -164,7 +166,7 @@ module ServiceRegistry
         return fail('invalid service identifier provided') if (service.strip == "")
         return success('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)['data']
-        return fail('invalid service identifier provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
         return fail('service has no definition') if (result['definition'].nil?) or (result['definition'] == "")
         return success_data({'definition' => result['definition']}) if (not result.nil?) and (not result['definition'].nil?)
       end
@@ -178,7 +180,7 @@ module ServiceRegistry
         service = result['data']
         service['definition'] = ""
         result = @juddi.save_service(service['name'], service['description'], service['definition'])
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
         success('service definition deregistered')
       end
 
@@ -188,7 +190,7 @@ module ServiceRegistry
         authorize
         return if not @authorized
         result = list_domain_perspectives
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'domain_perspectives') 
+        if has_data?(result, 'domain_perspectives') 
           result['data']['domain_perspectives'].each do |name, detail|
             @juddi.delete_business(detail['id'])
           end
@@ -199,7 +201,7 @@ module ServiceRegistry
         result = @juddi.find_businesses
         result['data']['domain_perspectives'] = {}
 
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'businesses')
+        if has_data?(result, 'businesses')
           result['data']['businesses'].each do |business, detail|
             hetz = false
             ServiceRegistry::HETZNER_DOMAIN_TYPES.each do |type|
@@ -244,7 +246,7 @@ module ServiceRegistry
       # ---- service components ----
       def list_service_components(domain_perspective = nil)
         result = @juddi.find_service_components
-        service_components = ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services') ? result['data']['services'] : {}
+        service_components = has_data?(result, 'services') ? result['data']['services'] : {}
         found = []
 
         if not domain_perspective.nil?
@@ -275,7 +277,7 @@ module ServiceRegistry
         authorize
         return if not @authorized
         result = list_service_components
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'service_components') 
+        if has_data?(result, 'service_components') 
           result['data']['service_components'].each do |service_component, description|
             @juddi.delete_service_component(service_component)
           end
@@ -285,7 +287,7 @@ module ServiceRegistry
       def service_component_registered?(service_component)
         result = @juddi.find_service_components(service_component)
         registered = false
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
+        if has_data?(result, 'services')
           result['data']['services'].each do |service_key, description|
             registered = (service_component.downcase == service_key.downcase)
           end
@@ -300,8 +302,8 @@ module ServiceRegistry
         return fail('service component already exists') if is_registered?(service_component_registered?(service_component))
 
         result = @juddi.save_service_component(service_component)
-        return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service component identifier') if notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
         success('service component registered')
 
         rescue => ex
@@ -327,8 +329,8 @@ module ServiceRegistry
          return success('service component unknown') if not is_registered?(service_component_registered?(service_component))
          return fail('service component has domain perspective associations') if service_component_has_domain_perspective_associations?(service_component)
          result = @juddi.delete_service_component(service_component)
-         return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-         return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+         return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+         return fail('invalid service component identifier') if notifications_include?(result, 'E_invalidKeyPassed')
          success('service component deregistered')
 
        rescue => ex
@@ -343,8 +345,8 @@ module ServiceRegistry
         return fail('no access point provided') if access_point.nil?
         return fail('invalid access point provided') if not (access_point =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
         result = @juddi.add_service_uri(service, access_point)
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid service or access point') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service or access point') if notifications_include?(result, 'E_invalidKeyPassed')
         success
 
        rescue => ex
@@ -359,8 +361,8 @@ module ServiceRegistry
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
         result = @juddi.save_service_component_uri(service_component, uri)
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid service component identifier or URI') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid service component identifier or URI') if notifications_include?(result, 'E_invalidKeyPassed')
         success
 
        rescue => ex
@@ -372,8 +374,8 @@ module ServiceRegistry
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component identifier') if (service_component.strip == "")
         result = @juddi.find_service_component_uri(service_component)
-        return fail('invalid service component identifier') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
-        uri = (ServiceRegistry::Providers::JSendProvider::has_data?(result, 'bindings') and (result['data']['bindings'].size > 0)) ? result['data']['bindings'].first[1]['access_point'] : nil
+        return fail('invalid service component identifier') if notifications_include?(result, 'E_invalidKeyPassed')
+        uri = (has_data?(result, 'bindings') and (result['data']['bindings'].size > 0)) ? result['data']['bindings'].first[1]['access_point'] : nil
         result['data']['uri'] = uri
         result
       end   
@@ -402,8 +404,8 @@ module ServiceRegistry
 
         result = @juddi.save_service(detail['name'], detail['description'], detail['definition'])
 
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid meta') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid meta') if notifications_include?(result, 'E_invalidKeyPassed')
 
         success_data('meta updated', result['data'])
        rescue => ex
@@ -459,8 +461,8 @@ module ServiceRegistry
 
         result = @juddi.save_business(detail['id'], detail['name'], detail['description'])
 
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid meta') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid meta') if notifications_include?(result, 'E_invalidKeyPassed')
 
         success_data('meta updated', result['data'])
        rescue => ex
@@ -493,10 +495,10 @@ module ServiceRegistry
       def query_service_by_pattern(pattern)
         result = @juddi.find_services
         list = {}        
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
+        if has_data?(result, 'services')
           result['data']['services'].each do |service, name|
             detail = @juddi.get_service(service)
-            if ServiceRegistry::Providers::JSendProvider::has_data?(detail, 'description')
+            if has_data?(detail, 'description')
               found = false
               dss = nil
               detail['data']['description'].each do |description|
@@ -535,7 +537,7 @@ module ServiceRegistry
         return fail('invalid pattern') if id.nil? or (id.strip == "")
 
         result = search_for_service(id)
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'services')
+        if has_data?(result, 'services')
           result['data']['services'].each do |sid, service|
             compare_service = "#{ServiceRegistry::HETZNER_SERVICES_URN}#{id}" == sid
             compare_service_component = "#{ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}#{id}" == sid
@@ -686,7 +688,7 @@ module ServiceRegistry
       def domain_registered?(type, domain_perspective)
         result = @juddi.find_businesses(domain_perspective)
         registered = false
-        if ServiceRegistry::Providers::JSendProvider::has_data?(result, 'businesses')
+        if has_data?(result, 'businesses')
           result['data']['businesses'].each do |business, detail|
             registered = (domain_perspective.downcase == business.downcase) and (detail['id'].include?(type))
           end
@@ -703,8 +705,8 @@ module ServiceRegistry
         id = compile_domain_id(type, domain_perspective)
         result = @juddi.save_business(id, domain_perspective)
 
-        return fail('invalid domain perspective') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid domain perspective') if notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
 
         success('domain perspective registered')
 
@@ -731,8 +733,8 @@ module ServiceRegistry
         return fail('domain perspective has associations') if domain_perspective_has_associations?(domain_perspective)
 
         result = @juddi.delete_business(compile_domain_id(type, domain_perspective))
-        return fail('not authorized') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_authTokenRequired')
-        return fail('invalid domain perspective provided') if ServiceRegistry::Providers::JSendProvider::notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
+        return fail('invalid domain perspective provided') if notifications_include?(result, 'E_invalidKeyPassed')
         success('domain perspective deregistered')
 
       rescue => ex
@@ -747,7 +749,7 @@ module ServiceRegistry
       end
 
       def is_registered?(result)
-        ServiceRegistry::Providers::JSendProvider::has_data?(result, 'registered') and result['data']['registered']
+        has_data?(result, 'registered') and result['data']['registered']
       end
 
       def description_is_meta?(meta)
