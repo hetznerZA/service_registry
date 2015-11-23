@@ -183,14 +183,6 @@ module ServiceRegistry
         @auth_token
       end
 
-      def request_soap(version, service, request, attr = nil, &block)
-        req = connection(version, service)
-        req.body = soap_envelope(request, service, attr)
-        execute(req) do |res|
-          block.call(res)
-        end
-      end
-
       def check_availability
         result = `curl -S #{@base_uri}/juddiv3 2>&1`
         not(result.downcase.include?("fail"))
@@ -202,6 +194,14 @@ module ServiceRegistry
       end
 
       private
+
+      def request_soap(version, service, request, attr = nil, &block)
+        req = connection(version, service)
+        req.body = soap_envelope(request, service, attr)
+        execute(req) do |res|
+          block.call(res)
+        end
+      end
 
       def extract_service_id(soap)
         soap[/serviceKey="(.*?)"/, 1]
