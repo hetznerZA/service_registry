@@ -2,11 +2,7 @@ module ServiceRegistry
   module Providers
     module JSender
       def report(status, message, result = nil)
-        data ||= {}
-        result = { 'result' => result} if not result.is_a? Hash
-        result.each do |key, value|
-          data[key] = value
-        end
+        data = compile_data(result)
         data['notifications'] = message.is_a?(Array) ? message : [ message ] 
         { 'status' => status, 'data' => data }
       end
@@ -30,6 +26,7 @@ module ServiceRegistry
       end
 
       def has_data?(result, key = nil)
+        return false if key.nil?
         return false if (result.nil?) or (result['data'].nil?)
         return false if (not key.nil?) and (result['data'][key].nil?)
         true
@@ -38,7 +35,18 @@ module ServiceRegistry
       def notifications_include?(result, pattern)
         return false if not has_data?(result, 'notifications')
         result['data']['notifications'].to_s.include?(pattern)
-      end      
+      end
+
+      private
+
+      def compile_data(result)
+        data ||= {}
+        result = { 'result' => result} if not result.is_a? Hash
+        result.each do |key, value|
+          data[key] = value
+        end
+        data
+      end
     end
   end
 end

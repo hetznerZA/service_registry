@@ -1,6 +1,5 @@
 require 'byebug'
 require 'spec_helper'
-require "./lib/service_registry/providers/dss_associate.rb"
 
 class Tester
   include ServiceRegistry::Providers::DssAssociate
