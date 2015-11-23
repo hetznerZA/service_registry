@@ -1,17 +1,10 @@
 require 'byebug'
 require 'spec_helper'
 
-class StubConfigurationService
-	attr_accessor :configuration
-
-	def broken?
-		false
-	end
-end
-
 describe "ServiceRegistry::Providers::BootstrappedProvider" do
 
 	before :each do
+  	@configuration_service = ServiceRegistry::Test::StubConfigurationService.new
   	@iut = ServiceRegistry::Providers::BootstrappedProvider.new
   end
 
@@ -42,32 +35,29 @@ describe "ServiceRegistry::Providers::BootstrappedProvider" do
 		end
 
 		it "should fail with 'configuration error' if the configuration could not be retrieved from the configuration service" do
+			@configuration_service.break
+      expect(@iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider"}, @configuration_service)).to eq({"status"=>"fail", "data"=>{"result"=>nil, "notifications"=>["configuration error"]}})
 		end
 
 		it "should fail with 'no configuration' if the configuration retrieved is nil" do
-      stub = StubConfigurationService.new
-      expect(@iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider"}, stub)).to eq({"status"=>"fail", "data"=>{"result"=>nil, "notifications"=>["no configuration"]}})
+      expect(@iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider"}, @configuration_service)).to eq({"status"=>"fail", "data"=>{"result"=>nil, "notifications"=>["no configuration"]}})
 		end
 
 		it "should fail with 'invalid configuration' if the configuration retrieved is empty" do
-      stub = StubConfigurationService.new
-      stub.configuration = {}
-      expect(@iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider"}, stub)).to eq({"status"=>"fail", "data"=>{"result"=>nil, "notifications"=>["invalid configuration"]}})
+      @configuration_service.configure({})
+      expect(@iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider"}, @configuration_service)).to eq({"status"=>"fail", "data"=>{"result"=>nil, "notifications"=>["invalid configuration"]}})
 		end
 
   	it "should set availability to true after successful bootstrap" do
-      stub = StubConfigurationService.new
-      stub.configuration = { 'key' => 'value'}
-      @iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider" }, stub)
+      @configuration_service.configure({ 'key' => 'value'})
+      @iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider" }, @configuration_service)
 			expect(@iut.available?).to eq({"status"=>"success", "data"=>{"available"=>true, "notifications"=>["success"]}})
 		end
 
 		it "should success with 'configuration valid' and 'valid identifier' if the bootstrap was successful and the configuration valid" do
-      stub = StubConfigurationService.new
-      stub.configuration = { 'key' => 'value'}
-      expect(@iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider" }, stub)).to eq({"status"=>"success", "data"=>{"result"=>nil, "notifications"=>["configuration valid", "valid identifier"]}})
+      @configuration_service.configure({ 'key' => 'value'})
+      expect(@iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider" }, @configuration_service)).to eq({"status"=>"success", "data"=>{"result"=>nil, "notifications"=>["configuration valid", "valid identifier"]}})
 		end
-
 	end
 
 	context "when asked if available" do
@@ -77,9 +67,8 @@ describe "ServiceRegistry::Providers::BootstrappedProvider" do
 		end
 
 		it "should return jsend with 'available' set to true if successfully bootstrapped" do
-      stub = StubConfigurationService.new
-      stub.configuration = { 'key' => 'value'}
-      @iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider" }, stub)
+      @configuration_service.configure({ 'key' => 'value'})
+      @iut.bootstrap({ 'CFGSRV_PROVIDER_ADDRESS' => 'http://localhost', 'CFGSRV_IDENTIFIER' => "BootstrappedProvider" }, @configuration_service)
 			expect(@iut.available?).to eq({"status"=>"success", "data"=>{"available"=>true, "notifications"=>["success"]}})
 		end
 	end

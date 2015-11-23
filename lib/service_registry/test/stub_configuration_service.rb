@@ -18,6 +18,11 @@ module ServiceRegistry
       def configure(configuration)
         @configuration = configuration
       end
+
+      def request_configuration
+        raise RuntimeError if @broken
+        @configuration
+      end      
     end
   end
 end
