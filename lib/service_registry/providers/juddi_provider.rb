@@ -4,6 +4,9 @@ require 'byebug'
 module ServiceRegistry
   module Providers
     class JUDDIProvider < BootstrappedProvider
+      include ServiceRegistry::Providers::DssAssociate
+      include ServiceRegistry::Providers::JSender
+            
       def initialize(urns)
         @auth_user = ''
         @auth_password = ''

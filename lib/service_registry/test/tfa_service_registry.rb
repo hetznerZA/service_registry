@@ -5,8 +5,9 @@ require 'json'
 module ServiceRegistry
   module Test
     class TfaServiceRegistry < ServiceRegistry::Providers::BootstrappedProvider
+      include ServiceRegistry::Providers::DssAssociate
       include ServiceRegistry::Providers::JSender
-      
+            
       attr_writer :authorized
 
       def initialize
