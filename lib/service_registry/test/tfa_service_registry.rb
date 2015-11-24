@@ -1,6 +1,7 @@
 require 'uri'
 require 'service_registry'
 require 'json'
+require 'soap4juddi'
 
 module ServiceRegistry
   module Test
@@ -18,7 +19,7 @@ module ServiceRegistry
                  'teams' => ServiceRegistry::HETZNER_TEAMS_URN,
                  'services' => ServiceRegistry::HETZNER_SERVICES_URN,
                  'service-components' => ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}
-        broker = ServiceRegistry::Providers::JUDDISoapBroker.new(@urns)
+        broker = ::Soap4juddi::Broker.new(@urns)
         broker.set_uri(@tfa_uri)
         @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns, broker)
         @authorized = true
