@@ -14,10 +14,7 @@ module ServiceRegistry
 
       def authorize(base_uri)
         @auth_token = '' # clear any existing token
-        req = connection(base_uri, 'security', 'get_authToken')
-        auth = @soap_xml.element_with_value('get_authToken', '', {'userID' => @auth_user, 'cred' => @auth_password})
-        req.body = @soap_xml.envelope_header_body(auth)
-        result = execute(req) do |res|
+        result = execute(build_authorization_request(base_uri)) do |res|
           @auth_token = (res.body.split('authtoken:')[1]).split('<')[0]
         end
         @auth_token
@@ -25,7 +22,7 @@ module ServiceRegistry
 
       def request_soap(base_uri, version, service, request, attr = nil, &block)
         req = connection(base_uri, version, service)
-        req.body = soap_envelope(request, service, attr)
+        req.body = @soap_xml.soap_envelope(request, service, attr)
         execute(req) do |res|
           block.call(res)
         end
@@ -41,10 +38,17 @@ module ServiceRegistry
 
       private
 
+      def build_authorization_request(base_uri)
+        req = connection(base_uri, 'security', 'get_authToken')
+        auth = @soap_xml.element_with_value('get_authToken', '', {'userID' => @auth_user, 'cred' => @auth_password})
+        req.body = @soap_xml.envelope_header_body(auth)
+        req
+      end
+
       def connection(base_uri, service, action)
         @uri = URI("#{base_uri}/juddiv3/services/#{service}")
         req = Net::HTTP::Post.new(@uri)
-        req.content_type = 'text/xml;charset=UTF-8'
+        req.content_type = @soap_xml.content_type
         req['SOAPAction'] = action
         req
       end      
@@ -63,14 +67,6 @@ module ServiceRegistry
         return success_data(result) if result
         return success
       end  
-
-      def soap_envelope(message, urn = nil, attr = nil)
-        text = ""
-        text = text + "<urn:#{urn} generic='2.0' xmlns='urn:uddi-org:api_v2' " + (attr.nil? ? "" : attr) + ">" if urn
-        text = text + message
-        text = text + "</urn:#{urn}>" if urn
-        @soap_xml.envelope_header_body(text, 2)
-      end
   	end
   end
 end

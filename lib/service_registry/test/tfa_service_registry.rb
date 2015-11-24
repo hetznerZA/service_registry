@@ -18,8 +18,9 @@ module ServiceRegistry
                  'teams' => ServiceRegistry::HETZNER_TEAMS_URN,
                  'services' => ServiceRegistry::HETZNER_SERVICES_URN,
                  'service-components' => ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}
-        @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns, ServiceRegistry::Providers::JUDDISoapBroker.new(@urns))
-        @juddi.set_uri(@tfa_uri)
+        broker = ServiceRegistry::Providers::JUDDISoapBroker.new(@urns)
+        broker.set_uri(@tfa_uri)
+        @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns, broker)
         @authorized = true
         @credentials = { 'username' => 'uddi', 'password' => 'uddi' }
 
@@ -31,12 +32,12 @@ module ServiceRegistry
       end
 
       def fix
-        @juddi.set_uri(@tfa_uri)
+        @juddi.broker.set_uri(@tfa_uri)
         @broken = false
       end
 
       def break
-        @juddi.set_uri("http://127.0.0.1:9992")
+        @juddi.broker.set_uri("http://127.0.0.1:9992")
         @broken = true
       end
 
@@ -745,8 +746,8 @@ module ServiceRegistry
 
       def authorize
         raise RuntimeError.new("Not available / properly initialized") if not available?['data']['available']
-        @juddi.authenticate(@credentials['username'], @credentials['password']) if @authorized
-        @juddi.authenticate('', '') if not @authorized
+        @juddi.broker.authenticate(@credentials['username'], @credentials['password']) if @authorized
+        @juddi.broker.authenticate('', '') if not @authorized
       end
 
       def is_registered?(result)
