@@ -10,6 +10,7 @@ module ServiceRegistry
         @auth_user = ''
         @auth_password = ''
        	@urns = urns
+       	@soap = ServiceRegistry::Providers::Soap4JUDDI.new
       end
 
       def set_uri(uri)
@@ -17,7 +18,7 @@ module ServiceRegistry
       end
 
       def auth_body
-      	"<urn:authInfo>authtoken:#{@auth_token}</urn:authInfo>"
+      	@soap.element_with_key_value("authInfo", "authtoken", @auth_token)
       end
 
       def save_element_bindings(service, bindings, urn, description)
@@ -28,7 +29,13 @@ module ServiceRegistry
             url_type = 'https' if binding.include?('https')
             url_type = 'http' if (not binding.include?('https') and binding.include?('http'))
             url_type ||= 'unknown'
-            body = body + "<urn:bindingTemplate bindingKey='' serviceKey='#{urn}#{service}'><description>#{description}</description><accessPoint URLType='#{url_type}'>#{binding}</accessPoint><urn:tModelInstanceDetails></urn:tModelInstanceDetails></urn:bindingTemplate>"
+            access_point = @soap.element_with_value('accessPoint', binding, {'URLType' => url_type})
+            description = @soap.element_with_value('description', description)
+            model_instance_details = @soap.element_with_value('tModelInstanceDetails', '')
+            bindingTemplate = @soap.element_with_value("bindingTemplate",
+            	                                         "#{description}#{access_point}#{model_instance_details}",
+            	                                        {'bindingKey' => '', 'serviceKey' => "#{urn}#{service}"})
+            body = body + bindingTemplate
           end
         end
         request_soap('publishv2', 'save_binding', body) do | res|
@@ -37,68 +44,80 @@ module ServiceRegistry
       end
 
       def save_business(key, name, description)
-      	body = "<name>#{name}</name>"
+      	body = @soap.element_with_value("name", name)
         if description
           description.each do |desc|
-            body = body + "<urn:description xml:lang='en'>#{desc}</urn:description>" if desc and not (desc == "")
+          	xml = @soap.element_with_value('description', desc, {'xml:lang' => 'en'})
+            body = "#{body}#{xml}" if desc and not (desc == "")
           end
         end
 
+        businessEntity = @soap.element_with_value('businessEntity', body, {'businessKey' => key})
         request_soap('publishv2', 'save_business',
-                     "#{auth_body} <urn:businessEntity businessKey='#{key}'>#{body}</urn:businessEntity>") do | res|
+                     "#{auth_body} #{businessEntity}") do | res|
           extract_business(res.body)
         end
       end
 
       def get_business(key)
-        request_soap('inquiryv2', 'get_businessDetail', "<urn:businessKey>#{key}</urn:businessKey>") do |res|
+        request_soap('inquiryv2', 'get_businessDetail', @soap.element_with_value('businessKey', key)) do |res|
           extract_business(res.body)
         end
       end
 
       def find_business(pattern)
-        request_soap('inquiryv2', 'find_business',
-        "<findQualifiers> <findQualifier>approximateMatch</findQualifier></findQualifiers> <name>#{pattern}</name>") do |res|
+      	qualifiers = @soap.element_with_value('findQualifiers', @soap.element_with_value('findQualifier', 'approximateMatch'))
+      	xml = @soap.element_with_value('name', pattern)
+        request_soap('inquiryv2', 'find_business', "#{qualifiers} #{xml}") do |res|
           extract_business_entries(res.body)
         end
       end	
 
       def delete_business(key)
+      	xml = @soap.element_with_value('businessKey', key)
         request_soap('publishv2', 'delete_business',
-        "#{auth_body} <urn:businessKey>#{key}</urn:businessKey>") do |res|
+        "#{auth_body} #{xml}") do |res|
           { 'errno' => extract_errno(res.body) }
         end
       end
 
       def find_services(pattern)
-        request_soap('inquiryv2', 'find_service',
-        "<findQualifiers> <findQualifier>approximateMatch</findQualifier> <findQualifier>orAllKeys</findQualifier> </findQualifiers> <name>#{pattern}</name>") do |res|
+      	qualifier1 = @soap.element_with_value('findQualifier', 'approximateMatch')
+      	qualifier2 = @soap.element_with_value('findQualifier', 'orAllKeys')
+      	qualifiers = @soap.element_with_value('findQualifiers', "#{qualifier1}#{qualifier2}")
+      	xml = @soap.element_with_value('name', pattern)
+        request_soap('inquiryv2', 'find_service', "#{qualifiers} #{xml}") do |res|
           extract_service_entries_elements(res.body, @urns['services'])
         end
       end
 
       def find_service_components(pattern)
-        request_soap('inquiryv2', 'find_service',
-        "<findQualifiers> <findQualifier>approximateMatch</findQualifier> <findQualifier>orAllKeys</findQualifier> </findQualifiers> <name>#{pattern}</name>") do |res|
+      	qualifier1 = @soap.element_with_value('findQualifier', 'approximateMatch')
+      	qualifier2 = @soap.element_with_value('findQualifier', 'orAllKeys')
+      	qualifiers = @soap.element_with_value('findQualifiers', "#{qualifier1}#{qualifier2}")
+      	xml = @soap.element_with_value('name', pattern)
+        request_soap('inquiryv2', 'find_service', "#{qualifiers} #{xml}") do |res|
           extract_service_entries_elements(res.body, @urns['service-components'])
         end
       end
 
       def find_element_bindings(name, urn)
-        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{urn}#{name}</urn:serviceKey>") do |res|
+        request_soap('inquiryv2', 'get_serviceDetail', @soap.element_with_value('serviceKey', "#{urn}#{name}")) do |res|
           extract_bindings(res.body)
         end
       end
 
       def delete_binding(binding)
-        request_soap('publishv2', 'delete_binding', "#{auth_body} <urn:bindingKey>#{binding}</urn:bindingKey>") do |res|
+      	xml = @soap.element_with_value('bindingKey', binding)
+        request_soap('publishv2', 'delete_binding', "#{auth_body} #{xml}") do |res|
           { 'errno' => extract_errno(res.body) }
         end
       end
 
       def get_service_element(name, urn)
         key = name.include?(urn) ? name : "#{urn}#{name}"
-        request_soap('inquiryv2', 'get_serviceDetail', "<urn:serviceKey>#{key}</urn:serviceKey>") do |res|
+        xml = @soap.element_with_value('serviceKey', key)
+        request_soap('inquiryv2', 'get_serviceDetail', "#{xml}") do |res|
           { 'name' => extract_name(res.body),
             'description' => extract_descriptions(res.body),
             'definition' => extract_service_definition(res.body) }
@@ -106,14 +125,20 @@ module ServiceRegistry
       end
 
       def save_service_element(name, description, definition, urn, business_key)
-        body = "#{auth_body} <urn:businessService businessKey='#{business_key}' serviceKey='#{urn}#{name}'><urn:name xml:lang='en'>#{name}</urn:name>"
+        # byebug
+        service_details = @soap.element_with_value('name', name)
         if description
           description.each do |desc|
-            body = body + "<urn:description xml:lang='en'>#{desc}</urn:description>" if desc and not (desc == "")
+          	service_details = service_details + @soap.element_with_value('description', desc, { 'xml:lang' => 'en' }) if desc and not (desc == "")
           end
         end
-        body = body + "<urn:categoryBag><urn:keyedReference tModelKey='uddi:uddi.org:wadl:types' keyName='service-definition' keyValue='#{definition}'></urn:keyedReference></urn:categoryBag>" if definition and not (definition.strip == "")
-        body = body + "</urn:businessService>"
+        if definition and not (definition.strip == "")
+	        keyedReference = @soap.element_with_value('keyedReference', '', {'tModelKey' => 'uddi:uddi.org:wadl:types', 'keyName' => 'service-definition', 'keyValue' => definition})
+	        service_details = service_details + @soap.element_with_value('categoryBag', keyedReference)
+	      end
+      	xml = @soap.element_with_value('businessService', service_details, {'businessKey' => business_key, 'serviceKey' => "#{urn}#{name}"})
+
+        body = "#{auth_body} #{xml}"
 
         request_soap('publishv2', 'save_service', body) do | res|
           extract_service(res.body)

@@ -408,7 +408,7 @@ module ServiceRegistry
         return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
         return fail('invalid meta') if notifications_include?(result, 'E_invalidKeyPassed')
 
-        success_data('meta updated', result['data'])
+        success('meta updated', result['data'])
        rescue => ex
          fix if @broken
          fail('failure configuring service with meta')
@@ -465,7 +465,7 @@ module ServiceRegistry
         return fail('not authorized') if notifications_include?(result, 'E_authTokenRequired')
         return fail('invalid meta') if notifications_include?(result, 'E_invalidKeyPassed')
 
-        success_data('meta updated', result['data'])
+        success('meta updated', result['data'])
        rescue => ex
          fix if @broken
          fail('failure configuring domain perspective with meta')

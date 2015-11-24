@@ -6,6 +6,7 @@ class Requires
 	  require "providers/jsender"
 	  require "providers/bootstrapped_provider"
 	  require "providers/juddi_soap_connector"
+	  require "providers/soap4juddi"
 	  require "providers/juddi_provider"
 	  require "test/orchestration_provider_registry"
 	  require "test/base_orchestration_provider"
