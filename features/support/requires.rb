@@ -5,7 +5,7 @@ class Requires
 	  require "providers/dss_associate"
 	  require "providers/jsender"
 	  require "providers/bootstrapped_provider"
-	  require "providers/juddi_soap_connector"
+	  require "providers/juddi_soap_broker"
 	  require "providers/soap4juddi_xml"
 	  require "providers/soap4juddi_connector"
 	  require "providers/juddi_provider"

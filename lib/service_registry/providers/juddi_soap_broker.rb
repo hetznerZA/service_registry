@@ -3,7 +3,7 @@ require 'byebug'
 
 module ServiceRegistry
   module Providers
-  	class JUDDISoapConnector
+  	class JUDDISoapBroker
       def initialize(urns)
        	@urns = urns
        	@soap_connector = ServiceRegistry::Providers::Soap4JUDDIConnector.new
