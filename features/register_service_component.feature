@@ -31,7 +31,7 @@ Feature: Registering service components
   Scenario: Invalid service component identifier
     Given invalid service component identifier
     When I request registration of the service component
-    Then I receive 'invalid service component identifier' notification
+    Then I receive 'invalid service component identifier provided' notification
     And the service component should not be available
 
   Scenario: failure

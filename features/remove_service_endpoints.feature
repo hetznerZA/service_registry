@@ -39,7 +39,7 @@ Feature: Removing URI from a service
     Given no service
     And valid URI
     When I request removal of a URI for the service
-    Then I receive 'no service provided' notification
+    Then I receive 'no service identifier provided' notification
 
   Scenario: Invalid service
     Given invalid service identifier

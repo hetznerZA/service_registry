@@ -1,15 +1,7 @@
-$LOAD_PATH.unshift File.expand_path("../../../lib/service_registry", __FILE__)
 require 'byebug'
+require './features/support/requires'
 
-def require_files
-  require "providers/jsend_provider"
-  require "test/orchestration_provider_registry"
-  Dir.glob(File.expand_path("../../../lib/service_registry/providers/**/*.rb", __FILE__), &method(:require))
-  require "test/base_orchestration_provider"
-  Dir.glob(File.expand_path("../../../lib/service_registry/test/**/*.rb", __FILE__), &method(:require))
-end
-
-require_files
+Requires::require_files
 
 Before do |scenario|
   begin

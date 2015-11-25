@@ -1,8 +1,12 @@
 require 'uri'
+require 'jsender'
 
 module ServiceRegistry
   module Test
-    class StubServiceRegistry < ServiceRegistry::Providers::JSendProvider
+    class StubServiceRegistry < ServiceRegistry::Providers::BootstrappedProvider
+      include ServiceRegistry::Providers::DssAssociate
+      include Jsender
+      
       attr_reader :dss, :services, :broken, :service_component_associations
       attr_writer :authorized
 
@@ -124,7 +128,7 @@ module ServiceRegistry
         return fail('not authorized') if not @authorized
         return fail('failure registering service component') if @broken
         return fail('no service component identifier provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component and service_component.strip == "")
+        return fail('invalid service component identifier provided') if (service_component and service_component.strip == "")
         if not @service_components.include?(service_component)
           @service_components << service_component
           return success('service component registered')
@@ -296,7 +300,7 @@ service component has domain perspective associations
       end
 
       def service_definition_for_service(service)
-        return fail('no service provided') if service.nil?
+        return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
         return fail('unknown service identifier provided') if @services[service].nil?
         return fail('service has no definition') if @services[service]['definition'].nil?
@@ -344,7 +348,7 @@ service component has domain perspective associations
         return fail('not authorized') if not @authorized
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
-        return fail('no service provided') if service.nil?
+        return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
         return fail('failure configuring service') if @broken
         @service_uris[service] ||= []
@@ -354,7 +358,7 @@ service component has domain perspective associations
 
       def service_uris(service)
         return fail('not authorized') if not @authorized
-        return fail('no service provided') if service.nil?
+        return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
         return fail('failure listing service URIs') if @broken
 
@@ -370,7 +374,7 @@ service component has domain perspective associations
         return fail('not authorized') if not @authorized
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
-        return fail('no service provided') if service.nil?
+        return fail('no service identifier provided') if service.nil?
         return fail('invalid service identifier provided') if (service.strip == "")
         return fail('failure removing URI from service') if @broken
         @service_uris[service].delete(uri)

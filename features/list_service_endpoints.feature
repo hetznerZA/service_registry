@@ -12,7 +12,7 @@ Feature: Listing endpoints for a service
   Scenario: No service
     Given no service
     When I request a list of service URIs
-    Then I receive 'no service provided' notification
+    Then I receive 'no service identifier provided' notification
 
   Scenario: Invalid service
     Given invalid service identifier
