@@ -7,6 +7,8 @@ require 'jsender'
 module ServiceRegistry
   module Test
     class SoarSrImplementation < ServiceRegistry::Providers::BootstrappedProvider
+      include ServiceRegistry::Providers::DssAssociate
+
       def initialize(uri, urns, credentials)
         @soar_sr = SoarSr::ServiceRegistry.new(uri, urns, credentials)
       end
