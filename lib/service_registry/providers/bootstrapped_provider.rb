@@ -1,7 +1,9 @@
+require 'jsender'
+
 module ServiceRegistry
   module Providers
     class BootstrappedProvider
-      include ServiceRegistry::Providers::JSender
+      include Jsender
 
       def available?
         success_data('available' => @available)

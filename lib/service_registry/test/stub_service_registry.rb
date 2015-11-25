@@ -1,10 +1,11 @@
 require 'uri'
+require 'jsender'
 
 module ServiceRegistry
   module Test
     class StubServiceRegistry < ServiceRegistry::Providers::BootstrappedProvider
       include ServiceRegistry::Providers::DssAssociate
-      include ServiceRegistry::Providers::JSender
+      include Jsender
       
       attr_reader :dss, :services, :broken, :service_component_associations
       attr_writer :authorized

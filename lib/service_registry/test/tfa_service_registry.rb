@@ -2,12 +2,13 @@ require 'uri'
 require 'service_registry'
 require 'json'
 require 'soap4juddi'
+require 'jsender'
 
 module ServiceRegistry
   module Test
     class TfaServiceRegistry < ServiceRegistry::Providers::BootstrappedProvider
       include ServiceRegistry::Providers::DssAssociate
-      include ServiceRegistry::Providers::JSender
+      include Jsender
             
       attr_writer :authorized
 
