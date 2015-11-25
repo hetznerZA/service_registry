@@ -10,7 +10,7 @@ module ServiceRegistry
       attr_reader :dss, :services, :broken, :service_component_associations
       attr_writer :authorized
 
-      def initialize
+      def initialize(uri, urns, credentials)
         @authorized = true
         @meta = {}
         @services = {}

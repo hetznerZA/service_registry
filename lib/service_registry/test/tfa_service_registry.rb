@@ -12,19 +12,14 @@ module ServiceRegistry
             
       attr_writer :authorized
 
-      def initialize
-        @tfa_uri = "http://localhost:8080"
-        @urns = { 'base' => ServiceRegistry::HETZNER_BASE_URN,
-                 'company' => ServiceRegistry::HETZNER_URN,
-                 'domains' => ServiceRegistry::HETZNER_DOMAINS_URN,
-                 'teams' => ServiceRegistry::HETZNER_TEAMS_URN,
-                 'services' => ServiceRegistry::HETZNER_SERVICES_URN,
-                 'service-components' => ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}
+      def initialize(uri, urns, credentials)
+        @tfa_uri = uri
+        @urns = urns
         broker = ::Soap4juddi::Broker.new(@urns)
         broker.set_uri(@tfa_uri)
         @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns, broker)
         @authorized = true
-        @credentials = { 'username' => 'uddi', 'password' => 'uddi' }
+        @credentials = credentials
 
         # stub out the bootstrapping environment
         @configuration_bootstrap = {'CFGSRV_PROVIDER_ADDRESS' => 'https://127.0.0.1', 'CFGSRV_TOKEN' => 'abcd', 'CFGSRV_IDENTIFIER' => 'identifier' }
@@ -529,15 +524,6 @@ module ServiceRegistry
       end
 
       # ---- associations ----
-      def domain_perspective_associations(domain_perspective)
-        meta = meta_for_domain_perspective('domains', domain_perspective)
-
-        meta['associations'] ||= {}
-        meta['associations']['services'] ||= {}
-        meta['associations']['service_components'] ||= {}
-        success_data(associations)
-      end
-
 
       def delete_all_domain_perspective_associations(domain_perspective)
         associations = domain_perspective_associations(domain_perspective)['data']['associations']
