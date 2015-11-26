@@ -359,8 +359,8 @@ module ServiceRegistry
       def configure_meta_for_service(service, meta)
         authorize
 
-        return fail('no service provided') if service.nil?
-        return fail('invalid service provided') if (service.strip == "")
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
 
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)

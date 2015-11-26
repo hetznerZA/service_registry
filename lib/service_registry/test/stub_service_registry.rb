@@ -334,8 +334,8 @@ service component has domain perspective associations
         return fail('not authorized') if not @authorized
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)
-        return fail('no service provided') if service.nil?
-        return fail('invalid service provided') if (service.strip == "")
+        return fail('no service identifier provided') if service.nil?
+        return fail('invalid service identifier provided') if (service.strip == "")
         return fail('failure configuring service with meta') if @broken
         @meta[service] = meta
       end
