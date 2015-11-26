@@ -117,7 +117,7 @@ module ServiceRegistry
         return fail('not authorized') if not @authorized
         return fail('failure deregistering domain perspective') if @broken
         if not @domain_perspectives.include?(domain_perspective)
-          return success('domain perspective unknown')
+          return success('unknown domain perspective')
         end
         return fail('domain perspective has associations') if does_domain_perspective_have_service_components_associated?(domain_perspective)
         @domain_perspectives.delete(domain_perspective)

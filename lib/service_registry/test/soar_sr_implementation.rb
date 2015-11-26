@@ -18,7 +18,7 @@ module ServiceRegistry
       end
 
       def fix
-        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, @credentials) if value
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, @credentials)
       end
 
       def break
@@ -75,10 +75,16 @@ module ServiceRegistry
       end
 
       def deregister_service_definition(service)
-        @soar_sr.service_definitions.deregister_service_definition(service)
+        process_result(@soar_sr.service_definitions.deregister_service_definition(service))
       end
 
       def reset_domain_perspectives
+        result = @soar_sr.domain_perspectives.list_domain_perspectives
+        if has_data?(result, 'domain_perspectives') 
+          result['data']['domain_perspectives'].each do |name, detail|
+            @soar_sr.broker.delete_business(detail['id'])
+          end
+        end
       end
 
       def list_domain_perspectives

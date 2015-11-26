@@ -59,12 +59,6 @@ module ServiceRegistry
         @domain_perspective = @domain_perspective_1
       end
 
-      def given_an_existing_domain_perspective
-        @iut.reset_domain_perspectives
-        @domain_perspective = @domain_perspective_1
-        @iut.register_domain_perspective(@domain_perspective)
-      end
-
       def given_a_new_team
         @iut.reset_domain_perspectives
       end

@@ -684,7 +684,7 @@ module ServiceRegistry
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
 
-        return fail('domain perspective unknown') if not is_registered?(domain_perspective_registered?(domain_perspective))
+        return fail('unknown domain perspective') if not is_registered?(domain_perspective_registered?(domain_perspective))
         return fail('domain perspective has associations') if domain_perspective_has_associations?(domain_perspective)
 
         result = @juddi.delete_business(compile_domain_id(type, domain_perspective))
