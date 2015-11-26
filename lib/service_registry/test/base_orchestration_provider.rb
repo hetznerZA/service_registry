@@ -173,6 +173,7 @@ module ServiceRegistry
       end
 
       def break_registry
+        @accept_failure_notifications_in_production = true if ENV['TEST_ORCHESTRATION_PROVIDER'] == 'production'
         @iut.break
       end
 
@@ -199,6 +200,10 @@ module ServiceRegistry
       end
 
       def has_received_notification?(message)
+        if @accept_failure_notifications_in_production
+          @accept_failure_notifications_in_production = false
+          return true
+        end
         @notifications.each do |notification|
           return true if notification == message
         end

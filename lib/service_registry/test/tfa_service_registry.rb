@@ -12,9 +12,15 @@ module ServiceRegistry
             
       attr_writer :authorized
 
-      def initialize(uri, urns, credentials)
+      def initialize(uri, fqdn, company_name, credentials)
+        @urns = { 'base' => ServiceRegistry::HETZNER_BASE_URN,
+                 'company' => ServiceRegistry::HETZNER_URN,
+                 'domains' => ServiceRegistry::HETZNER_DOMAINS_URN,
+                 'teams' => ServiceRegistry::HETZNER_TEAMS_URN,
+                 'services' => ServiceRegistry::HETZNER_SERVICES_URN,
+                 'service-components' => ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}
+
         @tfa_uri = uri
-        @urns = urns
         broker = ::Soap4juddi::Broker.new(@urns)
         broker.set_uri(@tfa_uri)
         @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns, broker)
@@ -476,7 +482,7 @@ module ServiceRegistry
       end
 
       def search_for_service(pattern)
-        return fail('invalid pattern') if pattern.nil?
+        return fail('invalid pattern provided') if pattern.nil?
         return fail('pattern too short') if (pattern.size < 4)
 
         services = @juddi.find_services(pattern)['data']['services']
@@ -496,7 +502,7 @@ module ServiceRegistry
       end     
 
       def service_by_id(id)
-        return fail('invalid pattern') if id.nil? or (id.strip == "")
+        return fail('invalid service identifier provided') if id.nil? or (id.strip == "")
 
         result = search_for_service(id)
         if has_data?(result, 'services')

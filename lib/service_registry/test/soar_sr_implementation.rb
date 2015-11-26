@@ -9,14 +9,25 @@ module ServiceRegistry
     class SoarSrImplementation < ServiceRegistry::Providers::BootstrappedProvider
       include ServiceRegistry::Providers::DssAssociate
 
-      def initialize(uri, urns, credentials)
-        @soar_sr = SoarSr::ServiceRegistry.new(uri, urns, credentials)
+      def initialize(uri, fqdn, company_name, credentials)
+        @uri = uri
+        @fqdn = fqdn
+        @company_name = company_name
+        @credentials = credentials
+        @soar_sr = SoarSr::ServiceRegistry.new(uri, fqdn, company_name, credentials)
       end
 
       def fix
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, @credentials) if value
       end
 
       def break
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, { 'username' => 'invalid', 'password' => 'none' })
+      end
+
+      def authorized=(value)
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, @credentials) if value
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, { 'username' => 'invalid', 'password' => 'none' }) if not value
       end
 
       def service_by_id(id)
@@ -24,7 +35,6 @@ module ServiceRegistry
       end 
 
       def register_service(service)
-        
         @soar_sr.services.register_service(service)
       end
 
