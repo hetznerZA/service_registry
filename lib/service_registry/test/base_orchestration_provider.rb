@@ -205,6 +205,7 @@ module ServiceRegistry
           return true
         end
         @notifications.each do |notification|
+          puts "COMPARING #{notification} with #{message}"
           return true if notification == message
         end
         false
