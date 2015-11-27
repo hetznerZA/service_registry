@@ -6,6 +6,7 @@ Feature: Deregistering domain perspectives
 
   Scenario: Not authorized
     Given an existing domain perspective    
+    And the domain perspective has no associations
     And unauthorized publisher
     And the domain perspective has no associations
     When I request deregistration of the domain perspective
