@@ -37,13 +37,13 @@ Feature: Configuring meta for a service
     Given valid meta
     And no service
     When I request configuration of the service with meta
-    Then I receive 'no service identifier provided' notification
+    Then I receive 'no service provided' notification
 
   Scenario: Invalid service
     Given valid meta
     And invalid service identifier
     When I request configuration of the service with meta
-    Then I receive 'invalid service identifier provided' notification
+    Then I receive 'invalid service provided' notification
 
   Scenario: Failure
     Given valid meta

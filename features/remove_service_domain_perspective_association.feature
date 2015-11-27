@@ -30,7 +30,7 @@ Feature: Removing service associations from domain perspectives
     Given an existing domain perspective
     And no service
     When I remove the service association from the domain perspective
-    Then I receive 'no service identifier provided' notification
+    Then I receive 'no service provided' notification
 
   Scenario: invalid service
     Given an existing domain perspective

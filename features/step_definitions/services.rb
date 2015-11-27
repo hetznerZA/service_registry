@@ -10,8 +10,8 @@ When(/^I register the service definition with the service$/) do
   @test.register_service_definition
 end
 
-Then(/^I receive 'unknown service identifier provided' notification$/) do
-  expect(@test.has_received_notification?('unknown service identifier provided')).to eq(true)
+Then(/^I receive 'unknown service provided' notification$/) do
+  expect(@test.has_received_notification?('unknown service provided')).to eq(true)
 end
 
 Then(/^the service unavailable$/) do
@@ -30,16 +30,16 @@ Then(/^the service is described by the service definition$/) do
   expect(@test.is_service_described_by_service_definition?).to eq(true)
 end
 
-Then(/^I receive 'no service identifier provided' notification$/) do
-  expect(@test.has_received_notification?('no service identifier provided')).to eq(true)
+Then(/^I receive 'no service provided' notification$/) do
+  expect(@test.has_received_notification?('no service provided')).to eq(true)
 end
 
 Then(/^I receive 'no service definition provided' notification$/) do
   expect(@test.has_received_notification?('no service definition provided')).to eq(true)
 end
 
-Then(/^I receive 'invalid service identifier provided' notification$/) do
-  expect(@test.has_received_notification?('invalid service identifier provided')).to eq(true)
+Then(/^I receive 'invalid service provided' notification$/) do
+  expect(@test.has_received_notification?('invalid service provided')).to eq(true)
 end
 
 Given(/^no service definition$/) do

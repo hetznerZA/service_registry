@@ -10,7 +10,7 @@ Feature: Associate a service with a domain perspective
     Given an existing domain perspective
     And no service
     When I request association of the service with the domain perspective
-    Then I receive 'no service identifier provided' notification
+    Then I receive 'no service provided' notification
     And the domain perspective associations should not change
 
   Scenario: Invalid service

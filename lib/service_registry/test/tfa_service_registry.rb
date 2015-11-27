@@ -134,7 +134,7 @@ module ServiceRegistry
       def register_service_definition(service, definition)
         authorize 
         result = validate_field_present(service, 'service identifier'); return result if result
-        return success('unknown service identifier provided') if not is_registered?(service_registered?(service))
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
         return fail('no service definition provided') if definition.nil?
         return fail('invalid service definition provided') if not definition.include?("wadl")
 
@@ -152,7 +152,7 @@ module ServiceRegistry
         result = validate_field_present(service, 'service identifier'); return result if result
         return success('unknown service') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)['data']
-        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('invalid service provided') if notifications_include?(result, 'E_invalidKeyPassed')
         return fail('service has no definition') if (result['definition'].nil?) or (result['definition'] == "")
         return success_data({'definition' => result['definition']}) if (not result.nil?) and (not result['definition'].nil?)
       end
@@ -359,8 +359,8 @@ module ServiceRegistry
       def configure_meta_for_service(service, meta)
         authorize
 
-        return fail('no service identifier provided') if service.nil?
-        return fail('invalid service identifier provided') if (service.strip == "")
+        return fail('no service provided') if service.nil?
+        return fail('invalid service provided') if (service.strip == "")
 
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)
@@ -502,7 +502,7 @@ module ServiceRegistry
       end     
 
       def service_by_id(id)
-        return fail('invalid service identifier provided') if id.nil? or (id.strip == "")
+        return fail('invalid service provided') if id.nil? or (id.strip == "")
 
         result = search_for_service(id)
         if has_data?(result, 'services')
@@ -567,7 +567,7 @@ module ServiceRegistry
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
-        return fail('no service identifier provided') if service.nil?
+        return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (not is_registered?(service_registered?(service)))
 
         service_id = compile_domain_id('services', service)
@@ -615,7 +615,7 @@ module ServiceRegistry
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
-        return fail('no service identifier provided') if service.nil?
+        return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (not is_registered?(service_registered?(service)))
 
         service_id = compile_domain_id('services', service)

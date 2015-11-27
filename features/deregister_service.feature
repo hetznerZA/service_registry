@@ -14,12 +14,12 @@ Feature: De-registering a service
   Scenario: No service
     Given no service
     When I request deregistration of the service
-    Then I receive 'no service identifier provided' notification
+    Then I receive 'no service provided' notification
 
   Scenario: Invalid service
     Given invalid service identifier
     When I request deregistration of the service
-    Then I receive 'invalid service identifier provided' notification
+    Then I receive 'invalid service provided' notification
 
   Scenario: Unknown service
     Given unknown service identifier

@@ -13,7 +13,7 @@ Feature: Registering services
   Scenario: No identifier
     Given no service
     When I request registration of the service
-    Then I receive 'no service identifier provided' notification
+    Then I receive 'no service provided' notification
     And the service should not be available
 
   Scenario: New service
@@ -31,7 +31,7 @@ Feature: Registering services
   Scenario: Invalid service identifier
     Given invalid service for registration
     When I request registration of the service
-    Then I receive 'invalid service identifier provided' notification
+    Then I receive 'invalid service provided' notification
     And the service should not be available
 
   Scenario: failure

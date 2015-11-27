@@ -15,7 +15,7 @@ Feature: Registering service definitions
     Given unknown service identifier
     And valid service definition
     When I register the service definition with the service
-    Then I receive 'unknown service identifier provided' notification
+    Then I receive 'unknown service provided' notification
 
   Scenario: service already registered
     Given a registered service
@@ -27,12 +27,12 @@ Feature: Registering service definitions
   Scenario: no service identifier
     Given no service
     When I register the service definition with the service
-    Then I receive 'no service identifier provided' notification
+    Then I receive 'no service provided' notification
 
   Scenario: service identifier invalid
     Given invalid service identifier
     When I register the service definition with the service
-    Then I receive 'invalid service identifier provided' notification
+    Then I receive 'invalid service provided' notification
 
   Scenario: no service definition
     Given valid service

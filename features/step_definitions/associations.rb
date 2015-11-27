@@ -84,10 +84,6 @@ Given(/^no service$/) do
   @test.given_no_service
 end
 
-Then(/^I receive 'no service provided' notification$/) do
-  expect(@test.has_received_notification?('no service provided')).to eq(true)
-end
-
 Given(/^invalid service identifier$/) do
   @test.given_invalid_service
 end
@@ -98,10 +94,6 @@ end
 
 Given(/^the service is associated with two service components$/) do
   @test.associate_service_with_two_service_components
-end
-
-Then(/^I receive 'invalid service provided' notification$/) do
-  expect(@test.has_received_notification?('invalid service provided')).to eq(true)
 end
 
 When(/^I remove the service component association from the domain perspective$/) do

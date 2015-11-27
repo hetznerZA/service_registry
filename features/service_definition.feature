@@ -14,7 +14,7 @@ Feature: Retrieve a service definition for a service
   Scenario: no service
     Given no service
     When I request the service definition
-    Then I receive 'no service identifier provided' notification
+    Then I receive 'no service provided' notification
 
   Scenario: invalid service
     Given invalid service identifier
