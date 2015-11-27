@@ -18,10 +18,6 @@ When(/^I request association of the service with the domain perspective$/) do
   @test.associate_domain_perspective_with_service
 end
 
-Then(/^I receive 'no service component provided' notification$/) do
-  expect(@test.has_received_notification?('no service component provided')).to eq(true)
-end
-
 Then(/^the domain perspective associations should not change$/) do
   expect(@test.domain_perspective_associations_changed?).to eq(false)
 end

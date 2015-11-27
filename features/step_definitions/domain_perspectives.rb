@@ -110,8 +110,8 @@ When(/^I request deregistration of the domain perspective$/) do
   @test.deregister_domain_perspective
 end
 
-Then(/^I receive 'unknown domain perspective' notification$/) do
-  expect(@test.has_received_notification?('unknown domain perspective')).to eq(true)
+Then(/^I receive 'unknown domain perspective provided' notification$/) do
+  expect(@test.has_received_notification?('unknown domain perspective provided')).to eq(true)
 end
 
 Given(/^no service components associated with the domain perspective$/) do

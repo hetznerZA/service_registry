@@ -10,10 +10,6 @@ When(/^I register the service definition with the service$/) do
   @test.register_service_definition
 end
 
-Then(/^I receive 'unknown service provided' notification$/) do
-  expect(@test.has_received_notification?('unknown service provided')).to eq(true)
-end
-
 Then(/^the service unavailable$/) do
   expect(@test.service_available?).to eq(false)
 end
@@ -238,8 +234,8 @@ When(/^I request deregistration of the service$/) do
   @test.deregister_service
 end
 
-Then(/^I receive 'service unknown' notification$/) do
-  expect(@test.has_received_notification?('unknown service')).to eq(true)
+Then(/^I receive 'unknown service provided' notification$/) do
+  expect(@test.has_received_notification?('unknown service provided')).to eq(true)
 end
 
 Then(/^I receive 'service deregistered' notification$/) do

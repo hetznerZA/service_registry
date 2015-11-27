@@ -24,7 +24,7 @@ Feature: De-registering a service
   Scenario: Unknown service
     Given unknown service identifier
     When I request deregistration of the service
-    Then I receive 'service unknown' notification
+    Then I receive 'unknown service provided' notification
 
   Scenario: Existing service
     Given a registered service

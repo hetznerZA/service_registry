@@ -117,7 +117,7 @@ module ServiceRegistry
         return fail('not authorized') if not @authorized
         return fail('failure deregistering domain perspective') if @broken
         if not @domain_perspectives.include?(domain_perspective)
-          return success('unknown domain perspective')
+          return success('unknown domain perspective provided')
         end
         return fail('domain perspective has associations') if does_domain_perspective_have_service_components_associated?(domain_perspective)
         @domain_perspectives.delete(domain_perspective)
@@ -127,7 +127,7 @@ module ServiceRegistry
       def register_service_component(service_component)
         return fail('not authorized') if not @authorized
         return fail('failure registering service component') if @broken
-        return fail('no service component identifier provided') if service_component.nil?
+        return fail('no service component provided') if service_component.nil?
         return fail('invalid service component provided') if (service_component and service_component.strip == "")
         if not @service_components.include?(service_component)
           @service_components << service_component
@@ -142,7 +142,7 @@ module ServiceRegistry
         return fail('failure deregistering service') if @broken
         return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (service.strip == "")
-        return success('unknown service') if @services[service].nil?
+        return success('unknown service provided') if @services[service].nil?
         @services.delete(service)
         success('service deregistered')
       end
@@ -150,7 +150,7 @@ module ServiceRegistry
       def deregister_service_component(service_component)
         return fail('not authorized') if not @authorized
         return fail('failure deregistering service component') if @broken
-        return fail('no service component identifier provided') if service_component.nil?
+        return fail('no service component provided') if service_component.nil?
         return fail('invalid service component provided') if (service_component and service_component.strip == "")
         if @service_components.include?(service_component)
           return fail('service component has service associations') if does_service_component_have_services_associated?(service_component)
@@ -159,7 +159,7 @@ module ServiceRegistry
           return success('service component deregistered')
 service component has domain perspective associations
         else
-          return success('service component unknown')
+          return success('unknown service component provided')
         end
       end
 

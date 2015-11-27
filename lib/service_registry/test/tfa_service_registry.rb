@@ -48,7 +48,7 @@ module ServiceRegistry
 
       def register_service(service)
         authorize
-        result = validate_hash_present(service, 'name', 'service identifier'); return result if result
+        result = validate_hash_present(service, 'name', 'service'); return result if result
         return fail('service already exists') if is_registered?(service_registered?(service['name']))
 
         description = []
@@ -76,8 +76,8 @@ module ServiceRegistry
 
       def deregister_service(service)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
-        return success('unknown service') if not is_registered?(service_registered?(service))
+        result = validate_field_present(service, 'service'); return result if result
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.delete_service(service)
         validate_and_succeed(result, 'service', 'service deregistered')
 
@@ -88,11 +88,11 @@ module ServiceRegistry
 
       def add_service_uri(service, uri)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
+        result = validate_field_present(service, 'service'); return result if result
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
 
-        return fail('unknown service') if not is_registered?(service_registered?(service))
+        return fail('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.add_service_uri(service, uri)
         validate_and_succeed(result, 'service')
 
@@ -103,9 +103,9 @@ module ServiceRegistry
 
       def service_uris(service)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
+        result = validate_field_present(service, 'service'); return result if result
 
-        return fail('unknown service') if not is_registered?(service_registered?(service))
+        return fail('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.service_uris(service)
         validate_and_succeed(result, 'service', '', result['data'])
 
@@ -116,11 +116,11 @@ module ServiceRegistry
 
       def remove_uri_from_service(service, uri)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
+        result = validate_field_present(service, 'service'); return result if result
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
 
-        return fail('unknown service') if not is_registered?(service_registered?(service))
+        return fail('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.remove_service_uri(service, uri)
         validate_and_succeed(result, 'service')
 
@@ -133,7 +133,7 @@ module ServiceRegistry
 
       def register_service_definition(service, definition)
         authorize 
-        result = validate_field_present(service, 'service identifier'); return result if result
+        result = validate_field_present(service, 'service'); return result if result
         return success('unknown service provided') if not is_registered?(service_registered?(service))
         return fail('no service definition provided') if definition.nil?
         return fail('invalid service definition provided') if not definition.include?("wadl")
@@ -149,8 +149,8 @@ module ServiceRegistry
       end
 
       def service_definition_for_service(service)
-        result = validate_field_present(service, 'service identifier'); return result if result
-        return success('unknown service') if not is_registered?(service_registered?(service))
+        result = validate_field_present(service, 'service'); return result if result
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)['data']
         return fail('invalid service provided') if notifications_include?(result, 'E_invalidKeyPassed')
         return fail('service has no definition') if (result['definition'].nil?) or (result['definition'] == "")
@@ -159,8 +159,8 @@ module ServiceRegistry
 
       def deregister_service_definition(service)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
-        return success('unknown service') if not is_registered?(service_registered?(service))
+        result = validate_field_present(service, 'service'); return result if result
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)
         service = result['data']
         service['definition'] = ""
@@ -281,7 +281,7 @@ module ServiceRegistry
 
       def register_service_component(service_component)
         authorize
-        result = validate_field_present(service_component, 'service component identifier'); return result if result
+        result = validate_field_present(service_component, 'service component'); return result if result
         return fail('service component already exists') if is_registered?(service_component_registered?(service_component))
 
         result = @juddi.save_service_component(service_component)
@@ -305,9 +305,9 @@ module ServiceRegistry
 
       def deregister_service_component(service_component)
          authorize
-         return fail('no service component identifier provided') if service_component.nil?
+         return fail('no service component provided') if service_component.nil?
          return fail('invalid service component provided') if service_component.strip == ""
-         return success('service component unknown') if not is_registered?(service_component_registered?(service_component))
+         return success('unknown service component provided') if not is_registered?(service_component_registered?(service_component))
          return fail('service component has domain perspective associations') if service_component_has_domain_perspective_associations?(service_component)
          result = @juddi.delete_service_component(service_component)
          validate_and_succeed(result, 'service component', 'service component deregistered') 
@@ -684,7 +684,7 @@ module ServiceRegistry
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
 
-        return fail('unknown domain perspective') if not is_registered?(domain_perspective_registered?(domain_perspective))
+        return fail('unknown domain perspective provided') if not is_registered?(domain_perspective_registered?(domain_perspective))
         return fail('domain perspective has associations') if domain_perspective_has_associations?(domain_perspective)
 
         result = @juddi.delete_business(compile_domain_id(type, domain_perspective))

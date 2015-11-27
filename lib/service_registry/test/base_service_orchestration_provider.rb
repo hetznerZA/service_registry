@@ -122,10 +122,13 @@ module ServiceRegistry
 
       def multiple_existing_domain_perspectives
         @iut.register_domain_perspective(@domain_perspective_1)
+        @iut.delete_all_domain_perspective_associations(@domain_perspective_1)
         @iut.register_domain_perspective(@domain_perspective_2)
+        @iut.delete_all_domain_perspective_associations(@domain_perspective_2)
       end
 
       def services_associated_with_different_domain_perspectives
+        # byebug
         @iut.register_service(@service_3)
         @iut.associate_service_with_domain_perspective(@service_3['name'], @domain_perspective_1)
         @iut.register_service(@service_4)

@@ -6,8 +6,8 @@ Then(/^the service component should not be available$/) do
   expect(@test.is_service_component_available?).to eq(false)
 end
 
-Then(/^I receive 'no service component identifier provided' notification$/) do
-  expect(@test.has_received_notification?('no service component identifier provided')).to eq(true)
+Then(/^I receive 'no service component provided' notification$/) do
+  expect(@test.has_received_notification?('no service component provided')).to eq(true)
 end
 
 Given(/^a new service component identifier$/) do
@@ -94,8 +94,8 @@ When(/^I request deregistration of the service component$/) do
   @test.deregister_service_component
 end
 
-Then(/^I receive 'service component unknown' notification$/) do
-  expect(@test.has_received_notification?('service component unknown')).to eq(true)
+Then(/^I receive 'unknown service component provided' notification$/) do
+  expect(@test.has_received_notification?('unknown service component provided')).to eq(true)
 end
 
 Given(/^no services associated with the service component$/) do

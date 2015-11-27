@@ -15,7 +15,7 @@ Feature: Deregistering domain perspectives
   Scenario: Unknown domain perspective
     Given an unknown domain perspective
     When I request deregistration of the domain perspective
-    Then I receive 'unknown domain perspective' notification
+    Then I receive 'unknown domain perspective provided' notification
 
   Scenario: Existing domain perspective
     Given an existing domain perspective

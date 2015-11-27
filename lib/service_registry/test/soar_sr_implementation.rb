@@ -75,7 +75,7 @@ module ServiceRegistry
       end
 
       def deregister_service_definition(service)
-        process_result(@soar_sr.service_definitions.deregister_service_definition(service))
+        @soar_sr.service_definitions.deregister_service_definition(service)
       end
 
       def reset_domain_perspectives
