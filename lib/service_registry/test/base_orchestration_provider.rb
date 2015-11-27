@@ -159,6 +159,10 @@ module ServiceRegistry
         process_result(@iut.associate_service_component_with_service(@service, @service_uri_1))
       end
 
+      def delete_all_domain_perspective_associations
+        @iut.delete_all_domain_perspective_associations(@domain_perspective)
+      end      
+
       def given_a_valid_service
         @service = @valid_service['name']
         @iut.register_service(@valid_service)
