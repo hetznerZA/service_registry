@@ -306,7 +306,7 @@ module ServiceRegistry
       def deregister_service_component(service_component)
          authorize
          return fail('no service component identifier provided') if service_component.nil?
-         return fail('invalid service component identifier') if service_component.strip == ""
+         return fail('invalid service component provided') if service_component.strip == ""
          return success('service component unknown') if not is_registered?(service_component_registered?(service_component))
          return fail('service component has domain perspective associations') if service_component_has_domain_perspective_associations?(service_component)
          result = @juddi.delete_service_component(service_component)
@@ -334,7 +334,7 @@ module ServiceRegistry
       def configure_service_component_uri(service_component, uri)
         authorize
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('invalid service component provided') if (service_component.strip == "")
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
         result = @juddi.save_service_component_uri(service_component, uri)
@@ -347,9 +347,9 @@ module ServiceRegistry
 
       def service_component_uri(service_component)
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('invalid service component provided') if (service_component.strip == "")
         result = @juddi.find_service_component_uri(service_component)
-        return fail('invalid service component identifier') if notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('invalid service component provided') if notifications_include?(result, 'E_invalidKeyPassed')
         uri = (has_data?(result, 'bindings') and (result['data']['bindings'].size > 0)) ? result['data']['bindings'].first[1]['access_point'] : nil
         result['data']['uri'] = uri
         result
@@ -545,7 +545,7 @@ module ServiceRegistry
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (not is_registered?(service_component_registered?(service_component)))
+        return fail('invalid service component provided') if (not is_registered?(service_component_registered?(service_component)))
 
         service_component_id = compile_domain_id('service-components', service_component)
         meta = meta_for_domain_perspective('domains', domain_perspective)
@@ -592,7 +592,7 @@ module ServiceRegistry
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (not is_registered?(service_component_registered?(service_component)))
+        return fail('invalid service component provided') if (not is_registered?(service_component_registered?(service_component)))
 
         service_component_id = compile_domain_id('service-components', service_component)
         meta = meta_for_domain_perspective('domains', domain_perspective)

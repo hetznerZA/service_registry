@@ -34,7 +34,7 @@ Then(/^the service component should still be available, unchanged$/) do
   expect(@test.is_service_component_available?).to eq(true)
 end
 
-Given(/^invalid service component identifier$/) do
+Given(/^invalid service component provided$/) do
   @test.given_invalid_service_component_identifier
 end
 
@@ -42,8 +42,8 @@ Given(/^no service component identifier$/) do
   @test.given_no_service_component_identifier
 end
 
-Then(/^I receive 'invalid service component identifier' notification$/) do
-  expect(@test.has_received_notification?('invalid service component identifier')).to eq(true)
+Then(/^I receive 'invalid service component provided' notification$/) do
+  expect(@test.has_received_notification?('invalid service component provided')).to eq(true)
 end
 
 Then(/^I receive 'failure registering service component' notification$/) do

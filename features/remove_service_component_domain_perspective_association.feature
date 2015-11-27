@@ -36,7 +36,7 @@ Feature: Removing service component associations from domain perspectives
     Given an existing domain perspective
     And invalid service component identifier
     When I remove the service component association from the domain perspective
-    Then I receive 'invalid service component identifier' notification
+    Then I receive 'invalid service component provided' notification
 
   Scenario: not associated
     Given existing service component identifier

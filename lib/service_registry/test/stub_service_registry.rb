@@ -128,7 +128,7 @@ module ServiceRegistry
         return fail('not authorized') if not @authorized
         return fail('failure registering service component') if @broken
         return fail('no service component identifier provided') if service_component.nil?
-        return fail('invalid service component identifier provided') if (service_component and service_component.strip == "")
+        return fail('invalid service component provided') if (service_component and service_component.strip == "")
         if not @service_components.include?(service_component)
           @service_components << service_component
           return success('service component registered')
@@ -151,7 +151,7 @@ module ServiceRegistry
         return fail('not authorized') if not @authorized
         return fail('failure deregistering service component') if @broken
         return fail('no service component identifier provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component and service_component.strip == "")
+        return fail('invalid service component provided') if (service_component and service_component.strip == "")
         if @service_components.include?(service_component)
           return fail('service component has service associations') if does_service_component_have_services_associated?(service_component)
           return fail('service component has domain perspective associations') if does_service_component_have_domain_perspectives_associated?(service_component)
@@ -173,7 +173,7 @@ service component has domain perspective associations
       def associate_service_component_with_service(service, service_component)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('invalid service component provided') if (service_component.strip == "")
         return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (service.strip == "")
         return fail('failure associating service component with service') if @broken
@@ -190,7 +190,7 @@ service component has domain perspective associations
       def associate_service_component_with_domain_perspective(service_component, domain_perspective)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('invalid service component provided') if (service_component.strip == "")
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (domain_perspective.strip == "")
         return fail('failure associating service component with domain perspective') if @broken
@@ -220,7 +220,7 @@ service component has domain perspective associations
       def disassociate_service_component_from_domain_perspective(domain_perspective, service_component)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('invalid service component provided') if (service_component.strip == "")
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (domain_perspective.strip == "")
         return fail('failure disassociating service component from domain perspective') if @broken
@@ -260,7 +260,7 @@ service component has domain perspective associations
       def configure_service_component_uri(service_component, uri)
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('invalid service component provided') if (service_component.strip == "")
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
         return fail('failure configuring service component') if @broken

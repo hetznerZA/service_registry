@@ -39,7 +39,7 @@ Feature: Configuring a URI for a service component
   Scenario: Invalid service component
     Given invalid service component identifier
     When I request configuration of the service component
-    Then I receive 'invalid service component identifier' notification
+    Then I receive 'invalid service component provided' notification
 
   Scenario: Failure
     Given valid URI
