@@ -32,7 +32,7 @@ Feature: Registering domain perspectives
     Given invalid domain perspective
     And valid domain perspectives are one of ['domains', 'services', 'service-components', team's]
     When I request registration of the domain perspective
-    Then I receive 'invalid domain perspective' notification
+    Then I receive 'invalid domain perspective provided' notification
     And the domain perspective should not be available
 
   Scenario: failure
