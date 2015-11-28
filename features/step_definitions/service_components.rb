@@ -34,7 +34,7 @@ Then(/^the service component should still be available, unchanged$/) do
   expect(@test.is_service_component_available?).to eq(true)
 end
 
-Given(/^invalid service component provided$/) do
+Given(/^invalid service component identifier$/) do
   @test.given_invalid_service_component_identifier
 end
 

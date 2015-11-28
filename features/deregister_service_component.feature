@@ -26,7 +26,7 @@ Feature: De-registering a service component
   Scenario: Unknown service component
     Given an unknown service component
     When I request deregistration of the service component
-    Then I receive 'uknown service component provided' notification
+    Then I receive 'unknown service component provided' notification
 
   Scenario: Existing service component
     Given existing service component identifier
