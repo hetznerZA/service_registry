@@ -79,12 +79,7 @@ module ServiceRegistry
       end
 
       def reset_domain_perspectives
-        result = @soar_sr.domain_perspectives.list_domain_perspectives
-        if has_data?(result, 'domain_perspectives') 
-          result['data']['domain_perspectives'].each do |name, detail|
-            @soar_sr.broker.delete_business(detail['id'])
-          end
-        end
+        @soar_sr.domain_perspectives.delete_all_domain_perspectives
       end
 
       def list_domain_perspectives
@@ -132,6 +127,7 @@ module ServiceRegistry
       end
 
       def delete_all_service_components
+        @soar_sr.service_components.delete_all_service_components
       end
 
       def service_component_registered?(service_component)
