@@ -658,7 +658,7 @@ module ServiceRegistry
       def register_domain(type, domain_perspective)
         authorize
         return fail('no domain perspective provided') if domain_perspective.nil?
-        return fail('invalid domain perspective') if (domain_perspective.strip == "") or (not ServiceRegistry::HETZNER_DOMAIN_TYPES.include?(type.downcase))
+        return fail('invalid domain perspective provided') if (domain_perspective.strip == "") or (not ServiceRegistry::HETZNER_DOMAIN_TYPES.include?(type.downcase))
         return fail('domain perspective already exists') if is_registered?(domain_perspective_registered?(domain_perspective))
 
         id = compile_domain_id(type, domain_perspective)

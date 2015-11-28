@@ -80,7 +80,7 @@ module ServiceRegistry
         return fail('not authorized') if not @authorized
         return fail('failure registering domain perspective') if @broken
         return fail('no domain perspective provided') if domain_perspective.nil?
-        return fail('invalid domain perspective') if (domain_perspective and domain_perspective.strip == "")
+        return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")
         if not @domain_perspectives.include?(domain_perspective)
           @domain_perspectives << domain_perspective
         else

@@ -86,10 +86,6 @@ Given(/^invalid domain perspective$/) do
   @test.given_an_invalid_domain_perspective
 end
 
-Then(/^I receive 'invalid domain perspective' notification$/) do
-  expect(@test.has_received_notification?('invalid domain perspective')).to eq(true)
-end
-
 Given(/^a domain perspective$/) do
   @test.given_a_new_domain_perspective
 end
