@@ -12,7 +12,7 @@ module ServiceRegistry
       def initialize(uri, fqdn, company_name, credentials)
         @uri = uri
         @fqdn = fqdn
-        @company_name = company_name
+        @company_name = company_name  
         @credentials = credentials
         @soar_sr = SoarSr::ServiceRegistry.new(uri, fqdn, company_name, credentials)
       end

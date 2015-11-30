@@ -234,6 +234,7 @@ module ServiceRegistry
         found = []
 
         if not domain_perspective.nil?
+          return fail('unknown domain perspective provided') if not is_registered?(domain_perspective_registered?(domain_perspective))
           associations = domain_perspective_associations(domain_perspective)['data']['associations']['service_components']
           return success_data({'service_components' => []}) if associations.count == 0
           

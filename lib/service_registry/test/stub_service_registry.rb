@@ -57,6 +57,9 @@ module ServiceRegistry
 
       def list_service_components(domain_perspective = nil)
         return fail('failure retrieving service components') if @broken
+        if domain_perspective and (not @domain_perspectives.include?(domain_perspective))
+          return success('unknown domain perspective provided')
+        end
         return success_data({ 'service_components' => @service_components }) if domain_perspective.nil?
         result = domain_perspective_associations(domain_perspective)
         success_data({ 'service_components' => result['data']['associations'] })
