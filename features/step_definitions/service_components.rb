@@ -38,6 +38,10 @@ Given(/^invalid service component identifier$/) do
   @test.given_invalid_service_component_identifier
 end
 
+Given(/^unknown service component identifier$/) do
+  @test.given_unknown_service_component_identifier
+end
+
 Given(/^no service component identifier$/) do
   @test.given_no_service_component_identifier
 end

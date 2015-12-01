@@ -109,6 +109,10 @@ module ServiceRegistry
         @service_component = " "
       end
 
+      def given_unknown_service_component_identifier
+        @service_component = "unknown"
+      end
+
       def given_no_service_component_identifier
         @service_component = nil
       end

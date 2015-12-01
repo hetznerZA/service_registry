@@ -264,6 +264,7 @@ service component has domain perspective associations
         return fail('not authorized') if not @authorized
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component provided') if (service_component.strip == "")
+        return fail('unknown service component provided') if not @service_components.include?(service_component)
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
         return fail('failure configuring service component') if @broken
@@ -273,6 +274,7 @@ service component has domain perspective associations
       end
 
       def service_component_uri(service_component)
+        return fail('unknown service component provided') if not @service_components.include?(service_component)
         return success_data({'uri' => nil}) if (not @service_component_associations[service_component]) or (not @service_component_associations[service_component]['uri'])
         success_data({'uri' => @service_component_associations[service_component]['uri']})
       end

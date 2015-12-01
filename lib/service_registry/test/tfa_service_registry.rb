@@ -336,6 +336,7 @@ module ServiceRegistry
         authorize
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component provided') if (service_component.strip == "")
+        return fail('unknown service component provided') if not is_registered?(service_component_registered?(service_component))
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
         result = @juddi.save_service_component_uri(service_component, uri)
@@ -349,6 +350,7 @@ module ServiceRegistry
       def service_component_uri(service_component)
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component provided') if (service_component.strip == "")
+        return fail('unknown service component provided') if not is_registered?(service_component_registered?(service_component))
         result = @juddi.find_service_component_uri(service_component)
         return fail('invalid service component provided') if notifications_include?(result, 'E_invalidKeyPassed')
         uri = (has_data?(result, 'bindings') and (result['data']['bindings'].size > 0)) ? result['data']['bindings'].first[1]['access_point'] : nil
