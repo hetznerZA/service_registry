@@ -41,7 +41,21 @@ Administer jUDDI here:
 juddiv3 REST API:
   https://juddi.apache.org/docs/3.x/devguide/html/ch09.html
 
-Publishers are issued auth tokens for making changes. Everyone can read by default. For more information on authentication with jUDDI (we can plug our own IDM and CAS in...) see https://juddi.apache.org/docs/3.x/userguide/html/ch04.html#_administering_users_and_access_control For the TFA, simply use the 'uddi' userid, password 'uddi'.
+Publishers are issued auth tokens for making changes. Everyone can read by default. For more information on authentication with jUDDI (we can plug our own IDM and CAS in...) see https://juddi.apache.org/docs/3.x/userguide/html/ch04.html#_administering_users_and_access_control For the TFA, register a username and password so:
+
+vi webapps/juddiv3/WEB-INF/classes/juddi-users.xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<juddi-users>
+    <user userid="uddi" password="md5hashedpassword"/>
+</juddi-users>
+
+You can MD5 hash here: http://www.miraclesalad.com/webtools/md5.php
+
+vi webapps/juddiv3/WEB-INF/classes/juddiv3.xml
+
+Change <authenticator> to:
+<class>org.apache.juddi.v3.auth.MD5XMLDocAuthenticator</class>
 
 tModels / seeding the database:
 
