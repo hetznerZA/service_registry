@@ -362,6 +362,7 @@ module ServiceRegistry
 
         return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (service.strip == "")
+        return fail('unknown service provided') if not is_registered?(service_registered?(service))
 
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)
