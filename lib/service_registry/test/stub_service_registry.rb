@@ -326,8 +326,8 @@ service component has domain perspective associations
         return success_data({'services' => found})
       end
 
-      def service_by_id(id)
-        @services[id].nil? ? success_data({'services' => {}}) : success_data({'services' => { id => @services[id]}})
+      def service_by_name(name)
+        @services[name].nil? ? success_data({'services' => {}}) : success_data({'services' => { name => @services[name]}})
       end
 
       def service_definition(service)

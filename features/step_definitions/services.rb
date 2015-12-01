@@ -119,7 +119,7 @@ Given(/^a service ID$/) do
 end
 
 When(/^I request the service by ID$/) do
-  @test.service_by_id
+  @test.service_by_name
 end
 
 Then(/^I receive a list with the service as the single entry in it$/) do

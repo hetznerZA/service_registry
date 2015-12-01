@@ -30,8 +30,8 @@ module ServiceRegistry
         @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, { 'username' => 'invalid', 'password' => 'none' }) if not value
       end
 
-      def service_by_id(id)
-        @soar_sr.services.service_by_id(id)
+      def service_by_name(name)
+        @soar_sr.services.service_by_name(name)
       end 
 
       def register_service(service)

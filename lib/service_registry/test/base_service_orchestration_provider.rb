@@ -102,8 +102,8 @@ module ServiceRegistry
         false
       end
 
-      def service_by_id
-        process_result(@iut.service_by_id(@service))
+      def service_by_name
+        process_result(@iut.service_by_name(@service))
       end
 
       def multiple_existing_services

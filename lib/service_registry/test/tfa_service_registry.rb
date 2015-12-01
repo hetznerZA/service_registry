@@ -502,19 +502,19 @@ module ServiceRegistry
         success_data({'services' => found})
       end     
 
-      def service_by_id(id)
-        return fail('invalid service provided') if id.nil? or (id.strip == "")
+      def service_by_name(name)
+        return fail('invalid service provided') if name.nil? or (name.strip == "")
 
-        result = search_for_service(id)
+        result = search_for_service(name)
         if has_data?(result, 'services')
-          result['data']['services'].each do |sid, service|
-            compare_service = "#{ServiceRegistry::HETZNER_SERVICES_URN}#{id}" == sid
-            compare_service_component = "#{ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}#{id}" == sid
-            return success_data({ 'services' => { sid => service }}) if compare_service or compare_service_component or (id == sid)
+          result['data']['services'].each do |sname, service|
+            compare_service = "#{ServiceRegistry::HETZNER_SERVICES_URN}#{name}" == sname
+            compare_service_component = "#{ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}#{name}" == sname
+            return success_data({ 'services' => { sname => service }}) if compare_service or compare_service_component or (name == sname)
           end
           success_data({ 'services' => {}})
         else
-          fail('failure finding service by id')
+          fail('failure finding service by name')
         end
       end 
 
