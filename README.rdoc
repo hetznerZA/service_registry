@@ -87,7 +87,8 @@ To find a list of service definitions given a service component, one would have 
 ==== Helpers
     require 'soar_sr'
     credentials = { 'username' => 'uddi', 'password' => 'uddi' }
-    @soar_sr = SoarSr::ServiceRegistry.new('http://localhost:8080', 'hetzner.co.za', 'hetzner', credentials)
+    freshness = 0 # > 0 to enable cache
+    @soar_sr = SoarSr::ServiceRegistry.new('http://localhost:8080', 'hetzner.co.za', 'hetzner', credentials, freshness)
     ds = @soar_sr.domain_perspectives
     sv = @soar_sr.services
     sc = @soar_sr.service_components
@@ -178,3 +179,6 @@ To find a list of service definitions given a service component, one would have 
     ss.search_domain_perspective('my domain', 'search')
     ss.search_domain_perspective('my domain', 'please')
     ss.search_domain_perspective('my domain', 'ti.on')
+    ss.search_for_service_by_name('search')
+    ss.search_for_service_by_name('please')
+    ss.search_for_service_by_name('ti.on')

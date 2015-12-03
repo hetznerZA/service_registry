@@ -10,24 +10,25 @@ module ServiceRegistry
       include ServiceRegistry::Providers::DssAssociate
 
       def initialize(uri, fqdn, company_name, credentials)
+        @no_cache = 0
         @uri = uri
         @fqdn = fqdn
         @company_name = company_name  
         @credentials = credentials
-        @soar_sr = SoarSr::ServiceRegistry.new(uri, fqdn, company_name, credentials)
+        @soar_sr = SoarSr::ServiceRegistry.new(uri, fqdn, company_name, credentials, @no_cache)
       end
 
       def fix
-        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, @credentials)
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, @credentials, @no_cache)
       end
 
       def break
-        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, { 'username' => 'invalid', 'password' => 'none' })
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, { 'username' => 'invalid', 'password' => 'none' }, @no_cache)
       end
 
       def authorized=(value)
-        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, @credentials) if value
-        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, { 'username' => 'invalid', 'password' => 'none' }) if not value
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, @credentials, @no_cache) if value
+        @soar_sr = SoarSr::ServiceRegistry.new(@uri, @fqdn, @company_name, { 'username' => 'invalid', 'password' => 'none' }, @no_cache) if not value
       end
 
       def service_by_name(name)
