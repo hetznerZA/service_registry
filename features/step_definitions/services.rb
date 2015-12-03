@@ -301,3 +301,19 @@ end
 Then(/^I receive 'failure listing service URIs' notification$/) do
   expect(@test.has_received_notification?('failure listing service URIs')).to eq(true)
 end
+
+Given(/^no pattern$/) do
+  @test.given_no_pattern
+end
+
+Then(/^I receive 'no pattern provided' notification$/) do
+  expect(@test.has_received_notification?('no pattern provided')).to eq(true)
+end
+
+Given(/^invalid pattern$/) do
+  @test.given_invalid_pattern
+end
+
+Then(/^I receive 'invalid pattern provided' notification$/) do
+  expect(@test.has_received_notification?('invalid pattern provided')).to eq(true)
+end

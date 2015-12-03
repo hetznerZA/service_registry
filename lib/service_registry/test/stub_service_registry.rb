@@ -314,8 +314,8 @@ service component has domain perspective associations
       end
 
       def search_for_service(pattern)
-        return fail('invalid pattern') if pattern.nil?
-        return fail('pattern too short') if (pattern.size < 4)
+        return fail('no pattern provided') if pattern.nil?
+        return fail('invalid pattern provided') if (pattern.size < 4)
         success_data({'services' => search_for_service_in_services(@services, pattern)})
       end
 

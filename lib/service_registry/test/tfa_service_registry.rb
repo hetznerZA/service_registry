@@ -486,8 +486,8 @@ module ServiceRegistry
       end
 
       def search_for_service(pattern)
-        return fail('invalid pattern provided') if pattern.nil?
-        return fail('pattern too short') if (pattern.size < 4)
+        return fail('no pattern provided') if pattern.nil?
+        return fail('invalid pattern provided') if (pattern.size < 4)
 
         services = @juddi.find_services(pattern)['data']['services']
         service_components = @juddi.find_service_components(pattern)['data']['services']

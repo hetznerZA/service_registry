@@ -18,6 +18,14 @@ module ServiceRegistry
         @need = 'id_3'
       end
 
+      def given_no_pattern
+        @need = nil
+      end
+
+      def given_invalid_pattern
+        @need = 'my'
+      end
+
       def given_service_with_pattern_in_id
         @expected_pattern_service = @service_3
         @iut.register_service(@service_3)
@@ -26,7 +34,6 @@ module ServiceRegistry
 
       def given_service_with_pattern_in_description
         @expected_pattern_service = @service_3
-        # byebug
         @iut.register_service(@service_3)
         @iut.register_service_definition(@service_3['name'], @service_definition_1)
       end
@@ -50,7 +57,7 @@ module ServiceRegistry
       end
 
       def match_need
-        # byebug
+        #byebug
         process_result(@iut.search_for_service(@need))
       end
 

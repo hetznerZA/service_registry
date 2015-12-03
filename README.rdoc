@@ -16,6 +16,7 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/list_domain_perspectives.feature listing teams} when needing teams to model ownership in the domain
 * {file:features/register_domain_perspective.feature registering teams} new teams become relevant
 * {file:features/deregister_domain_perspective.feature deregistering teams} when teams become irrelevant
+* {file:features/teams.feature teams} are thought of as domain perspectives when modelling them
 
 === service components
 * {file:features/listing_service_components.feature listing service components} when provisioning service components and mapping service components to domain perspectives
@@ -67,9 +68,7 @@ The service supports:
 == Dependencies
 
 The service registry depends on:
-* {file:features/configure_with_directory.feature a directory configuration} for UDDI and inetOrgPerson support
-* {file:features/discover_domain_perspectives.feature discovery of domain perspectives}
-* {file:features/discover_service_components.feature discovery of service components} using a UDDI directory.
+* A directory for UDDI and inetOrgPerson support
 
 == Service definitions and service components
 
