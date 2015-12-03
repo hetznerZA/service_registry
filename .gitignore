@@ -3,6 +3,7 @@ test_tfa.sh
 test_production.sh
 iut-list
 juddi-distro-3.3.1
+*.swo
 *.zip
 *.tar.gz
 *.swp
