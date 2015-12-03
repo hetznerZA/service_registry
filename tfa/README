@@ -1,123 +1,120 @@
+= Test Framework Artifact
+
+== jUDDI server
+
 Download version 3.3.1 of jUDDI here: http://apache.mirrors.lucidnetworks.net/juddi/juddi/3.3.1/juddi-distro-3.3.1.tar.gz or elsewhere.
 
-jUDDI server
-------------
-
 Install:
-  cd juddi-directory/tomcat-directory
-  export CATALINA_HOME=$(pwd)
-  export CATALINA_BASE=$(pwd)
+    cd juddi-directory/tomcat-directory
+    export CATALINA_HOME=$(pwd)
+    export CATALINA_BASE=$(pwd)
 
 Ensure $JAVA_HOME points to your java (>= 7)
 
 Configure a user (find existing usernames and passwords here:)
-  vi conf/tomcat-users.xml
+    vi conf/tomcat-users.xml
 
 Add:
-  <role rolename="manager-gui"/>
-  <user username="tomcat" password="s3cret" roles="manager-gui"/>
+    <role rolename="manager-gui"/>
+    <user username="tomcat" password="s3cret" roles="manager-gui"/>
 
-Logo:
-  copy the logo of your choice to juddi-tomcat-directory/webapps/juddi-gui/img/logo2.png
+Logo: copy the logo of your choice to juddi-tomcat-directory/webapps/juddi-gui/img/logo2.png
 
 Start so:
-  bin/catalina.sh start
+    bin/catalina.sh start
 
 Manage tomcat here:
-  http://localhost:8080/manager/html
+    http://localhost:8080/manager/html
 
 Access jUDDI here:
-  http://localhost:8080/juddiv3/
+    http://localhost:8080/juddiv3/
 
 Access the jUDDI GUI here:
-  http://localhost:8080/juddi-gui/
-  default: admin, admin
+    http://localhost:8080/juddi-gui/
+    default: admin, admin
 
 Administer jUDDI here:
-  http://localhost:8080/juddiv3/admin
-  http://localhost:8080/juddi-gui/settings.jsp
-  default: uddiadmin, da_password1
+    http://localhost:8080/juddiv3/admin
+    http://localhost:8080/juddi-gui/settings.jsp
+    default: uddiadmin, da_password1
 
 juddiv3 REST API:
-  https://juddi.apache.org/docs/3.x/devguide/html/ch09.html
+    https://juddi.apache.org/docs/3.x/devguide/html/ch09.html
 
 Publishers are issued auth tokens for making changes. Everyone can read by default. For more information on authentication with jUDDI (we can plug our own IDM and CAS in...) see https://juddi.apache.org/docs/3.x/userguide/html/ch04.html#_administering_users_and_access_control For the TFA, register a username and password so:
 
-vi webapps/juddiv3/WEB-INF/classes/juddi-users.xml
+    vi webapps/juddiv3/WEB-INF/classes/juddi-users.xml
 
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<juddi-users>
-    <user userid="uddi" password="md5hashedpassword"/>
-</juddi-users>
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <juddi-users>
+        <user userid="uddi" password="md5hashedpassword"/>
+    </juddi-users>
 
 You can MD5 hash here: http://www.miraclesalad.com/webtools/md5.php
 
-vi webapps/juddiv3/WEB-INF/classes/juddiv3.xml
+    vi webapps/juddiv3/WEB-INF/classes/juddiv3.xml
 
 Change <authenticator> to:
-<class>org.apache.juddi.v3.auth.MD5XMLDocAuthenticator</class>
+    <class>org.apache.juddi.v3.auth.MD5XMLDocAuthenticator</class>
 
 tModels / seeding the database:
 
 In order to create services in jUDDI, a tModel hierarchy needs to be in place. Log into the gui as uddi (password uddi) and create the following tModels:
 
-uddi:hetzner.co.za:hetzner (select Create-Business)
-uddi:hetzner.co.za:keygenerator (select Create-tModel Partion)
-uddi:hetzner.co.za:services:keygenerator (select Create-tModel Partion)
-uddi:hetzner.co.za:service-components:keygenerator (select Create-tModel Partion)
+    uddi:hetzner.co.za:hetzner (select Create-Business)
+    uddi:hetzner.co.za:keygenerator (select Create-tModel Partion)
+    uddi:hetzner.co.za:services:keygenerator (select Create-tModel Partion)
+    uddi:hetzner.co.za:service-components:keygenerator (select Create-tModel Partion)
 
 Businesses represent companies and departments in the company. They allow services to be associated with them as well as contact details. Domain perspectives are like departments, but purely from a grouping of services perspective. They do how-ever also have contact associated, and of course services. This makes the businesses type a good fit for domain perspectives.
 
 This allows services of the following form to be created via the API:
-uddi:hetzner.co.za:services:new-service-name-1788
+    uddi:hetzner.co.za:services:new-service-name-1788
 
-SOAP requests using curl:
--------------------------
+== SOAP requests using curl:
 
 Create a request xml as defined by the WSDL in question (see for example: http://localhost:8080/juddiv3/services/security?wsdl) For a list of jUDDI services, see: http://localhost:8080/juddiv3/services/
 
 Example:
-tfa/soap/get_authToken.xml
+    tfa/soap/get_authToken.xml
 
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-     xmlns:urn="urn:uddi-org:api_v3">
-<soapenv:Header/>
-<soapenv:Body>
-    <urn:get_authToken userID="uddi" cred="uddi"/>
-</soapenv:Body>
-</soapenv:Envelope>
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:urn="urn:uddi-org:api_v3">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <urn:get_authToken userID="uddi" cred="uddi"/>
+    </soapenv:Body>
+    </soapenv:Envelope>
 
 Then issue request:
 
-curl --header "Content-Type: text/xml;charset=UTF-8" --header "SOAPAction: get_authToken" --data @../../soap/get_authToken.xml http://localhost:8080/juddiv3/services/security
+    curl --header "Content-Type: text/xml;charset=UTF-8" --header "SOAPAction: get_authToken" --data @../../soap/get_authToken.xml http://localhost:8080/juddiv3/services/security
 
-REST requests using curl:
--------------------------
+== REST requests using curl:
 
 For some reason, with jUDDI out of the box JSON REST request do not return data. The same request with XML as format does work, e.g.:
 
-http://localhost:8080/juddiv3/services/inquiryRest/JSON/businessList (broken)
+    http://localhost:8080/juddiv3/services/inquiryRest/JSON/businessList (broken)
 
-http://localhost:8080/juddiv3/services/inquiryRest/XML/businessList (works)
+    http://localhost:8080/juddiv3/services/inquiryRest/XML/businessList (works)
 
 I have not been able to resolve this, so whether REST or SOAP, we have to work with the XML anyway. For now I've opted for the TFA to use SOAP.
 
-Persistence:
-------------
+== Persistence
 
 If you want to use something other then embedded derby, see http://juddi.apache.org/docs/3.2/juddi-guide/html_single/#_derby_out_of_the_box
 
 For working with the embedded Derby database, install the derby tools:
-http://db.apache.org/derby/releases/release-10.12.1.1.cgi
-http://db.apache.org/derby/papers/DerbyTut/install_software.html
+    http://db.apache.org/derby/releases/release-10.12.1.1.cgi
+    http://db.apache.org/derby/papers/DerbyTut/install_software.html
 
 juddi in test mode creates its database here: juddi-distro-3.3.1/juddi-tomcat-3.3.1/target/juddi-derby-test-db
 To connect to the database:
 
-$ cd juddi-distro-3.3.1/juddi-tomcat-3.3.1/target/
-$ java org.apache.derby.tools.ij
-ij version 10.12
-ij> connect 'jdbc:derby:./juddi-derby-test-db';
-ij> select * from J3_SERVICE_NAME;
+    $ cd juddi-distro-3.3.1/juddi-tomcat-3.3.1/target/
+    $ java org.apache.derby.tools.ij
+    ij version 10.12
+    ij> connect 'jdbc:derby:./juddi-derby-test-db';
+    ij> select * from J3_SERVICE_NAME;
 
 To clear the database, simply stop tomcat, delete the juddi-derby-test-db directory and start tomcat again. Note: after clearing the database you will need to seed it again as detailed above.
