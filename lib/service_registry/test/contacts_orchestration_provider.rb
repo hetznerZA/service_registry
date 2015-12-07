@@ -6,7 +6,7 @@ module ServiceRegistry
     	end
 
     	def no_contact_details_for_domain_perspective
-    		contacts = @iut.contact_details_for_domain(@domain_perspective)
+    		contacts = @iut.contact_details_for_domain(@domain_perspective)['data']['contacts']
     		# contacts ||= {}
     		contacts.each do |contact|
     			@iut.remove_contact_from_domain(@domain_perspective, contact)
@@ -25,16 +25,16 @@ module ServiceRegistry
     	end
 
     	def has_received_empty_list_of_contacts?
-    		@result == []
+    		data['contacts'] == []
     	end
 
     	def has_received_list_with_one_contact?
-    		contacts = @iut.contact_details_for_domain(@domain_perspective)
-    		(contacts.size == 1) and (contacts[0] == @contact_1)
+    		contacts = @iut.contact_details_for_domain(@domain_perspective)['data']['contacts']
+    		(contacts.size == 1) and (contacts[0]['name'] == @contact_1['name']) and (contacts[0]['email'] == @contact_1['email']) and (contacts[0]['phone'] == @contact_1['phone']) and (contacts[0]['description'] == @contact_1['description'])
     	end
 
     	def has_received_list_with_all_contacts?
-    		contacts = @iut.contact_details_for_domain(@domain_perspective)
+    		contacts = @iut.contact_details_for_domain(@domain_perspective)['data']['contacts']
     		(contacts.size == 2) and (contacts[0] == @contact_1) and (contacts[1] == @contact_2)
     	end
 
@@ -44,7 +44,6 @@ module ServiceRegistry
 
       def contact_associated_with_domain_perspective?
         result = @iut.contact_details_for_domain(@domain_perspective)  
-        byebug
         puts result
       end
     end

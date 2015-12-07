@@ -647,6 +647,7 @@ module ServiceRegistry
       end
 
       def add_contact_to_domain_perspective(domain_perspective, contact)
+        return fail('failure adding contact details') if @broken        
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
         return fail('unknown domain perspective provided') if not is_registered?(domain_perspective_registered?(domain_perspective))
@@ -663,13 +664,15 @@ module ServiceRegistry
       end
 
       def contact_details_for_domain(domain_perspective)
-        byebug
+        return fail('failure retrieving contact details') if @broken
         return fail('no domain perspective provided') if not domain_perspective
-        return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")        
-        return fail('failure retrieving contact details') if @broken        
-        domain_perspectives = find_domain('teams', domain_perspective)
-        domain_perspectives = find_domain('domains', domain_perspective) if domain_perspectives['data']['result'].nil?
-        success_data('contacts' => domain_perspective['contacts'])
+        return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")  
+        result = domain_perspective_registered?(domain_perspective)
+        return fail('unknown domain perspective provided') if not is_registered?(result)
+        id = result['data']['id']
+        domain_perspective = @juddi.get_business(id)
+        contacts = domain_perspective['data'].first[1]['contacts']
+        success_data('contacts' => contacts)
       end      
 
       def remove_contact_from_domain(domain, contact)
@@ -691,12 +694,17 @@ module ServiceRegistry
       def domain_registered?(type, domain_perspective)
         result = @juddi.find_businesses(domain_perspective)
         registered = false
+        id = nil
         if has_data?(result, 'businesses')
           result['data']['businesses'].each do |business, detail|
-            registered = (domain_perspective.downcase == business.downcase) and (detail['id'].include?(type))
+            if (domain_perspective.downcase == business.downcase) and (detail['id'].include?(type))
+              registered = true
+              id = detail['id']
+              break
+            end
           end
         end
-        success_data({'registered' => registered})
+        success_data({'registered' => registered, 'id' => id})
       end
 
       def register_domain(type, domain_perspective)

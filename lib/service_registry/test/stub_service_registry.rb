@@ -398,7 +398,7 @@ service component has domain perspective associations
         return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")        
         return fail('failure retrieving contact details') if @broken        
         @contacts[domain_perspective] ||= []
-        @contacts[domain_perspective]
+        success_data({'contacts' => @contacts[domain_perspective]})
       end      
 
       private
