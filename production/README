@@ -1,0 +1,21 @@
+I think it will boil down to: in the web-app's META-INF pointing:
+
+    <!-- mysql 
+    <Resource name="jdbc/JuddiDS" auth="Container"
+            type="javax.sql.DataSource" username="root" password=""
+            driverClassName="com.mysql.jdbc.Driver" 
+            url="jdbc:mysql://localhost:3306/juddiv3"
+            maxActive="8" 
+            />
+
+To AWS RDS
+[2015/12/04, 10:56:07 AM] Ernst van Graan - hg8wwst: Hopefully much ado about nothing ;)
+[2015/12/04, 10:57:30 AM] Ernst van Graan - hg8wwst: Building the wars are as simple as:
+
+cd webapps
+cd juddiv3
+jar -cvf ../juddiv3.war *
+cd ../juddi-gui
+jar -cvf ../juddi-gui.war *
+
+Note that there are 2 webapps to deploy to beanstalk... can we do that on the same beanstalk instance?

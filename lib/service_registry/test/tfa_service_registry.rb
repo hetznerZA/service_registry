@@ -646,7 +646,47 @@ module ServiceRegistry
         success_data(meta)
       end
 
+      def add_contact_to_domain_perspective(domain_perspective, contact)
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if domain_perspective.strip == ""
+        return fail('unknown domain perspective provided') if not is_registered?(domain_perspective_registered?(domain_perspective))
+
+        domain_perspectives = find_domain('teams', domain_perspective)
+        domain_perspectives = find_domain('domains', domain_perspective) if domain_perspectives['data']['result'].nil?
+
+        id = domain_perspectives['data'].first[1]['id']
+        domain_perspective = domain_perspectives['data'].first[1]
+        domain_perspective['contacts'] ||= []
+        domain_perspective['contacts'] << contact
+
+        result = @juddi.save_business(id, domain_perspective['name'], domain_perspective['description'], domain_perspective['contacts'])
+      end
+
+      def contact_details_for_domain(domain_perspective)
+        byebug
+        return fail('no domain perspective provided') if not domain_perspective
+        return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")        
+        return fail('failure retrieving contact details') if @broken        
+        domain_perspectives = find_domain('teams', domain_perspective)
+        domain_perspectives = find_domain('domains', domain_perspective) if domain_perspectives['data']['result'].nil?
+        success_data('contacts' => domain_perspective['contacts'])
+      end      
+
+      def remove_contact_from_domain(domain, contact)
+
+      end      
+
       private
+
+      def find_domain(type, domain_perspective)
+        result = @juddi.find_businesses(domain_perspective)
+        if has_data?(result, 'businesses')
+          result['data']['businesses'].each do |business, detail|
+            return success_data(business => detail) if (domain_perspective.downcase == business.downcase) and (detail['id'].include?(type))
+          end
+        end
+        success
+      end
 
       def domain_registered?(type, domain_perspective)
         result = @juddi.find_businesses(domain_perspective)

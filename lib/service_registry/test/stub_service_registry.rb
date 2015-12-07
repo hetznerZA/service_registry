@@ -21,6 +21,7 @@ module ServiceRegistry
         @service_component_associations = {}
         @service_associations = {}
         @service_uris = {}
+        @contacts = {}
       end
 
       def register_service(service)
@@ -386,6 +387,19 @@ service component has domain perspective associations
         @service_uris[service].delete(uri)
         success
       end
+
+      def add_contact_to_domain_perspective(domain_perspective, contact)
+        @contacts[domain_perspective] ||= []
+        @contacts[domain_perspective] << contact
+      end
+
+      def contact_details_for_domain(domain_perspective)
+        return fail('no domain perspective provided') if not domain_perspective
+        return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")        
+        return fail('failure retrieving contact details') if @broken        
+        @contacts[domain_perspective] ||= []
+        @contacts[domain_perspective]
+      end      
 
       private
 

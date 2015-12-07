@@ -103,9 +103,9 @@ module ServiceRegistry
         @broker.find_element_bindings(service_component, @urns['service-components'])
       end
 
-      def save_business(key, name, description = nil)
+      def save_business(key, name, description = nil, contacts = nil)
         @broker.authorize
-        @broker.save_business(key, name, description)
+        @broker.save_business(key, name, description, contacts)
       end
 
       def get_business(key)

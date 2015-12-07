@@ -18,6 +18,12 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/deregister_domain_perspective.feature deregistering teams} when teams become irrelevant
 * {file:features/teams.feature teams} are thought of as domain perspectives when modelling them
 
+=== contacts
+* {file:features/add_contacts.feature adding contacts} when interested in accountability, responsibility and ownership
+* {file:features/add_contacts.feature changing contacts} when interested in accountability, responsibility and ownership
+* {file:features/remove_contacts.feature removing contacts} when interested in accountability, responsibility and ownership
+* {file:features/find_contacts.feature finding contacts} when interested in accountability, responsibility and ownership
+
 === service components
 * {file:features/listing_service_components.feature listing service components} when provisioning service components and mapping service components to domain perspectives
 * {file:features/register_service_component.feature registering service components} when new service components are added
@@ -100,6 +106,7 @@ To find a list of service definitions given a service component, one would have 
 ==== Domain perspectives
     ds.delete_all_domain_perspectives
     ds.list_domain_perspectives
+    ds.domain_perspective_by_name('domains', 'my domain')
     ds.domain_perspective_registered?('my domain')
     ds.register_domain_perspective('my domain')
     ds.domain_perspective_registered?('my domain')
@@ -140,6 +147,7 @@ To find a list of service definitions given a service component, one would have 
 ==== Teams
     ts.team_registered?('my team')
     ts.register_team('my team')
+    ds.domain_perspective_by_name('teams', 'my team')
     ts.team_registered?('my team')
     ts.deregister_team('my team')
     ts.team_registered?('my team')
