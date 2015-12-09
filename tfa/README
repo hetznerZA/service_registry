@@ -12,7 +12,8 @@ Install:
 Configuring Java
   Ensure $JAVA_HOME points to your java (>= 7)
     export JAVA_HOME=$(/usr/libexec/java_home)
-  Ensure unlimited cryptographic extensions are installed and enabled.
+
+If using Oracle JDK, ensure unlimited cryptographic extensions are installed and enabled.
   Download the .zip from Oracle: http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
   Unzip and copy US_export_policy.jar and local_policy.jar to $JAVA_HOME/jre/lib/security/
 
@@ -75,8 +76,8 @@ tModels / seeding the database:
 
 In order to create services in jUDDI, a tModel hierarchy needs to be in place. Log into the gui as uddi (password uddi) and create the following tModels:
 
-    uddi:hetzner.co.za:hetzner (select Create-Business)
     uddi:hetzner.co.za:keygenerator (select Create-tModel Partion)
+    uddi:hetzner.co.za:hetzner (select Create-Business)
     uddi:hetzner.co.za:services:keygenerator (select Create-tModel Partion)
     uddi:hetzner.co.za:service-components:keygenerator (select Create-tModel Partion)
 
