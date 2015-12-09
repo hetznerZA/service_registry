@@ -56,7 +56,6 @@ Encrypt a password using AES256 so:
 Then place the password in the users file:
     vi webapps/juddiv3/WEB-INF/classes/juddi-users-encrypted.xml
 
-    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <juddi-users>
         <user userid="uddi" password="encryptedpassword"/>
     </juddi-users>
@@ -71,6 +70,36 @@ Change <authenticator> to:
 And tell jUDDI which cryptor to use:
     <!-- jUDDI Cryptor implementation to use-->
     <cryptor>org.apache.juddi.v3.client.cryptor.AES256Cryptor</cryptor>
+
+Configuring the database
+
+vi juddiv3/WEB-INF/lib/persistence.xml
+
+<property name="openjpa.jdbc.DBDictionary" value="mysql"/>
+
+vi juddiv3/META-INF/context.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <Resource name="jdbc/JuddiDS" auth="Container"
+        type="javax.sql.DataSource" username="uddi" password="password"
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://IP:3306/juddiv3"
+        maxActive="8"/>
+</Context>
+
+Make sure mysql-connector-java-x.y.z.jar is in the juddiv3 war so:
+cp <tomcat-dir>/lib/mysql-connector-java-5.1.6.jar webapps/juddiv3/WEB-INF/lib/
+
+Now create the database and provide access:
+
+create database juddiv3;
+use juddiv3;
+grant all ON juddiv3.* to `uddi`@`%` IDENTIFIED BY 'password';
+flush privileges;
+
+Make sure conf/CATALINA/localhost/juddiv3.xml does not exist from the tomcat root directory.
 
 tModels / seeding the database:
 
@@ -115,9 +144,9 @@ For some reason, with jUDDI out of the box JSON REST request do not return data.
 
 I have not been able to resolve this, so whether REST or SOAP, we have to work with the XML anyway. For now I've opted for the TFA to use SOAP.
 
-== Persistence
+== Local Derby persistence
 
-If you want to use something other then embedded derby, see http://juddi.apache.org/docs/3.2/juddi-guide/html_single/#_derby_out_of_the_box
+By default, if you do not set up a jdbc connection as detailed above, you can test with the local derby database juddi ships with.
 
 For working with the embedded Derby database, install the derby tools:
     http://db.apache.org/derby/releases/release-10.12.1.1.cgi
