@@ -2,14 +2,19 @@
 
 == jUDDI server
 
-Download version 3.3.1 of jUDDI here: http://apache.mirrors.lucidnetworks.net/juddi/juddi/3.3.1/juddi-distro-3.3.1.tar.gz or elsewhere.
+Download version 3.3.2 of jUDDI here: http://apache.arvixe.com/juddi/juddi/3.3.2/juddi-distro-3.3.2.tar.gz or elsewhere.
 
 Install:
     cd juddi-directory/tomcat-directory
     export CATALINA_HOME=$(pwd)
     export CATALINA_BASE=$(pwd)
 
-Ensure $JAVA_HOME points to your java (>= 7)
+Configuring Java
+  Ensure $JAVA_HOME points to your java (>= 7)
+    export JAVA_HOME=$(/usr/libexec/java_home)
+  Ensure unlimited cryptographic extensions are installed and enabled.
+  Download the .zip from Oracle: http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
+  Unzip and copy US_export_policy.jar and local_policy.jar to $JAVA_HOME/jre/lib/security/
 
 Configure a user (find existing usernames and passwords here:)
     vi conf/tomcat-users.xml
@@ -43,19 +48,28 @@ juddiv3 REST API:
 
 Publishers are issued auth tokens for making changes. Everyone can read by default. For more information on authentication with jUDDI (we can plug our own IDM and CAS in...) see https://juddi.apache.org/docs/3.x/userguide/html/ch04.html#_administering_users_and_access_control For the TFA, register a username and password so:
 
-    vi webapps/juddiv3/WEB-INF/classes/juddi-users.xml
+Encrypt a password using AES256 so:
+    cd juddi-distro-3.3.2/juddi-tomcat-3.3.2/bin
+    ./juddi-cryptor.sh org.apache.juddi.v3.client.cryptor.AES256Cryptor
+
+Then place the password in the users file:
+    vi webapps/juddiv3/WEB-INF/classes/juddi-users-encrypted.xml
 
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <juddi-users>
-        <user userid="uddi" password="md5hashedpassword"/>
+        <user userid="uddi" password="encryptedpassword"/>
     </juddi-users>
 
-You can MD5 hash here: http://www.miraclesalad.com/webtools/md5.php
+Configure jUDDI to use encryption:
 
     vi webapps/juddiv3/WEB-INF/classes/juddiv3.xml
 
 Change <authenticator> to:
-    <class>org.apache.juddi.v3.auth.MD5XMLDocAuthenticator</class>
+    <class>org.apache.juddi.v3.auth.CryptedXMLDocAuthenticator</class>
+
+And tell jUDDI which cryptor to use:
+    <!-- jUDDI Cryptor implementation to use-->
+    <cryptor>org.apache.juddi.v3.client.cryptor.AES256Cryptor</cryptor>
 
 tModels / seeding the database:
 
@@ -108,10 +122,10 @@ For working with the embedded Derby database, install the derby tools:
     http://db.apache.org/derby/releases/release-10.12.1.1.cgi
     http://db.apache.org/derby/papers/DerbyTut/install_software.html
 
-juddi in test mode creates its database here: juddi-distro-3.3.1/juddi-tomcat-3.3.1/target/juddi-derby-test-db
+juddi in test mode creates its database here: juddi-distro-3.3.2/juddi-tomcat-3.3.2/target/juddi-derby-test-db
 To connect to the database:
 
-    $ cd juddi-distro-3.3.1/juddi-tomcat-3.3.1/target/
+    $ cd juddi-distro-3.3.2/juddi-tomcat-3.3.2/target/
     $ java org.apache.derby.tools.ij
     ij version 10.12
     ij> connect 'jdbc:derby:./juddi-derby-test-db';
