@@ -193,7 +193,19 @@ module ServiceRegistry
 
       def search_domain_perspective(domain_perspective, pattern)
         @soar_sr.search.search_domain_perspective(domain_perspective, pattern)
-      end      
+      end 
+
+      def add_contact_to_domain_perspective(domain_perspective, contact)
+        @soar_sr.contacts.add_contact_to_domain_perspective(domain_perspective, contact)
+      end     
+
+      def contact_details_for_domain(domain_perspective)
+        @soar_sr.contacts.contact_details_for_domain(domain_perspective)
+      end
+
+      def remove_contact_from_domain_perspective(domain_perspective, contact)
+        @soar_sr.contacts.remove_contact_from_domain_perspective(domain_perspective, contact)
+      end
     end
   end
 end
