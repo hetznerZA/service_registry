@@ -407,7 +407,6 @@ module ServiceRegistry
 
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)
-# byebug
         descriptions = []
         detail = nil
         id = compile_domain_id(type, domain_perspective)
@@ -647,20 +646,30 @@ module ServiceRegistry
       end
 
       def add_contact_to_domain_perspective(domain_perspective, contact)
-        return fail('failure adding contact details') if @broken        
+        return fail('failure adding contact') if @broken        
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
-        return fail('unknown domain perspective provided') if not is_registered?(domain_perspective_registered?(domain_perspective))
+        result = domain_perspective_registered?(domain_perspective)
+        return fail('unknown domain perspective provided') if not is_registered?(result)
+        return fail('no contact details provided') if not contact
+        return fail('invalid contact details provided') if (not contact.is_a?(Hash)) or (contact == {}) or (contact['name'].nil?) or (contact['name'].strip == "")
+        details = {}.merge!(contact)
+        details = ensure_required_contact_details(details)
 
         domain_perspectives = find_domain('teams', domain_perspective)
         domain_perspectives = find_domain('domains', domain_perspective) if domain_perspectives['data']['result'].nil?
 
         id = domain_perspectives['data'].first[1]['id']
-        domain_perspective = domain_perspectives['data'].first[1]
+        domain_perspective = @juddi.get_business(id)['data'].first[1]
+
         domain_perspective['contacts'] ||= []
-        domain_perspective['contacts'] << contact
+
+        return fail('contact already exists - remove first to update') if contacts_include?(domain_perspective['contacts'], details)
+
+        domain_perspective['contacts'] << details
 
         result = @juddi.save_business(id, domain_perspective['name'], domain_perspective['description'], domain_perspective['contacts'])
+        result
       end
 
       def contact_details_for_domain(domain_perspective)
@@ -670,16 +679,56 @@ module ServiceRegistry
         result = domain_perspective_registered?(domain_perspective)
         return fail('unknown domain perspective provided') if not is_registered?(result)
         id = result['data']['id']
-        domain_perspective = @juddi.get_business(id)
-        contacts = domain_perspective['data'].first[1]['contacts']
-        success_data('contacts' => contacts)
+        domain_perspective = @juddi.get_business(id)['data'].first[1]
+        domain_perspective['contacts'] ||= []
+        domain_perspective['contacts'].each do |contact|
+          contact['description'] = '' if contact['description'] == 'n/a'
+          contact['email'] = '' if contact['email'] == 'n/a'
+          contact['phone'] = '' if contact['phone'] == 'n/a'
+        end
+        success_data('contacts' => domain_perspective['contacts'])
       end      
 
-      def remove_contact_from_domain(domain, contact)
+      def remove_contact_from_domain_perspective(domain_perspective, contact)
+        return fail('failure removing contact') if @broken        
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if domain_perspective.strip == ""
+        result = domain_perspective_registered?(domain_perspective)
+        return fail('unknown domain perspective provided') if not is_registered?(result)
+        return fail('no contact details provided') if not contact
+        return fail('invalid contact details provided') if (not contact.is_a?(Hash)) or (contact == {})
 
+        domain_perspectives = find_domain('teams', domain_perspective)
+        domain_perspectives = find_domain('domains', domain_perspective) if domain_perspectives['data']['result'].nil?
+
+        id = domain_perspectives['data'].first[1]['id']
+
+        domain_perspective = @juddi.get_business(id)['data'].first[1]
+        domain_perspective['contacts'] ||= []
+
+        return fail('unknown contact') if not contacts_include?(domain_perspective['contacts'], contact)
+
+        domain_perspective['contacts'].delete(contact)
+        domain_perspective['contacts'] = nil if domain_perspective['contacts'] == []
+
+        result = @juddi.save_business(id, domain_perspective['name'], domain_perspective['description'], domain_perspective['contacts'])
       end      
 
       private
+
+      def ensure_required_contact_details(details)
+        details['description'] = 'n/a' if details['description'].nil? or details['description'].strip == ""
+        details['email'] = 'n/a' if details['email'].nil? or details['email'].strip == ""
+        details['phone'] = 'n/a' if details['phone'].nil? or details['phone'].strip == ""
+        details
+      end
+
+      def contacts_include?(contacts, contact)
+        contacts.each do |compare|
+          return true if (compare['name'] == contact['name']) and (compare['email'] == contact['email']) and (compare['description'] == contact['description']) and (compare['phone'] == contact['phone'])
+        end
+        false
+      end
 
       def find_domain(type, domain_perspective)
         result = @juddi.find_businesses(domain_perspective)
