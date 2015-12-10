@@ -15,25 +15,25 @@ Feature: Removing a contact for a domain perspectives
     Then I receive 'invalid domain perspective provided' notification
 
   Scenario: No contact details
-    Given a domain perspective
+    Given an existing domain perspective
     And no contact details
     When I remove the contact from the domain perspective
     Then I receive 'no contact details provided' notification
 
   Scenario: Invalid contact details
-    Given a domain perspective
+    Given an existing domain perspective
     And invalid contact details
     When I remove the contact from the domain perspective
     Then I receive 'invalid contact details provided' notification
 
   Scenario: Existing contact
-    Given a domain perspective
+    Given an existing domain perspective
     And existing contact name
     When I remove the contact from the domain perspective
     Then the contact is no longer associated with the domain perspective
 
   Scenario: Non-existing contact
-    Given a domain perspective
+    Given an existing domain perspective
     And valid contact details
     When I remove the contact from the domain perspective
     Then I receive 'unknown contact' notification

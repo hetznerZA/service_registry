@@ -15,7 +15,7 @@ Feature: Find contacts for domain perspectives
     Then I receive 'invalid domain perspective provided' notification
 
   Scenario: No contact details for the domain perspective
-    Given a domain perspective
+    Given an existing domain perspective
     And no contact details for the domain perspective
     When I request contact details for the domain perspective
     Then I receive an empty list of contacts
@@ -27,7 +27,7 @@ Feature: Find contacts for domain perspectives
     Then I receive a list with the contact
 
   Scenario: Multiple contacts for the domain perspective
-    Given a domain perspective
+    Given an existing domain perspective
     And multiple contacts for the domain perspective
     When I request contact details for the domain perspective
     Then I receive a list of all the contacts

@@ -7,7 +7,7 @@ module ServiceRegistry
       include ServiceRegistry::Providers::DssAssociate
       include Jsender
       
-      attr_reader :dss, :services, :broken, :service_component_associations
+      attr_reader :dss, :services, :broken, :service_component_associations, :contacts
       attr_writer :authorized
 
       def initialize(uri, fqdn, company_name, credentials)
@@ -389,17 +389,46 @@ service component has domain perspective associations
       end
 
       def add_contact_to_domain_perspective(domain_perspective, contact)
+        return fail('failure adding contact') if @broken        
+        return fail('no domain perspective provided') if not domain_perspective
+        return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")        
+        if domain_perspective and (not @domain_perspectives.include?(domain_perspective))
+          return success('unknown domain perspective provided')
+        end        
+        return fail('no contact details provided') if not contact
+        return fail('invalid contact details provided') if (not contact.is_a?(Hash)) or (contact == {})
         @contacts[domain_perspective] ||= []
+        return fail('contact already exists - remove first to update') if @contacts[domain_perspective].include?(contact)
         @contacts[domain_perspective] << contact
+        success
       end
 
       def contact_details_for_domain(domain_perspective)
+        return fail('failure retrieving contact details') if @broken        
         return fail('no domain perspective provided') if not domain_perspective
         return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")        
-        return fail('failure retrieving contact details') if @broken        
+        if domain_perspective and (not @domain_perspectives.include?(domain_perspective))
+          return success('unknown domain perspective provided')
+        end        
         @contacts[domain_perspective] ||= []
         success_data({'contacts' => @contacts[domain_perspective]})
       end      
+
+      def remove_contact_from_domain_perspective(domain_perspective, contact)
+        # byebug
+        return fail('failure removing contact') if @broken        
+        return fail('no domain perspective provided') if not domain_perspective
+        return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")        
+        if domain_perspective and (not @domain_perspectives.include?(domain_perspective))
+          return success('unknown domain perspective provided')
+        end        
+        return fail('no contact details provided') if not contact
+        return fail('invalid contact details provided') if (not contact.is_a?(Hash)) or (contact == {})
+        @contacts[domain_perspective] ||= []
+        return fail('unknown contact') if not @contacts[domain_perspective].include?(contact)
+        @contacts[domain_perspective].delete(contact)
+        success
+      end
 
       private
 

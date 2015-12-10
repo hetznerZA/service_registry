@@ -38,8 +38,12 @@ Given(/^invalid contact details$/) do
   @test.given_invalid_contact_details
 end
 
-Then(/^I receive 'no contact details provided' notification$/) do
+Given(/^no contact details$/) do
   @test.given_no_contact_details
+end
+
+Then(/^I receive 'no contact details provided' notification$/) do
+  expect(@test.has_received_notification?('no contact details provided')).to eq(true)
 end
 
 Then(/^I receive 'invalid contact details provided' notification$/) do

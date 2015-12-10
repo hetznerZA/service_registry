@@ -181,6 +181,23 @@ module ServiceRegistry
         @contact = @contact_1
       end
 
+      def given_no_contact_details
+        @contact = nil
+      end
+
+      def given_invalid_contact_details
+        @contact = {}
+      end
+
+      def given_existing_contact
+        result = @iut.contact_details_for_domain(@domain_perspective)
+        result['data']['contacts'].each do |contact|
+          remove_contact_from_domain_perspective(@domain_perspective, contact)
+        end
+        @contact = @contact_1
+        @iut.add_contact_to_domain_perspective(@domain_perspective, @contact)
+      end      
+
       def break_registry
         @accept_failure_notifications_in_production = true if ENV['TEST_ORCHESTRATION_PROVIDER'] == 'production'
         @iut.break

@@ -44,7 +44,11 @@ module ServiceRegistry
 
       def contact_associated_with_domain_perspective?
         result = @iut.contact_details_for_domain(@domain_perspective)  
-        puts result
+        result['data']['contacts'].include?(@contact)
+      end
+
+      def remove_contact_from_domain_perspective
+        process_result(@iut.remove_contact_from_domain_perspective(@domain_perspective, @contact))
       end
     end
   end
