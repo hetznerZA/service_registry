@@ -100,6 +100,7 @@ To find a list of service definitions given a service component, one would have 
     sc = @soar_sr.service_components
     sd = @soar_sr.service_definitions
     ts = @soar_sr.teams
+    cc = @soar_sr.contacts
     as = @soar_sr.associations
     ss = @soar_sr.search
 
@@ -151,6 +152,18 @@ To find a list of service definitions given a service component, one would have 
     ts.team_registered?('my team')
     ts.deregister_team('my team')
     ts.team_registered?('my team')
+
+==== Contacts
+    contact = { 'name' => 'Peter Umpkin', 'email' => 'p.umpkin@ppatch.com', 'description' => 'Director of operations', 'phone' => '0917872413'}
+    contact2 = { 'name' => 'Bruce Atman', 'email' => 'b.atman@marvelling.com', 'description' => 'Head of sales'}
+    ds.register_domain_perspective('my domain')
+    cc.add_contact_to_domain_perspective('my domain', contact)
+    cc.add_contact_to_domain_perspective('my domain', contact2)
+    cc.contact_details_for_domain('my domain')
+    cc.remove_contact_from_domain_perspective('my domain', contact)
+    ts.register_team('my team')
+    cc.add_contact_to_domain_perspective('my team', contact2)
+    cc.contact_details_for_domain('my team')
 
 ==== Associations
     ds.register_domain_perspective('my domain')

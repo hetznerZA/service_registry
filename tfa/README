@@ -101,6 +101,10 @@ flush privileges;
 
 Make sure conf/CATALINA/localhost/juddiv3.xml does not exist from the tomcat root directory.
 
+Restart the jUDDI GUI from the tomcat manager or from the command line so:
+
+bin/catalina.sh
+
 tModels / seeding the database:
 
 In order to create services in jUDDI, a tModel hierarchy needs to be in place. Log into the gui as uddi (password uddi) and create the following tModels:
