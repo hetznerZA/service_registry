@@ -73,7 +73,7 @@ And tell jUDDI which cryptor to use:
 
 Configuring the database
 
-vi juddiv3/WEB-INF/lib/persistence.xml
+vi webapps/juddiv3/WEB-INF/classes/META-INF/persistence.xml
 
 <property name="openjpa.jdbc.DBDictionary" value="mysql"/>
 

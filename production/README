@@ -6,7 +6,7 @@ Configure the juddi-gui authenticator as in the TFA README
 
 For production, configure the data source as follows to point to a relational database of your choice:
 
-vi juddiv3/WEB-INF/lib/persistence.xml 
+vi webapps/juddiv3/WEB-INF/classes/META-INF/persistence.xml 
 
 <property name="openjpa.jdbc.DBDictionary" value="mysql"/>
 
@@ -16,10 +16,10 @@ vi juddiv3/META-INF/context.xml
 <Context>
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     <Resource name="jdbc/JuddiDS" auth="Container"
-        type="javax.sql.DataSource" username="uddi" password="password"
+        type="javax.sql.DataSource" username="#{systemProperties['RDS_USERNAME']}" password="#{systemProperties['RDS_PASSWORD']}"
         driverClassName="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://IP:3306/juddiv3"
-        maxActive="8"/>
+        url="jdbc:mysql://#{systemProperties['RDS_HOSTNAME']}:#{systemProperties['RDS_PORT']}/#{systemProperties['RDS_DB_NAME']}"
+        maxActive="20"/>
 </Context>
 
 Make sure mysql-connector-java-x.y.z.jar is in the juddiv3 war so:
