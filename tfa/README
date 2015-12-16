@@ -57,7 +57,7 @@ Then place the password in the users file:
     vi webapps/juddiv3/WEB-INF/classes/juddi-users-encrypted.xml
 
     <juddi-users>
-        <user userid="uddi" password="encryptedpassword"/>
+        <user userid="uddi" password="f43bbd129632c2292d28eef365fffdaa"/>
     </juddi-users>
 
 Configure jUDDI to use encryption:
@@ -77,7 +77,7 @@ vi webapps/juddiv3/WEB-INF/classes/META-INF/persistence.xml
 
 <property name="openjpa.jdbc.DBDictionary" value="mysql"/>
 
-vi juddiv3/META-INF/context.xml
+vi webapps/juddiv3/META-INF/context.xml
 
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
@@ -103,7 +103,8 @@ Make sure conf/CATALINA/localhost/juddiv3.xml does not exist from the tomcat roo
 
 Restart the jUDDI GUI from the tomcat manager or from the command line so:
 
-bin/catalina.sh
+bin/catalina.sh stop
+bin/catalina.sh start
 
 tModels / seeding the database:
 
