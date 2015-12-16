@@ -37,13 +37,13 @@ Feature: Configuring URI for a service
     Given no service
     And valid URI
     When I request configuration of the service URI
-    Then I receive 'no service identifier provided' notification
+    Then I receive 'no service provided' notification
 
   Scenario: Invalid service
     Given invalid service identifier
     And valid URI
     When I request configuration of the service URI
-    Then I receive 'invalid service identifier provided' notification
+    Then I receive 'invalid service provided' notification
 
   Scenario: Failure
     Given a registered service

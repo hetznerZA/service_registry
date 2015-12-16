@@ -1,0 +1,42 @@
+Download the correct juddi as expressed in the TFA README and uncompress it.
+Delete webapps/juddi-gui and replace it with the Hetzner jUDDI GUI found in here: git@github.com:hetznerZA/soar_sr_gui.git
+Clone this repo, build it and then do all GUI configuration to target/juddi-gui. Soft-link target/juddi-gui to the tomcat directory's webapps/juddi-gui and then follow the rest of these instructions.
+
+Configure the juddi-gui authenticator as in the TFA README
+
+For production, configure the data source as follows to point to a relational database of your choice:
+
+vi webapps/juddiv3/WEB-INF/classes/META-INF/persistence.xml 
+
+<property name="openjpa.jdbc.DBDictionary" value="mysql"/>
+
+vi juddiv3/META-INF/context.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <Resource name="jdbc/JuddiDS" auth="Container"
+        type="javax.sql.DataSource" username="#{systemProperties['RDS_USERNAME']}" password="#{systemProperties['RDS_PASSWORD']}"
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://#{systemProperties['RDS_HOSTNAME']}:#{systemProperties['RDS_PORT']}/#{systemProperties['RDS_DB_NAME']}"
+        maxActive="20"/>
+</Context>
+
+Make sure mysql-connector-java-x.y.z.jar is in the juddiv3 war so:
+cp <tomcat-dir>/lib/mysql-connector-java-5.1.6.jar webapps/juddiv3/WEB-INF/lib/
+
+Now create the database and provide access:
+
+create juddiv3
+grant all ON juddi.* to `uddi`@`%` IDENTIFIED BY 'password';
+flush privileges;
+
+Make sure conf/CATALINA/localhost/juddiv3.xml does not exist from the tomcat root directory.
+
+cd webapps
+cd juddiv3
+jar -cvf ../juddiv3.war *
+cd ../juddi-gui
+jar -cvf ../juddi-gui.war *
+
+Note that there are 2 webapps to deploy to beanstalk... can we do that on the same beanstalk instance?

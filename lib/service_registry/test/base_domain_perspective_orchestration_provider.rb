@@ -40,10 +40,6 @@ module ServiceRegistry
         process_result(@iut.register_domain_perspective(@domain_perspective_2))
       end
 
-      def delete_all_domain_perspective_associations
-        @iut.delete_all_domain_perspective_associations(@domain_perspective)
-      end
-
       def is_domain_perspective_available?
         @iut.fix
         process_result(@iut.list_domain_perspectives)

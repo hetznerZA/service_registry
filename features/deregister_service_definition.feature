@@ -13,7 +13,7 @@ Feature: Deregistering a service definition
   Scenario: invalid service identifier
     Given invalid service identifier
     When I deregister the service definition
-    Then I receive 'invalid service identifier provided' notification
+    Then I receive 'invalid service provided' notification
 
   Scenario: valid service identifier
     Given a registered service

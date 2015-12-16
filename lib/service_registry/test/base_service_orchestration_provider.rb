@@ -18,6 +18,14 @@ module ServiceRegistry
         @need = 'id_3'
       end
 
+      def given_no_pattern
+        @need = nil
+      end
+
+      def given_invalid_pattern
+        @need = 'my'
+      end
+
       def given_service_with_pattern_in_id
         @expected_pattern_service = @service_3
         @iut.register_service(@service_3)
@@ -26,7 +34,6 @@ module ServiceRegistry
 
       def given_service_with_pattern_in_description
         @expected_pattern_service = @service_3
-        # byebug
         @iut.register_service(@service_3)
         @iut.register_service_definition(@service_3['name'], @service_definition_1)
       end
@@ -50,7 +57,7 @@ module ServiceRegistry
       end
 
       def match_need
-        # byebug
+        #byebug
         process_result(@iut.search_for_service(@need))
       end
 
@@ -102,8 +109,8 @@ module ServiceRegistry
         false
       end
 
-      def service_by_id
-        process_result(@iut.service_by_id(@service))
+      def service_by_name
+        process_result(@iut.service_by_name(@service))
       end
 
       def multiple_existing_services
@@ -122,10 +129,13 @@ module ServiceRegistry
 
       def multiple_existing_domain_perspectives
         @iut.register_domain_perspective(@domain_perspective_1)
+        @iut.delete_all_domain_perspective_associations(@domain_perspective_1)
         @iut.register_domain_perspective(@domain_perspective_2)
+        @iut.delete_all_domain_perspective_associations(@domain_perspective_2)
       end
 
       def services_associated_with_different_domain_perspectives
+        # byebug
         @iut.register_service(@service_3)
         @iut.associate_service_with_domain_perspective(@service_3['name'], @domain_perspective_1)
         @iut.register_service(@service_4)

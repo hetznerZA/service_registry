@@ -10,10 +10,6 @@ When(/^I register the service definition with the service$/) do
   @test.register_service_definition
 end
 
-Then(/^I receive 'unknown service identifier provided' notification$/) do
-  expect(@test.has_received_notification?('unknown service identifier provided')).to eq(true)
-end
-
 Then(/^the service unavailable$/) do
   expect(@test.service_available?).to eq(false)
 end
@@ -30,16 +26,16 @@ Then(/^the service is described by the service definition$/) do
   expect(@test.is_service_described_by_service_definition?).to eq(true)
 end
 
-Then(/^I receive 'no service identifier provided' notification$/) do
-  expect(@test.has_received_notification?('no service identifier provided')).to eq(true)
+Then(/^I receive 'no service provided' notification$/) do
+  expect(@test.has_received_notification?('no service provided')).to eq(true)
 end
 
 Then(/^I receive 'no service definition provided' notification$/) do
   expect(@test.has_received_notification?('no service definition provided')).to eq(true)
 end
 
-Then(/^I receive 'invalid service identifier provided' notification$/) do
-  expect(@test.has_received_notification?('invalid service identifier provided')).to eq(true)
+Then(/^I receive 'invalid service provided' notification$/) do
+  expect(@test.has_received_notification?('invalid service provided')).to eq(true)
 end
 
 Given(/^no service definition$/) do
@@ -123,7 +119,7 @@ Given(/^a service ID$/) do
 end
 
 When(/^I request the service by ID$/) do
-  @test.service_by_id
+  @test.service_by_name
 end
 
 Then(/^I receive a list with the service as the single entry in it$/) do
@@ -238,8 +234,8 @@ When(/^I request deregistration of the service$/) do
   @test.deregister_service
 end
 
-Then(/^I receive 'service unknown' notification$/) do
-  expect(@test.has_received_notification?('unknown service')).to eq(true)
+Then(/^I receive 'unknown service provided' notification$/) do
+  expect(@test.has_received_notification?('unknown service provided')).to eq(true)
 end
 
 Then(/^I receive 'service deregistered' notification$/) do
@@ -304,4 +300,20 @@ end
 
 Then(/^I receive 'failure listing service URIs' notification$/) do
   expect(@test.has_received_notification?('failure listing service URIs')).to eq(true)
+end
+
+Given(/^no pattern$/) do
+  @test.given_no_pattern
+end
+
+Then(/^I receive 'no pattern provided' notification$/) do
+  expect(@test.has_received_notification?('no pattern provided')).to eq(true)
+end
+
+Given(/^invalid pattern$/) do
+  @test.given_invalid_pattern
+end
+
+Then(/^I receive 'invalid pattern provided' notification$/) do
+  expect(@test.has_received_notification?('invalid pattern provided')).to eq(true)
 end

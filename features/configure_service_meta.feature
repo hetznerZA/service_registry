@@ -45,6 +45,12 @@ Feature: Configuring meta for a service
     When I request configuration of the service with meta
     Then I receive 'invalid service provided' notification
 
+  Scenario: Unknown service
+    Given valid meta
+    And unknown service identifier
+    When I request configuration of the service with meta
+    Then I receive 'unknown service provided' notification
+
   Scenario: Failure
     Given valid meta
     And a registered service

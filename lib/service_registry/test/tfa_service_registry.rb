@@ -12,19 +12,20 @@ module ServiceRegistry
             
       attr_writer :authorized
 
-      def initialize
-        @tfa_uri = "http://localhost:8080"
+      def initialize(uri, fqdn, company_name, credentials)
         @urns = { 'base' => ServiceRegistry::HETZNER_BASE_URN,
                  'company' => ServiceRegistry::HETZNER_URN,
                  'domains' => ServiceRegistry::HETZNER_DOMAINS_URN,
                  'teams' => ServiceRegistry::HETZNER_TEAMS_URN,
                  'services' => ServiceRegistry::HETZNER_SERVICES_URN,
                  'service-components' => ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}
+
+        @tfa_uri = uri
         broker = ::Soap4juddi::Broker.new(@urns)
         broker.set_uri(@tfa_uri)
         @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns, broker)
         @authorized = true
-        @credentials = { 'username' => 'uddi', 'password' => 'uddi' }
+        @credentials = credentials
 
         # stub out the bootstrapping environment
         @configuration_bootstrap = {'CFGSRV_PROVIDER_ADDRESS' => 'https://127.0.0.1', 'CFGSRV_TOKEN' => 'abcd', 'CFGSRV_IDENTIFIER' => 'identifier' }
@@ -47,7 +48,7 @@ module ServiceRegistry
 
       def register_service(service)
         authorize
-        result = validate_hash_present(service, 'name', 'service identifier'); return result if result
+        result = validate_hash_present(service, 'name', 'service'); return result if result
         return fail('service already exists') if is_registered?(service_registered?(service['name']))
 
         description = []
@@ -75,8 +76,8 @@ module ServiceRegistry
 
       def deregister_service(service)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
-        return success('unknown service') if not is_registered?(service_registered?(service))
+        result = validate_field_present(service, 'service'); return result if result
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.delete_service(service)
         validate_and_succeed(result, 'service', 'service deregistered')
 
@@ -87,11 +88,11 @@ module ServiceRegistry
 
       def add_service_uri(service, uri)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
+        result = validate_field_present(service, 'service'); return result if result
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
 
-        return fail('unknown service') if not is_registered?(service_registered?(service))
+        return fail('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.add_service_uri(service, uri)
         validate_and_succeed(result, 'service')
 
@@ -102,9 +103,9 @@ module ServiceRegistry
 
       def service_uris(service)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
+        result = validate_field_present(service, 'service'); return result if result
 
-        return fail('unknown service') if not is_registered?(service_registered?(service))
+        return fail('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.service_uris(service)
         validate_and_succeed(result, 'service', '', result['data'])
 
@@ -115,11 +116,11 @@ module ServiceRegistry
 
       def remove_uri_from_service(service, uri)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
+        result = validate_field_present(service, 'service'); return result if result
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
 
-        return fail('unknown service') if not is_registered?(service_registered?(service))
+        return fail('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.remove_service_uri(service, uri)
         validate_and_succeed(result, 'service')
 
@@ -132,8 +133,8 @@ module ServiceRegistry
 
       def register_service_definition(service, definition)
         authorize 
-        result = validate_field_present(service, 'service identifier'); return result if result
-        return success('unknown service identifier provided') if not is_registered?(service_registered?(service))
+        result = validate_field_present(service, 'service'); return result if result
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
         return fail('no service definition provided') if definition.nil?
         return fail('invalid service definition provided') if not definition.include?("wadl")
 
@@ -148,18 +149,18 @@ module ServiceRegistry
       end
 
       def service_definition_for_service(service)
-        result = validate_field_present(service, 'service identifier'); return result if result
-        return success('unknown service') if not is_registered?(service_registered?(service))
+        result = validate_field_present(service, 'service'); return result if result
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)['data']
-        return fail('invalid service identifier provided') if notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('invalid service provided') if notifications_include?(result, 'E_invalidKeyPassed')
         return fail('service has no definition') if (result['definition'].nil?) or (result['definition'] == "")
         return success_data({'definition' => result['definition']}) if (not result.nil?) and (not result['definition'].nil?)
       end
 
       def deregister_service_definition(service)
         authorize
-        result = validate_field_present(service, 'service identifier'); return result if result
-        return success('unknown service') if not is_registered?(service_registered?(service))
+        result = validate_field_present(service, 'service'); return result if result
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)
         service = result['data']
         service['definition'] = ""
@@ -233,6 +234,7 @@ module ServiceRegistry
         found = []
 
         if not domain_perspective.nil?
+          return fail('unknown domain perspective provided') if not is_registered?(domain_perspective_registered?(domain_perspective))
           associations = domain_perspective_associations(domain_perspective)['data']['associations']['service_components']
           return success_data({'service_components' => []}) if associations.count == 0
           
@@ -280,7 +282,7 @@ module ServiceRegistry
 
       def register_service_component(service_component)
         authorize
-        result = validate_field_present(service_component, 'service component identifier'); return result if result
+        result = validate_field_present(service_component, 'service component'); return result if result
         return fail('service component already exists') if is_registered?(service_component_registered?(service_component))
 
         result = @juddi.save_service_component(service_component)
@@ -304,9 +306,9 @@ module ServiceRegistry
 
       def deregister_service_component(service_component)
          authorize
-         return fail('no service component identifier provided') if service_component.nil?
-         return fail('invalid service component identifier') if service_component.strip == ""
-         return success('service component unknown') if not is_registered?(service_component_registered?(service_component))
+         return fail('no service component provided') if service_component.nil?
+         return fail('invalid service component provided') if service_component.strip == ""
+         return success('unknown service component provided') if not is_registered?(service_component_registered?(service_component))
          return fail('service component has domain perspective associations') if service_component_has_domain_perspective_associations?(service_component)
          result = @juddi.delete_service_component(service_component)
          validate_and_succeed(result, 'service component', 'service component deregistered') 
@@ -333,7 +335,8 @@ module ServiceRegistry
       def configure_service_component_uri(service_component, uri)
         authorize
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('invalid service component provided') if (service_component.strip == "")
+        return fail('unknown service component provided') if not is_registered?(service_component_registered?(service_component))
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
         result = @juddi.save_service_component_uri(service_component, uri)
@@ -346,9 +349,10 @@ module ServiceRegistry
 
       def service_component_uri(service_component)
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (service_component.strip == "")
+        return fail('invalid service component provided') if (service_component.strip == "")
+        return fail('unknown service component provided') if not is_registered?(service_component_registered?(service_component))
         result = @juddi.find_service_component_uri(service_component)
-        return fail('invalid service component identifier') if notifications_include?(result, 'E_invalidKeyPassed')
+        return fail('invalid service component provided') if notifications_include?(result, 'E_invalidKeyPassed')
         uri = (has_data?(result, 'bindings') and (result['data']['bindings'].size > 0)) ? result['data']['bindings'].first[1]['access_point'] : nil
         result['data']['uri'] = uri
         result
@@ -360,6 +364,7 @@ module ServiceRegistry
 
         return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (service.strip == "")
+        return fail('unknown service provided') if not is_registered?(service_registered?(service))
 
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)
@@ -402,7 +407,6 @@ module ServiceRegistry
 
         return fail('no meta provided') if meta.nil?
         return fail('invalid meta') if not meta.is_a?(Hash)
-# byebug
         descriptions = []
         detail = nil
         id = compile_domain_id(type, domain_perspective)
@@ -481,8 +485,8 @@ module ServiceRegistry
       end
 
       def search_for_service(pattern)
-        return fail('invalid pattern') if pattern.nil?
-        return fail('pattern too short') if (pattern.size < 4)
+        return fail('no pattern provided') if pattern.nil?
+        return fail('invalid pattern provided') if (pattern.size < 4)
 
         services = @juddi.find_services(pattern)['data']['services']
         service_components = @juddi.find_service_components(pattern)['data']['services']
@@ -500,19 +504,19 @@ module ServiceRegistry
         success_data({'services' => found})
       end     
 
-      def service_by_id(id)
-        return fail('invalid pattern') if id.nil? or (id.strip == "")
+      def service_by_name(name)
+        return fail('invalid service provided') if name.nil? or (name.strip == "")
 
-        result = search_for_service(id)
+        result = search_for_service(name)
         if has_data?(result, 'services')
-          result['data']['services'].each do |sid, service|
-            compare_service = "#{ServiceRegistry::HETZNER_SERVICES_URN}#{id}" == sid
-            compare_service_component = "#{ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}#{id}" == sid
-            return success_data({ 'services' => { sid => service }}) if compare_service or compare_service_component or (id == sid)
+          result['data']['services'].each do |sname, service|
+            compare_service = "#{ServiceRegistry::HETZNER_SERVICES_URN}#{name}" == sname
+            compare_service_component = "#{ServiceRegistry::HETZNER_SERVICE_COMPONENTS_URN}#{name}" == sname
+            return success_data({ 'services' => { sname => service }}) if compare_service or compare_service_component or (name == sname)
           end
           success_data({ 'services' => {}})
         else
-          fail('failure finding service by id')
+          fail('failure finding service by name')
         end
       end 
 
@@ -529,15 +533,6 @@ module ServiceRegistry
       end
 
       # ---- associations ----
-      def domain_perspective_associations(domain_perspective)
-        meta = meta_for_domain_perspective('domains', domain_perspective)
-
-        meta['associations'] ||= {}
-        meta['associations']['services'] ||= {}
-        meta['associations']['service_components'] ||= {}
-        success_data(associations)
-      end
-
 
       def delete_all_domain_perspective_associations(domain_perspective)
         associations = domain_perspective_associations(domain_perspective)['data']['associations']
@@ -553,7 +548,7 @@ module ServiceRegistry
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (not is_registered?(service_component_registered?(service_component)))
+        return fail('invalid service component provided') if (not is_registered?(service_component_registered?(service_component)))
 
         service_component_id = compile_domain_id('service-components', service_component)
         meta = meta_for_domain_perspective('domains', domain_perspective)
@@ -575,7 +570,7 @@ module ServiceRegistry
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
-        return fail('no service identifier provided') if service.nil?
+        return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (not is_registered?(service_registered?(service)))
 
         service_id = compile_domain_id('services', service)
@@ -600,7 +595,7 @@ module ServiceRegistry
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
         return fail('no service component provided') if service_component.nil?
-        return fail('invalid service component identifier') if (not is_registered?(service_component_registered?(service_component)))
+        return fail('invalid service component provided') if (not is_registered?(service_component_registered?(service_component)))
 
         service_component_id = compile_domain_id('service-components', service_component)
         meta = meta_for_domain_perspective('domains', domain_perspective)
@@ -623,7 +618,7 @@ module ServiceRegistry
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
-        return fail('no service identifier provided') if service.nil?
+        return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (not is_registered?(service_registered?(service)))
 
         service_id = compile_domain_id('services', service)
@@ -650,23 +645,121 @@ module ServiceRegistry
         success_data(meta)
       end
 
+      def add_contact_to_domain_perspective(domain_perspective, contact)
+        return fail('failure adding contact') if @broken        
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if domain_perspective.strip == ""
+        result = domain_perspective_registered?(domain_perspective)
+        return fail('unknown domain perspective provided') if not is_registered?(result)
+        return fail('no contact details provided') if not contact
+        return fail('invalid contact details provided') if (not contact.is_a?(Hash)) or (contact == {}) or (contact['name'].nil?) or (contact['name'].strip == "")
+        details = {}.merge!(contact)
+        details = ensure_required_contact_details(details)
+
+        domain_perspectives = find_domain('teams', domain_perspective)
+        domain_perspectives = find_domain('domains', domain_perspective) if domain_perspectives['data']['result'].nil?
+
+        id = domain_perspectives['data'].first[1]['id']
+        domain_perspective = @juddi.get_business(id)['data'].first[1]
+
+        domain_perspective['contacts'] ||= []
+
+        return fail('contact already exists - remove first to update') if contacts_include?(domain_perspective['contacts'], details)
+
+        domain_perspective['contacts'] << details
+
+        result = @juddi.save_business(id, domain_perspective['name'], domain_perspective['description'], domain_perspective['contacts'])
+        result
+      end
+
+      def contact_details_for_domain(domain_perspective)
+        return fail('failure retrieving contact details') if @broken
+        return fail('no domain perspective provided') if not domain_perspective
+        return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")  
+        result = domain_perspective_registered?(domain_perspective)
+        return fail('unknown domain perspective provided') if not is_registered?(result)
+        id = result['data']['id']
+        domain_perspective = @juddi.get_business(id)['data'].first[1]
+        domain_perspective['contacts'] ||= []
+        domain_perspective['contacts'].each do |contact|
+          contact['description'] = '' if contact['description'] == 'n/a'
+          contact['email'] = '' if contact['email'] == 'n/a'
+          contact['phone'] = '' if contact['phone'] == 'n/a'
+        end
+        success_data('contacts' => domain_perspective['contacts'])
+      end      
+
+      def remove_contact_from_domain_perspective(domain_perspective, contact)
+        return fail('failure removing contact') if @broken        
+        return fail('no domain perspective provided') if domain_perspective.nil?
+        return fail('invalid domain perspective provided') if domain_perspective.strip == ""
+        result = domain_perspective_registered?(domain_perspective)
+        return fail('unknown domain perspective provided') if not is_registered?(result)
+        return fail('no contact details provided') if not contact
+        return fail('invalid contact details provided') if (not contact.is_a?(Hash)) or (contact == {})
+
+        domain_perspectives = find_domain('teams', domain_perspective)
+        domain_perspectives = find_domain('domains', domain_perspective) if domain_perspectives['data']['result'].nil?
+
+        id = domain_perspectives['data'].first[1]['id']
+
+        domain_perspective = @juddi.get_business(id)['data'].first[1]
+        domain_perspective['contacts'] ||= []
+
+        return fail('unknown contact') if not contacts_include?(domain_perspective['contacts'], contact)
+
+        domain_perspective['contacts'].delete(contact)
+        domain_perspective['contacts'] = nil if domain_perspective['contacts'] == []
+
+        result = @juddi.save_business(id, domain_perspective['name'], domain_perspective['description'], domain_perspective['contacts'])
+      end      
+
       private
+
+      def ensure_required_contact_details(details)
+        details['description'] = 'n/a' if details['description'].nil? or details['description'].strip == ""
+        details['email'] = 'n/a' if details['email'].nil? or details['email'].strip == ""
+        details['phone'] = 'n/a' if details['phone'].nil? or details['phone'].strip == ""
+        details
+      end
+
+      def contacts_include?(contacts, contact)
+        contacts.each do |compare|
+          return true if (compare['name'] == contact['name']) and (compare['email'] == contact['email']) and (compare['description'] == contact['description']) and (compare['phone'] == contact['phone'])
+        end
+        false
+      end
+
+      def find_domain(type, domain_perspective)
+        result = @juddi.find_businesses(domain_perspective)
+        if has_data?(result, 'businesses')
+          result['data']['businesses'].each do |business, detail|
+            return success_data(business => detail) if (domain_perspective.downcase == business.downcase) and (detail['id'].include?(type))
+          end
+        end
+        success
+      end
 
       def domain_registered?(type, domain_perspective)
         result = @juddi.find_businesses(domain_perspective)
         registered = false
+        id = nil
         if has_data?(result, 'businesses')
           result['data']['businesses'].each do |business, detail|
-            registered = (domain_perspective.downcase == business.downcase) and (detail['id'].include?(type))
+            if (domain_perspective.downcase == business.downcase) and (detail['id'].include?(type))
+              registered = true
+              id = detail['id']
+              break
+            end
           end
         end
-        success_data({'registered' => registered})
+        success_data({'registered' => registered, 'id' => id})
       end
 
       def register_domain(type, domain_perspective)
         authorize
         return fail('no domain perspective provided') if domain_perspective.nil?
-        return fail('invalid domain perspective') if (domain_perspective.strip == "") or (not ServiceRegistry::HETZNER_DOMAIN_TYPES.include?(type.downcase))
+        return fail('invalid domain perspective provided') if (domain_perspective.strip == "") or (not ServiceRegistry::HETZNER_DOMAIN_TYPES.include?(type.downcase))
         return fail('domain perspective already exists') if is_registered?(domain_perspective_registered?(domain_perspective))
 
         id = compile_domain_id(type, domain_perspective)
@@ -692,7 +785,7 @@ module ServiceRegistry
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
 
-        return fail('domain perspective unknown') if not is_registered?(domain_perspective_registered?(domain_perspective))
+        return fail('unknown domain perspective provided') if not is_registered?(domain_perspective_registered?(domain_perspective))
         return fail('domain perspective has associations') if domain_perspective_has_associations?(domain_perspective)
 
         result = @juddi.delete_business(compile_domain_id(type, domain_perspective))

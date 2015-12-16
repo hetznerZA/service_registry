@@ -16,8 +16,13 @@ Feature: Listing service components
     When service components are listed
     Then I receive an empty list of service components
 
+  Scenario: Unknown domain perspective
+    Given an unknown domain perspective
+    When service components are listed
+    Then I receive 'unknown domain perspective provided' notification
+
   Scenario: No service components and a domain perspective
-    Given a domain perspective
+    Given an existing domain perspective
     And no service components exist in the domain perspective
     When service components are listed
     Then I receive an empty list of service components

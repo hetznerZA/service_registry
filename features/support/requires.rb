@@ -4,9 +4,6 @@ class Requires
 	def self.require_files
 	  require "providers/dss_associate"
 	  require "providers/bootstrapped_provider"
-	  # require "providers/juddi_soap_broker"
-	  # require "providers/soap4juddi_xml"
-	  # require "providers/soap4juddi_connector"
 	  require "providers/juddi_provider"
 	  require "test/orchestration_provider_registry"
 	  require "test/base_orchestration_provider"

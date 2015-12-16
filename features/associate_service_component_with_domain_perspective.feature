@@ -1,6 +1,7 @@
 Feature: Associate a service component with a domain perspective
   Scenario: Not authorized
     Given an existing domain perspective
+    And the domain perspective has no associations
     And existing service component identifier
     And unauthorized publisher
     When I request association of the service component with the domain perspective
@@ -17,7 +18,7 @@ Feature: Associate a service component with a domain perspective
     Given an existing domain perspective
     And invalid service component identifier
     When I request association of the service component with the domain perspective
-    Then I receive 'invalid service component identifier' notification
+    Then I receive 'invalid service component provided' notification
     And the domain perspective associations should not change
 
   Scenario: No domain perspective

@@ -13,7 +13,7 @@ Feature: Registering service components
   Scenario: No identifier
     Given no service component identifier
     When I request registration of the service component
-    Then I receive 'no service component identifier provided' notification
+    Then I receive 'no service component provided' notification
     And the service component should not be available
 
   Scenario: New service component
@@ -31,7 +31,7 @@ Feature: Registering service components
   Scenario: Invalid service component identifier
     Given invalid service component identifier
     When I request registration of the service component
-    Then I receive 'invalid service component identifier provided' notification
+    Then I receive 'invalid service component provided' notification
     And the service component should not be available
 
   Scenario: failure

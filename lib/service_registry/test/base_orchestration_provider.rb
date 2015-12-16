@@ -27,6 +27,9 @@ module ServiceRegistry
         @service_definition = nil
         @service_uri_1 = 'http://localhost/1'
         @service_uri_2 = 'http://localhost/2'
+        @contact_1 = { 'name' => 'Darren Silke', 'email' => 'darren@smooth-silk.com', 'description' => 'Intern', 'phone' => '0217881445'}; @contact_1.freeze
+        @contact_2 = { 'name' => 'Tenashe Madzingaidzo', 'email' => 'tenashe@greatpasswords.net', 'phone' => '', 'description' => ''}; @contact_2.freeze
+
         #@service_definition_1 = "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type='text/xsl' href='/wadl/wadl.xsl'?><wadl:application xmlns:wadl='http://wadl.dev.java.net/2009/02'    xmlns:jr='http://jasperreports.sourceforge.net/xsd/jasperreport.xsd'    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://wadl.dev.java.net/2009/02 wadl.xsd '><wadl:resources base='/'><wadl:resource path='/available-policies'>  <wadl:method name='GET' id='_available-policies'>    <wadl:doc>      Lists the policies available against which this service can validate credentials    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/validate-credential-using-policy'>  <wadl:method name='POST' id='_validate-credential-using-policy'>    <wadl:doc>      Given a credential string, examine the entropy against a security paradigm    </wadl:doc>    <wadl:request>      <wadl:param name='credential' type='xsd:string' required='true' style='query'>      </wadl:param>      <wadl:param name='policy' type='xsd:string' required='true' style='query'>      </wadl:param>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/generate-credential'>  <wadl:method name='GET' id='_generate-credential'>    <wadl:doc>      Generates a strong credential given a policy to adhere to    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status'>  <wadl:method name='GET' id='_status'>    <wadl:doc>      Returns 100 if capable of validating credentials against a policy and returns 0 if policy dependencies have failed and unable to validate credentials against policies    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/status-detail'>  <wadl:method name='GET' id='_status-detail'>    <wadl:doc>      This endpoint provides detail of the status measure available on the /status endpoint    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource><wadl:resource path='/lexicon'>  <wadl:method name='GET' id='_lexicon'>    <wadl:doc>      Description of all the services available on this service component    </wadl:doc>    <wadl:request>    </wadl:request>  </wadl:method></wadl:resource></wadl:resources></wadl:application>"
         @service_definition_1 = "https://github.com/hetznerZA/some/service/wadl/definition.xml"
         @valid_meta = {'dss' => 'http://my.dss.host-h.net/qid=should_this_service_be_included&service=SERVICE-ID'}
@@ -59,12 +62,6 @@ module ServiceRegistry
         @domain_perspective = @domain_perspective_1
       end
 
-      def given_an_existing_domain_perspective
-        @iut.reset_domain_perspectives
-        @domain_perspective = @domain_perspective_1
-        @iut.register_domain_perspective(@domain_perspective)
-      end
-
       def given_a_new_team
         @iut.reset_domain_perspectives
       end
@@ -79,7 +76,7 @@ module ServiceRegistry
 
       def given_an_invalid_domain_perspective
         @domain_perspective = " "
-      end
+      end      
 
       def given_an_existing_domain_perspective
         process_result(@iut.reset_domain_perspectives)
@@ -113,6 +110,10 @@ module ServiceRegistry
 
       def given_invalid_service_component_identifier
         @service_component = " "
+      end
+
+      def given_unknown_service_component_identifier
+        @service_component = "unknown"
       end
 
       def given_no_service_component_identifier
@@ -165,6 +166,10 @@ module ServiceRegistry
         process_result(@iut.associate_service_component_with_service(@service, @service_uri_1))
       end
 
+      def delete_all_domain_perspective_associations
+        @iut.delete_all_domain_perspective_associations(@domain_perspective)
+      end      
+
       def given_a_valid_service
         @service = @valid_service['name']
         @iut.register_service(@valid_service)
@@ -172,7 +177,29 @@ module ServiceRegistry
         @pre_service_definition = result['status'] == 'fail' ? nil : result['data']['definition']
       end
 
+      def given_valid_contact_details
+        @contact = @contact_1
+      end
+
+      def given_no_contact_details
+        @contact = nil
+      end
+
+      def given_invalid_contact_details
+        @contact = {}
+      end
+
+      def given_existing_contact
+        result = @iut.contact_details_for_domain(@domain_perspective)
+        result['data']['contacts'].each do |contact|
+          remove_contact_from_domain_perspective(@domain_perspective, contact)
+        end
+        @contact = @contact_1
+        @iut.add_contact_to_domain_perspective(@domain_perspective, @contact)
+      end      
+
       def break_registry
+        @accept_failure_notifications_in_production = true if ENV['TEST_ORCHESTRATION_PROVIDER'] == 'production'
         @iut.break
       end
 
@@ -199,7 +226,12 @@ module ServiceRegistry
       end
 
       def has_received_notification?(message)
+        if @accept_failure_notifications_in_production
+          @accept_failure_notifications_in_production = false
+          return true
+        end
         @notifications.each do |notification|
+          #puts "COMPARING #{notification} with #{message}"
           return true if notification == message
         end
         false

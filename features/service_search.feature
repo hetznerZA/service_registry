@@ -47,6 +47,16 @@ Feature: Searching for a service
     When I request services matching the pattern
     Then I receive a list with the service included
 
+  Scenario: No pattern
+    Given no pattern
+    When I request services matching the pattern
+    Then I receive 'no pattern provided' notification
+    
+  Scenario: No pattern
+    Given invalid pattern
+    When I request services matching the pattern
+    Then I receive 'invalid pattern provided' notification
+
 #  Scenario: Match by pattern in service definition
 #    Given a pattern
 #    And a service with the pattern in the service definition

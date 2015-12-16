@@ -5,8 +5,9 @@ Feature: Deregistering domain perspectives
   I want to deregister the domain perspective
 
   Scenario: Not authorized
-    Given unauthorized publisher
-    And an existing domain perspective    
+    Given an existing domain perspective    
+    And the domain perspective has no associations
+    And unauthorized publisher
     And the domain perspective has no associations
     When I request deregistration of the domain perspective
     Then I receive 'not authorized' notification
@@ -14,7 +15,7 @@ Feature: Deregistering domain perspectives
   Scenario: Unknown domain perspective
     Given an unknown domain perspective
     When I request deregistration of the domain perspective
-    Then I receive 'domain perspective unknown' notification
+    Then I receive 'unknown domain perspective provided' notification
 
   Scenario: Existing domain perspective
     Given an existing domain perspective

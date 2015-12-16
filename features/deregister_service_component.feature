@@ -16,17 +16,17 @@ Feature: De-registering a service component
   Scenario: No service component
     Given no service component identifier
     When I request deregistration of the service component
-    Then I receive 'no service component identifier provided' notification
+    Then I receive 'no service component provided' notification
 
   Scenario: Invalid service component
     Given invalid service component identifier
     When I request deregistration of the service component
-    Then I receive 'invalid service component identifier' notification
+    Then I receive 'invalid service component provided' notification
 
   Scenario: Unknown service component
     Given an unknown service component
     When I request deregistration of the service component
-    Then I receive 'service component unknown' notification
+    Then I receive 'unknown service component provided' notification
 
   Scenario: Existing service component
     Given existing service component identifier
