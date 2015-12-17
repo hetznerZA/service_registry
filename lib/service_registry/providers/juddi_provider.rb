@@ -93,12 +93,6 @@ module ServiceRegistry
         @broker.save_element_bindings(service_component, [uri], @urns['service-components'], "service component")
       end
 
-      def delete_existing_bindings(bindings)
-        bindings.each do |binding, detail|
-          @broker.delete_binding(binding)
-        end
-      end
-
       def find_service_component_uri(service_component)
         @broker.find_element_bindings(service_component, @urns['service-components'])
       end
@@ -122,11 +116,13 @@ module ServiceRegistry
         @broker.delete_business(key)
       end
 
-      def business_eq?(business, comparison)
-        business == "#{@urns['domains']}#{comparison}"
-      end    
-
       private
+
+      def delete_existing_bindings(bindings)
+        bindings.each do |binding, detail|
+          @broker.delete_binding(binding)
+        end
+      end
 
       def has_bindings?(result)
         result and result['data'] and result['data']['bindings'] and (result['data']['bindings'].size > 0)
