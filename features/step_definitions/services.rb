@@ -202,6 +202,14 @@ Given(/^a new service identifier$/) do
   @test.given_new_service
 end
 
+Given(/^a new service identifier in uppercase$/) do
+  @test.given_new_service_uppercase
+end
+
+Then(/^the service should be available using the standardized lowercase name$/) do
+  expect(@test.service_available_lowercase?).to eq(true)
+end
+
 Then(/^I receive 'service registered' notification$/) do
   expect(@test.has_received_notification?('service registered')).to eq(true)
 end

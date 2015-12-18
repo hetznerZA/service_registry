@@ -47,6 +47,7 @@ module ServiceRegistry
       # ---- services ----
 
       def register_service(service)
+        service = standardize(service)
         authorize
         result = validate_hash_present(service, 'name', 'service'); return result if result
         return fail('service already exists') if is_registered?(service_registered?(service['name']))
@@ -64,6 +65,7 @@ module ServiceRegistry
       end
 
       def service_registered?(service)
+        service = standardize(service)
         result = @juddi.find_services(service)
         registered = false
         if has_data?(result, 'services')
@@ -75,6 +77,7 @@ module ServiceRegistry
       end
 
       def deregister_service(service)
+        service = standardize(service)
         authorize
         result = validate_field_present(service, 'service'); return result if result
         return success('unknown service provided') if not is_registered?(service_registered?(service))
@@ -87,6 +90,7 @@ module ServiceRegistry
       end
 
       def add_service_uri(service, uri)
+        service = standardize(service)
         authorize
         result = validate_field_present(service, 'service'); return result if result
         return fail('no URI provided') if uri.nil?
@@ -102,6 +106,7 @@ module ServiceRegistry
       end
 
       def service_uris(service)
+        service = standardize(service)
         authorize
         result = validate_field_present(service, 'service'); return result if result
 
@@ -115,6 +120,7 @@ module ServiceRegistry
       end
 
       def remove_uri_from_service(service, uri)
+        service = standardize(service)
         authorize
         result = validate_field_present(service, 'service'); return result if result
         return fail('no URI provided') if uri.nil?
@@ -132,6 +138,7 @@ module ServiceRegistry
       # ---- service definition ----
 
       def register_service_definition(service, definition)
+        service = standardize(service)
         authorize 
         result = validate_field_present(service, 'service'); return result if result
         return success('unknown service provided') if not is_registered?(service_registered?(service))
@@ -149,6 +156,7 @@ module ServiceRegistry
       end
 
       def service_definition_for_service(service)
+        service = standardize(service)
         result = validate_field_present(service, 'service'); return result if result
         return success('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.get_service(service)['data']
@@ -158,6 +166,7 @@ module ServiceRegistry
       end
 
       def deregister_service_definition(service)
+        service = standardize(service)
         authorize
         result = validate_field_present(service, 'service'); return result if result
         return success('unknown service provided') if not is_registered?(service_registered?(service))
@@ -229,6 +238,7 @@ module ServiceRegistry
 
       # ---- service components ----
       def list_service_components(domain_perspective = nil)
+        domain_perspective = standardize(domain_perspective)
         result = @juddi.find_service_components
         service_components = has_data?(result, 'services') ? result['data']['services'] : {}
         found = []
@@ -270,6 +280,7 @@ module ServiceRegistry
       end
 
       def service_component_registered?(service_component)
+        service_component = standardize(service_component)
         result = @juddi.find_service_components(service_component)
         registered = false
         if has_data?(result, 'services')
@@ -281,6 +292,7 @@ module ServiceRegistry
       end
 
       def register_service_component(service_component)
+        service_component = standardize(service_component)
         authorize
         result = validate_field_present(service_component, 'service component'); return result if result
         return fail('service component already exists') if is_registered?(service_component_registered?(service_component))
@@ -294,6 +306,7 @@ module ServiceRegistry
       end
 
       def service_component_has_domain_perspective_associations?(service_component)
+        service_component = standardize(service_component)
         domain_perspectives = list_domain_perspectives['data']['domain_perspectives']
         domain_perspectives.each do |name, detail|
           service_components = domain_perspective_associations(name)['data']['associations']['service_components']
@@ -305,6 +318,7 @@ module ServiceRegistry
       end
 
       def deregister_service_component(service_component)
+        service_component = standardize(service_component)
          authorize
          return fail('no service component provided') if service_component.nil?
          return fail('invalid service component provided') if service_component.strip == ""
@@ -319,6 +333,7 @@ module ServiceRegistry
       end
 
       def associate_service_component_with_service(service, access_point, description = '')
+        service = standardize(service)
         authorize
         return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (service.strip == "") or not is_registered?(service_registered?(service))
@@ -333,6 +348,7 @@ module ServiceRegistry
       end
 
       def configure_service_component_uri(service_component, uri)
+        service_component = standardize(service_component)
         authorize
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component provided') if (service_component.strip == "")
@@ -348,6 +364,7 @@ module ServiceRegistry
       end
 
       def service_component_uri(service_component)
+        service_component = standardize(service_component)
         return fail('no service component provided') if service_component.nil?
         return fail('invalid service component provided') if (service_component.strip == "")
         return fail('unknown service component provided') if not is_registered?(service_component_registered?(service_component))
@@ -360,6 +377,7 @@ module ServiceRegistry
 
       # ---- meta ----
       def configure_meta_for_service(service, meta)
+        service = standardize(service)
         authorize
 
         return fail('no service provided') if service.nil?
@@ -389,6 +407,7 @@ module ServiceRegistry
       end
 
       def meta_for_service(service)
+        service = standardize(service)
         detail = @juddi.get_service(service)['data']
         if detail['description']
           detail['description'].each do |desc|
@@ -400,6 +419,7 @@ module ServiceRegistry
       end
 
       def configure_meta_for_domain_perspective(type, domain_perspective, meta)
+        domain_perspective = standardize(domain_perspective)
         authorize
 
         return fail('no domain perspective provided') if domain_perspective.nil?
@@ -442,6 +462,7 @@ module ServiceRegistry
       end
 
       def meta_for_domain_perspective(type, domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         id = compile_domain_id(type, domain_perspective)
         detail = @juddi.get_business(id)['data'][domain_perspective]
         detail ||= {}
@@ -505,6 +526,7 @@ module ServiceRegistry
       end     
 
       def service_by_name(name)
+        name = standardize(name)
         return fail('invalid service provided') if name.nil? or (name.strip == "")
 
         result = search_for_service(name)
@@ -521,6 +543,7 @@ module ServiceRegistry
       end 
 
       def search_domain_perspective(domain_perspective, pattern)
+        domain_perspective = standardize(domain_perspective)
         found = {}
         data = domain_perspective_associations(domain_perspective)['data']['associations']
         service_components = data['service_components']
@@ -535,6 +558,7 @@ module ServiceRegistry
       # ---- associations ----
 
       def delete_all_domain_perspective_associations(domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         associations = domain_perspective_associations(domain_perspective)['data']['associations']
         associations.each do |id, value|
           disassociate_service_component_from_domain_perspective(domain_perspective, id)
@@ -543,6 +567,8 @@ module ServiceRegistry
       end
 
       def associate_service_component_with_domain_perspective(service_component, domain_perspective)
+        domain_perspective = standardize(domain_perspective)
+        service_component = standardize(service_component)
         #byebug
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
@@ -567,6 +593,8 @@ module ServiceRegistry
       end
 
       def associate_service_with_domain_perspective(service, domain_perspective)
+        domain_perspective = standardize(domain_perspective)
+        service = standardize(service)
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
 
@@ -590,6 +618,8 @@ module ServiceRegistry
       end
 
       def disassociate_service_component_from_domain_perspective(domain_perspective, service_component)
+        domain_perspective = standardize(domain_perspective)
+        service_component = standardize(service_component)
         # byebug
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
@@ -614,6 +644,8 @@ module ServiceRegistry
       end
 
       def disassociate_service_from_domain_perspective(domain_perspective, service)
+        domain_perspective = standardize(domain_perspective)
+        service = standardize(service)
         # byebug
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (not is_registered?(domain_perspective_registered?(domain_perspective)))
@@ -638,6 +670,7 @@ module ServiceRegistry
       end
 
       def domain_perspective_associations(domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         meta = meta_for_domain_perspective('domains', domain_perspective)
         meta['associations'] ||= {}
         meta['associations']['service_components'] ||= {}
@@ -646,6 +679,7 @@ module ServiceRegistry
       end
 
       def add_contact_to_domain_perspective(domain_perspective, contact)
+        domain_perspective = standardize(domain_perspective)
         return fail('failure adding contact') if @broken        
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
@@ -673,6 +707,7 @@ module ServiceRegistry
       end
 
       def contact_details_for_domain(domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         return fail('failure retrieving contact details') if @broken
         return fail('no domain perspective provided') if not domain_perspective
         return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")  
@@ -690,6 +725,7 @@ module ServiceRegistry
       end      
 
       def remove_contact_from_domain_perspective(domain_perspective, contact)
+        domain_perspective = standardize(domain_perspective)
         return fail('failure removing contact') if @broken        
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
@@ -731,6 +767,7 @@ module ServiceRegistry
       end
 
       def find_domain(type, domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         result = @juddi.find_businesses(domain_perspective)
         if has_data?(result, 'businesses')
           result['data']['businesses'].each do |business, detail|
@@ -741,6 +778,7 @@ module ServiceRegistry
       end
 
       def domain_registered?(type, domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         result = @juddi.find_businesses(domain_perspective)
         registered = false
         id = nil
@@ -757,6 +795,7 @@ module ServiceRegistry
       end
 
       def register_domain(type, domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         authorize
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if (domain_perspective.strip == "") or (not ServiceRegistry::HETZNER_DOMAIN_TYPES.include?(type.downcase))
@@ -772,15 +811,18 @@ module ServiceRegistry
       end
 
       def compile_domain_id(type, domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         "#{@urns[type]}#{domain_perspective}"
       end
 
       def domain_perspective_has_associations?(domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         associations = domain_perspective_associations(domain_perspective)['data']['associations']
         (associations['service_components'].size > 0) or (associations['services'].size > 0)
       end
 
       def deregister_domain(type, domain_perspective)
+        domain_perspective = standardize(domain_perspective)
         authorize
         return fail('no domain perspective provided') if domain_perspective.nil?
         return fail('invalid domain perspective provided') if domain_perspective.strip == ""
@@ -834,6 +876,20 @@ module ServiceRegistry
         return fail("no #{element} provided") if field.nil?
         return fail("invalid #{element} provided") if field.strip == ""        
       end
+
+    def standardize(name)
+      return standardize_dictionary(name) if name.is_a?(Hash)
+      return standardized = name.to_s.downcase if not name.nil?
+      nil
+    end
+
+    def standardize_dictionary(dictionary)
+      value = standardize(dictionary['name'])
+      standardized = dictionary
+      standardized['name'] = value
+      standardized
+    end
+
     end
   end
 end

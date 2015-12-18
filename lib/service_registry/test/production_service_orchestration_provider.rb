@@ -12,6 +12,7 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("producti
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Configuring URI for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Listing endpoints for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Removing URI from a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Standardizing names", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "De-registering a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Registering services", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
@@ -20,3 +21,4 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "M
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Configuring URI for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Listing endpoints for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Removing URI from a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Standardizing names", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)

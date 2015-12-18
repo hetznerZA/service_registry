@@ -4,6 +4,10 @@
 
 The service registry provides a variety of features supporting domain and service modelling, discovery and support. For a discussion on the model adopted (minimal SOA architectural without full-blown virtual services, but with domain perspectives as functional view implementations in minimal infrastructural virtual services (web applications)) {file:features/service_domain_perspective_association.readme see here.}
 
+=== Non-functional requirements
+
+* {file:features/nfr.feature name standardization} when expressing non-functional requirements
+
 === decision support system
 * {file:features/dss.feature decision support} when mapping services
 
@@ -82,11 +86,14 @@ To find a list of service definitions given a service component, one would have 
 
 == Usage
 
+The soar_sr gem can be included in ruby applications or frameworks to provide access to a UDDI registry
+Expressed here are common workflows when engaging the service registry. For detailed usage of the soar_sr UDDI client gem, please see http://http://www.rubydoc.info/gems/soar_sr
+
 === Setting up a local juddi instance
 * {file:tfa/README TFA instructions}
 
-=== soar_sr gem implementation
-    spec.add_development_dependency 'soar_sr'
+=== Using the soar_sr UDDI client 
+    spec.add_dependency 'soar_sr'
 
     bundle exec irb
 
@@ -104,102 +111,35 @@ To find a list of service definitions given a service component, one would have 
     as = @soar_sr.associations
     ss = @soar_sr.search
 
-==== Domain perspectives
-    ds.delete_all_domain_perspectives
-    ds.list_domain_perspectives
-    ds.domain_perspective_by_name('domains', 'my domain')
-    ds.domain_perspective_registered?('my domain')
-    ds.register_domain_perspective('my domain')
-    ds.domain_perspective_registered?('my domain')
-    ds.deregister_domain_perspective('my domain')
-    ds.list_domain_perspectives
+=== Workflows
 
-==== Services
-    sv.register_service({'name' => 'my service', 'description' => 'a new service', 'definition' => 'http://de.finiti.on'})
-    sv.service_registered?('my service')
-    sv.add_service_uri('my service', 'http://one-uri.com/my_service')
-    sv.add_service_uri('my service', 'http://find-me-here.com/my_service')
-    sv.remove_uri_from_service('my service', 'http://one-uri.com/my_service')
-    sv.service_uris('my service')
-    sv.configure_meta_for_service('my service', {'some' => 'meta'})
-    sv.meta_for_service('my service')
-    sv.service_by_name('my service')
-    sv.deregister_service('my service')
-    sv.service_by_name('my service')
+==== My team has a new suite of services deployed to service components to solve a business need (domain perspective)
 
-==== Service components
-    sc.delete_all_service_components
-    sc.list_service_components
-    sc.register_service_component('my sc')
-    sc.service_component_registered?('my sc')
-    sc.configure_service_component_uri('my sc', 'http://my-sc.com')
-    sc.service_component_uri('my sc')
-    sc.deregister_service_component('my sc')
-    sc.service_component_registered?('my sc')
+First, ensure the team exists in the service registry:
 
-==== Service definitions
-    sv.register_service({'name' => 'my service', 'description' => 'a new service', 'definition' => 'http://de.finiti.on'})
-    sd.service_definition_for_service('my service')
-    sd.deregister_service_definition('my service')
-    sd.service_definition_for_service('my service')
-    sd.register_service_definition('my service', 'http://github.com/myservice/def.wadl')
-    sd.service_definition_for_service('my service')
+  ts.register_team('my team')
 
-==== Teams
-    ts.team_registered?('my team')
-    ts.register_team('my team')
-    ds.domain_perspective_by_name('teams', 'my team')
-    ts.team_registered?('my team')
-    ts.deregister_team('my team')
-    ts.team_registered?('my team')
+Add a contact to the team:
 
-==== Contacts
-    contact = { 'name' => 'Peter Umpkin', 'email' => 'p.umpkin@ppatch.com', 'description' => 'Director of operations', 'phone' => '0917872413'}
-    contact2 = { 'name' => 'Bruce Atman', 'email' => 'b.atman@marvelling.com', 'description' => 'Head of sales'}
-    ds.register_domain_perspective('my domain')
-    cc.add_contact_to_domain_perspective('my domain', contact)
-    cc.add_contact_to_domain_perspective('my domain', contact2)
-    cc.contact_details_for_domain('my domain')
-    cc.remove_contact_from_domain_perspective('my domain', contact)
-    ts.register_team('my team')
-    cc.add_contact_to_domain_perspective('my team', contact2)
-    cc.contact_details_for_domain('my team')
+  contact = { 'name' => 'Peter Umpkin', 'email' => 'p.umpkin@ppatch.com', 'description' => 'Director of operations', 'phone' => '0917872413'}
+  cc.add_contact_to_domain_perspective('my team', contact)
 
-==== Associations
-    ds.register_domain_perspective('my domain')
-    as.delete_all_domain_perspective_associations('my domain')
-    sc.register_service_component('my sc')
-    as.associate_service_component_with_domain_perspective('my sc', 'my domain')
-    as.service_component_has_domain_perspective_associations?('my sc')
-    as.domain_perspective_associations('my domain')
-    as.domain_perspective_has_associations?('my domain')
-    as.disassociate_service_component_from_domain_perspective('my domain', 'my sc')
-    as.service_component_has_domain_perspective_associations?('my sc')
-    as.domain_perspective_has_associations?('my domain')
+Next, if it does not exist yet, register the domain perspective the services operate in:
 
-    ds.register_domain_perspective('my domain')
-    as.delete_all_domain_perspective_associations('my domain')
-    sv.register_service({'name' => 'my service', 'description' => 'a new service', 'definition' => 'http://de.finiti.on'})
-    as.associate_service_with_domain_perspective('my service', 'my domain')
-    as.domain_perspective_has_associations?('my domain')
-    as.domain_perspective_associations('my domain')
-    as.disassociate_service_from_domain_perspective('my domain', 'my service')
-    as.domain_perspective_associations('my domain')
+  ds.register_domain_perspective('my domain perspective')
 
-==== Search
-    sv.register_service({'name' => 'search me', 'description' => 'pretty please', 'definition' => 'http://de.finiti.on'})
-    sv.add_service_uri('search me', 'https://this.is.another.one/ybo')
-    sv.add_service_uri('search me', 'http://some.where.net/smoothies')
-    sv.service_uris('search me')
-    sv.remove_uri_from_service('search me', 'https://this.is.another.one/ybo')
-    ss.search_for_service('search')
-    ss.search_for_service('please')
-    ss.search_for_service('ti.on')
-    ds.register_domain_perspective('my domain')
-    as.associate_service_with_domain_perspective('search me', 'my domain')
-    ss.search_domain_perspective('my domain', 'search')
-    ss.search_domain_perspective('my domain', 'please')
-    ss.search_domain_perspective('my domain', 'ti.on')
-    ss.search_for_service_by_name('search')
-    ss.search_for_service_by_name('please')
-    ss.search_for_service_by_name('ti.on')
+Add a contact to the domain perspective:
+  contact = { 'name' => 'Bruce Atman', 'email' => 'b.atman@marvelling.com', 'description' => 'Head of sales'}
+  cc.add_contact_to_domain_perspective('my domain perspective', contact)
+
+Now add the service components:
+  sc.register_service_component('my-service-component-1.cpt4.host-h.net')
+  sc.configure_service_component_uri('my-service-component-1.cpt4.host-h.net', 'https://my-service-component-1.cpt4.host-h.net/')
+
+Associate the service component with the domain perspective:
+  as.associate_service_component_with_domain_perspective('my-service-component-1.cpt4.host-h.net', 'my domain perspective')
+
+Set ownership for the service component to the team:
+  as.associate_service_component_with_domain_perspective('my-service-component-1.cpt4.host-h.net', 'my team')
+
+TBD: register services and their definitions, associations to domain perspective and teams.

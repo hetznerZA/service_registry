@@ -51,7 +51,7 @@ module ServiceRegistry
       end
 
       def is_team_available?
-        @domain_perspective = @team
+        @domain_perspective = @standardized_team
         is_domain_perspective_available?
       end  
 

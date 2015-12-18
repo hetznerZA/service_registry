@@ -9,6 +9,7 @@ module ServiceRegistry
         @service_component_domain_perspective_associations = []
 
         @team = 'teamA'
+        @standardized_team = 'teama'
         @domain_perspective_1 = 'domain_perspective_1'
         @domain_perspective_2 = 'domain_perspective_2'
         @valid_uri = 'http://127.0.0.1'
@@ -19,6 +20,7 @@ module ServiceRegistry
         @service_3 = { 'name' => 'entropy_service_id_3', 'description' => 'entropy service C', 'definition' => nil }
         @service_4 = { 'name' => 'service_id_4', 'description' => 'entropy service D', 'definition' => nil }
         @service_5 = { 'name' => 'service_id_5', 'description' => 'service E', 'definition' => nil }
+        @service_uppercase = { 'name' => 'VALID_SERVICE_ID_2', 'description' => 'valid service B', 'definition' => nil }
         @secure_service = { 'name' => 'secure_service', 'description' => 'secure service B' }
         @service_component = nil
         @uri = nil

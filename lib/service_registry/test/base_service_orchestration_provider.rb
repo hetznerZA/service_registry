@@ -10,6 +10,11 @@ module ServiceRegistry
         @iut.deregister_service(@service['name']) if @iut.service_registered?(@service['name'])
       end
 
+      def given_new_service_uppercase
+        @service = @service_uppercase
+        @iut.deregister_service(@service['name']) if @iut.service_registered?(@service['name'])
+      end
+
       def given_a_need
         @need = 'valid'
       end
@@ -49,6 +54,7 @@ module ServiceRegistry
       end
 
       def register_service
+        # byebug
         process_result(@iut.register_service(@service))
       end
 
@@ -57,7 +63,7 @@ module ServiceRegistry
       end
 
       def match_need
-        #byebug
+        # byebug
         process_result(@iut.search_for_service(@need))
       end
 
@@ -157,6 +163,12 @@ module ServiceRegistry
 
       def service_available?
         id = @service.nil? ? "" : @service['name']
+        process_result(@iut.service_registered?(id))
+        data['registered']
+      end
+
+      def service_available_lowercase?
+        id = @service.nil? ? "" : @service['name'].downcase
         process_result(@iut.service_registered?(id))
         data['registered']
       end

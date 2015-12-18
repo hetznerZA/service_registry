@@ -30,6 +30,7 @@ module ServiceRegistry
         return fail('no service provided') if service.nil? or service['name'].nil?
         return fail('invalid service provided') if ((not service.is_a? Hash) or (service['name'].strip == ""))
         return fail('service already exists') if not @services[service['name']].nil?
+        service['name'] = service['name'].downcase
         @services[service['name']] = service
         success('service registered')
       end
@@ -77,7 +78,7 @@ module ServiceRegistry
       end
 
       def register_team(team)
-        register_domain_perspective(team)
+        register_domain_perspective(team.downcase)
       end
 
       def register_domain_perspective(domain_perspective)

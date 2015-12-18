@@ -28,6 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'nokogiri'
   spec.add_development_dependency 'soap4juddi', "~>0.1.6"
   spec.add_development_dependency 'jsender', "~>0.1.5"
-  spec.add_development_dependency 'soar_sr', "~>0.1.7"
+  spec.add_development_dependency 'soar_sr', "~>0.1.9"
   spec.add_development_dependency 'persistent-cache'
 end
