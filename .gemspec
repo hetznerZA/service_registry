@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'yard'
   spec.add_development_dependency 'byebug'
   spec.add_development_dependency 'nokogiri'
-  spec.add_development_dependency 'soap4juddi', "~>0.1.6"
+  spec.add_development_dependency 'soap4juddi', "~>0.1.8"
   spec.add_development_dependency 'jsender', "~>0.1.5"
   spec.add_development_dependency 'soar_sr', "~>0.1.10"
   spec.add_development_dependency 'persistent-cache'
