@@ -25,9 +25,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-expectations", "~> 3.3"
   spec.add_development_dependency 'yard'
   spec.add_development_dependency 'byebug'
-  spec.add_development_dependency 'nokogiri'
-  spec.add_development_dependency 'soap4juddi', "~>0.1.9"
-  spec.add_development_dependency 'jsender', "~>0.1.5"
-  spec.add_development_dependency 'soar_sr', "~>0.1.12"
-  spec.add_development_dependency 'persistent-cache'
+  spec.add_dependency 'nokogiri'
+  spec.add_dependency 'jsender', "~>0.1.5"
+  spec.add_dependency 'soar_sr', "~>0.1.14"
+  spec.add_dependency 'persistent-cache'
 end

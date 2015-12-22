@@ -81,6 +81,7 @@ module ServiceRegistry
       end      
 
       def given_an_existing_domain_perspective
+        #byebug
         process_result(@iut.reset_domain_perspectives)
         process_result(@iut.register_domain_perspective(@domain_perspective_1))
         @domain_perspective = @domain_perspective_1
