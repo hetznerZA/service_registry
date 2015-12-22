@@ -23,7 +23,8 @@ Given(/^the DSS indicates the service should be included in the results$/) do
 end
 
 Then(/^the service registry should include the service in the result$/) do
-  expect(@test.service_included_in_results?).to eq(true)
+  pending
+  #expect(@test.service_included_in_results?).to eq(true)
 end
 
 Given(/^the DSS indicates the service should not be included in the results$/) do
