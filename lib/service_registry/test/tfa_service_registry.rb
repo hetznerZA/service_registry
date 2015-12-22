@@ -22,7 +22,7 @@ module ServiceRegistry
 
         @tfa_uri = uri
         broker = ::Soap4juddi::Broker.new(@urns)
-        broker.set_uri(@tfa_uri)
+        broker.base_uri(@tfa_uri)
         @juddi = ServiceRegistry::Providers::JUDDIProvider.new(@urns, broker)
         @authorized = true
         @credentials = credentials
@@ -35,12 +35,12 @@ module ServiceRegistry
       end
 
       def fix
-        @juddi.broker.set_uri(@tfa_uri)
+        @juddi.broker.base_uri(@tfa_uri)
         @broken = false
       end
 
       def break
-        @juddi.broker.set_uri("http://127.0.0.1:9992")
+        @juddi.broker.base_uri("http://127.0.0.1:9992")
         @broken = true
       end
 
