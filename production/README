@@ -18,7 +18,7 @@ vi juddiv3/META-INF/context.xml
     <Resource name="jdbc/JuddiDS" auth="Container"
         type="javax.sql.DataSource" username="#{systemProperties['RDS_USERNAME']}" password="#{systemProperties['RDS_PASSWORD']}"
         driverClassName="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://#{systemProperties['RDS_HOSTNAME']}:#{systemProperties['RDS_PORT']}/#{systemProperties['RDS_DB_NAME']}"
+        url="jdbc:mysql://#{systemProperties['RDS_HOSTNAME']}:#{systemProperties['RDS_PORT']}/#{systemProperties['RDS_DB_NAME']}?autoReconnect=true"
         maxActive="20"/>
 </Context>
 

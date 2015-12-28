@@ -31,15 +31,6 @@ Feature: Map service components to services
     When I request a list of services that can meet my need
     Then I can extract a URI to the service on a service component
 
-  Scenario: mapping status to service components
-    Given a pending test
-    #Given a need
-    #And existing service component identifier
-    #And one service match
-    #And the service is associated with the service component
-    #When I request a list of services that can meet my need
-    #Then I can extract a status of the service component providing that service
-
   Scenario: multiple service components providing the service
     Given a need
     And multiple existing service components
