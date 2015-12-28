@@ -27,6 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'byebug'
   spec.add_dependency 'nokogiri'
   spec.add_dependency 'jsender', "~>0.1.5"
-  spec.add_dependency 'soar_sr', "~>0.1.19"
+  spec.add_dependency 'soar_sr', "~>1.0.0"
   spec.add_dependency 'persistent-cache'
 end
