@@ -404,7 +404,7 @@ service component has domain perspective associations
         success
       end
 
-      def contact_details_for_domain(domain_perspective)
+      def contact_details_for_domain_perspective(domain_perspective)
         return fail('failure retrieving contact details') if @broken        
         return fail('no domain perspective provided') if not domain_perspective
         return fail('invalid domain perspective provided') if (domain_perspective and domain_perspective.strip == "")        

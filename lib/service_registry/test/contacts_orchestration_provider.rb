@@ -2,11 +2,11 @@ module ServiceRegistry
   module Test
     class ContactsOrchestrationProvider < BaseOrchestrationProvider      
     	def request_contact_details_for_domain_perspective
-    		process_result(@iut.contact_details_for_domain(@domain_perspective))
+    		process_result(@iut.contact_details_for_domain_perspective(@domain_perspective))
     	end
 
     	def no_contact_details_for_domain_perspective
-    		contacts = @iut.contact_details_for_domain(@domain_perspective)['data']['contacts']
+    		contacts = @iut.contact_details_for_domain_perspective(@domain_perspective)['data']['contacts']
     		# contacts ||= {}
     		contacts.each do |contact|
     			@iut.remove_contact_from_domain(@domain_perspective, contact)
@@ -29,12 +29,12 @@ module ServiceRegistry
     	end
 
     	def has_received_list_with_one_contact?
-    		contacts = @iut.contact_details_for_domain(@domain_perspective)['data']['contacts']
+    		contacts = @iut.contact_details_for_domain_perspective(@domain_perspective)['data']['contacts']
     		(contacts.size == 1) and contacts_include?(contacts, @contact_1)
     	end
 
     	def has_received_list_with_all_contacts?
-    		contacts = @iut.contact_details_for_domain(@domain_perspective)['data']['contacts']
+    		contacts = @iut.contact_details_for_domain_perspective(@domain_perspective)['data']['contacts']
     		(contacts.size == 2) and contacts_include?(contacts, @contact_1) and contacts_include?(contacts, @contact_2)
     	end
 
@@ -43,7 +43,7 @@ module ServiceRegistry
       end
 
       def contact_associated_with_domain_perspective?
-        result = @iut.contact_details_for_domain(@domain_perspective)  
+        result = @iut.contact_details_for_domain_perspective(@domain_perspective)  
         contacts_include?(result['data']['contacts'], @contact)
       end
 

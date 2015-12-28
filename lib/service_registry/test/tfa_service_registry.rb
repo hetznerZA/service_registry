@@ -706,7 +706,7 @@ module ServiceRegistry
         result
       end
 
-      def contact_details_for_domain(domain_perspective)
+      def contact_details_for_domain_perspective(domain_perspective)
         domain_perspective = standardize(domain_perspective)
         return fail('failure retrieving contact details') if @broken
         return fail('no domain perspective provided') if not domain_perspective

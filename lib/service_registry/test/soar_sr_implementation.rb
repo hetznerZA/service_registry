@@ -199,8 +199,8 @@ module ServiceRegistry
         @soar_sr.contacts.add_contact_to_domain_perspective(domain_perspective, contact)
       end     
 
-      def contact_details_for_domain(domain_perspective)
-        @soar_sr.contacts.contact_details_for_domain(domain_perspective)
+      def contact_details_for_domain_perspective(domain_perspective)
+        @soar_sr.contacts.contact_details_for_domain_perspective(domain_perspective)
       end
 
       def remove_contact_from_domain_perspective(domain_perspective, contact)

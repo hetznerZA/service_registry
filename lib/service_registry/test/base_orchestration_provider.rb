@@ -193,7 +193,7 @@ module ServiceRegistry
       end
 
       def given_existing_contact
-        result = @iut.contact_details_for_domain(@domain_perspective)
+        result = @iut.contact_details_for_domain_perspective(@domain_perspective)
         result['data']['contacts'].each do |contact|
           remove_contact_from_domain_perspective(@domain_perspective, contact)
         end
