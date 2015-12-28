@@ -1,6 +1,11 @@
 # Service registry
 
-Please see README.rdoc
+## Documentation
+
+```
+yard server --reload
+# browse to http://localhost:8808
+```
 
 ## Testing
 
