@@ -128,14 +128,26 @@ Add a contact to the domain perspective:
   contact = { 'name' => 'Bruce Atman', 'email' => 'b.atman@marvelling.com', 'description' => 'Head of sales'}
   cc.add_contact_to_domain_perspective('my domain perspective', contact)
 
-Now add the service components:
-  sc.register_service_component('my-service-component-1.cpt4.host-h.net')
-  sc.configure_service_component_uri('my-service-component-1.cpt4.host-h.net', 'https://my-service-component-1.cpt4.host-h.net/')
+For each service component:
+  Add the service component:
+    sc.register_service_component('my-service-component-1.cpt4.host-h.net')
+    sc.configure_service_component_uri('my-service-component-1.cpt4.host-h.net', 'https://my-service-component-1.cpt4.host-h.net/')
 
-Associate the service component with the domain perspective:
-  as.associate_service_component_with_domain_perspective('my-service-component-1.cpt4.host-h.net', 'my domain perspective')
+  Associate the service component with the domain perspective:
+     as.associate_service_component_with_domain_perspective('my-service-component-1.cpt4.host-h.net', 'my domain perspective')
 
-Set ownership for the service component to the team:
-  as.associate_service_component_with_domain_perspective('my-service-component-1.cpt4.host-h.net', 'my team')
+  Set ownership for the service component to the team:
+    as.associate_service_component_with_domain_perspective('my-service-component-1.cpt4.host-h.net', 'my team')
 
-TBD: register services and their definitions, associations to domain perspective and teams.
+For each service in the domain perspective:
+  Register the service:
+    sv.register_service({'name' => 'my service', 'description' => 'a new service', 'definition' => 'http://de.finiti.on'})
+
+  Add access points for the service:
+    sv.add_service_uri('my service', 'http://one-uri.com/my_service')
+
+  Associate the service with its domain perspective:
+    as.associate_service_with_domain_perspective('my service', 'my domain perspective')
+
+  Set ownership for the service to the team:
+    as.associate_service_with_domain_perspective('my service', 'my team')
