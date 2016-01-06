@@ -63,8 +63,16 @@ module ServiceRegistry
         @soar_sr.services.configure_meta_for_service(service, meta)
       end
 
+      def configure_meta_for_service_component(service_component, meta)
+        @soar_sr.service_components.configure_meta_for_service_component(service_component, meta)
+      end
+
       def meta_for_service(service)
         @soar_sr.services.meta_for_service(service)
+      end      
+
+      def meta_for_service_component(service_component)
+        @soar_sr.service_components.meta_for_service_component(service_component)
       end      
 
       def register_service_definition(service, definition)

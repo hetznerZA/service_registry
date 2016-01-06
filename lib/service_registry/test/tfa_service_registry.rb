@@ -406,9 +406,51 @@ module ServiceRegistry
          fail('failure configuring service with meta')
       end
 
+      def configure_meta_for_service_component(service_component, meta)
+        service_component = standardize(service_component)
+        authorize
+
+        return fail('no service component provided') if service_component.nil?
+        return fail('invalid service component provided') if (service_component.strip == "")
+        return fail('unknown service component provided') if not is_registered?(service_component_registered?(service_component))
+
+        return fail('no meta provided') if meta.nil?
+        return fail('invalid meta') if not meta.is_a?(Hash)
+
+        descriptions = []
+        detail = @juddi.get_service_component(service_component)['data']
+        detail['description'] ||= {}
+        detail['description'].each do |desc|
+          descriptions << desc if not description_is_meta?(desc)
+        end
+
+        descriptions << CGI.escape(meta.to_json)
+
+        detail = @juddi.get_service_component(service_component)['data']
+        detail['description'] = descriptions
+
+        result = @juddi.save_service_component(detail['name'], detail['description'], detail['definition'])
+        validate_and_succeed(result, 'meta', 'meta updated', result['data'])
+       rescue => ex
+         fix if @broken
+         fail('failure configuring service component with meta')
+      end      
+
       def meta_for_service(service)
         service = standardize(service)
         detail = @juddi.get_service(service)['data']
+        if detail['description']
+          detail['description'].each do |desc|
+            return JSON.parse(CGI.unescape(desc)) if (description_is_meta?(desc))
+          end
+        end
+
+        {}
+      end
+
+      def meta_for_service_component(service_component)
+        service_component = standardize(service_component)
+        detail = @juddi.get_service_component(service_component)['data']
         if detail['description']
           detail['description'].each do |desc|
             return JSON.parse(CGI.unescape(desc)) if (description_is_meta?(desc))
