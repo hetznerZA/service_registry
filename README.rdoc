@@ -30,6 +30,7 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/register_service_component.feature registering service components} when new service components are added
 * {file:features/deregister_service_component.feature deregistering service components} when service components should no longer be accessible
 * {file:features/service_component_uri.feature configuring service component URI} when enabling location of service components
+* {file:features/configure_service_component_meta.feature configuring service component meta} when provisioning service components
 
 === services
 * {file:features/register_service.feature registering services} when provisioning services
@@ -151,3 +152,25 @@ For each service in the domain perspective:
 
   Set ownership for the service to the team:
     as.associate_service_with_domain_perspective('my service', 'my team')
+
+==== My team wants to add a service component with meta and associate it with a team
+
+First, ensure the team exists in the service registry:
+
+  ts.register_team('my team')
+
+Add a contact to the team:
+
+  contact = { 'name' => 'Peter Umpkin', 'email' => 'p.umpkin@ppatch.com', 'description' => 'Director of operations', 'phone' => '0917872413'}
+  cc.add_contact_to_domain_perspective('my team', contact)
+
+Add the service component:
+  sc.register_service_component('my-service-component-1.cpt4.host-h.net')
+  sc.configure_service_component_uri('my-service-component-1.cpt4.host-h.net', 'https://my-service-component-1.cpt4.host-h.net/')
+
+Set ownership for the service component to the team:
+  as.associate_service_component_with_domain_perspective('my-service-component-1.cpt4.host-h.net', 'my team')
+
+Configure meta for the service component:
+  First retrieve the existing meta if any:
+    meta = sv.meta_for_service('my-service-component-1.cpt4.host-h.net')

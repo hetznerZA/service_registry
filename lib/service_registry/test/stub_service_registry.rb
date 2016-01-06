@@ -348,8 +348,23 @@ service component has domain perspective associations
         @meta[service] = meta
       end
 
+      def configure_meta_for_service_component(service_component, meta)
+        return fail('not authorized') if not @authorized
+        return fail('no meta provided') if meta.nil?
+        return fail('invalid meta') if not meta.is_a?(Hash)
+        return fail('no service component provided') if service_component.nil?
+        return fail('invalid service component provided') if (service_component.strip == "")
+        return fail('unknown service component provided') if (not @service_components.include?(service_component))
+        return fail('failure configuring service component with meta') if @broken
+        @meta[service_component] = meta
+      end      
+
       def meta_for_service(service)
         @meta[service]
+      end
+
+      def meta_for_service_component(service_component)
+        @meta[service_component]
       end
 
       def add_service_uri(service, uri)

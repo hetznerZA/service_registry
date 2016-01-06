@@ -6,5 +6,7 @@ module ServiceRegistry
 end
 
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Configuring meta for a service", ServiceRegistry::Test::ProductionMetaOrchestrationProvider)
-
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Configuring meta for a service", ServiceRegistry::Test::ProductionMetaOrchestrationProvider)
+
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Configuring meta for a service component", ServiceRegistry::Test::ProductionMetaOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Configuring meta for a service component", ServiceRegistry::Test::ProductionMetaOrchestrationProvider)

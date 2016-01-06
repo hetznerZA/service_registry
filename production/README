@@ -2,7 +2,7 @@ Download the correct juddi as expressed in the TFA README and uncompress it.
 Delete webapps/juddi-gui and replace it with the Hetzner jUDDI GUI found in here: git@github.com:hetznerZA/soar_sr_gui.git
 Clone this repo, build it and then do all GUI configuration to target/juddi-gui. Soft-link target/juddi-gui to the tomcat directory's webapps/juddi-gui and then follow the rest of these instructions.
 
-Configure the juddi-gui authenticator as in the TFA README
+Configure the juddi authenticator as in the TFA README
 
 For production, configure the data source as follows to point to a relational database of your choice:
 

@@ -25,6 +25,13 @@ module ServiceRegistry
         process_result(@iut.configure_meta_for_service(s, @meta))
       end
 
+      def configure_service_component_meta
+        s = nil if @service_component.nil?
+        s = @service_component['name'] if @service_component.is_a?(Hash)
+        s = @service_component if not @service_component.nil? and (not @service_component.is_a?(Hash))
+        process_result(@iut.configure_meta_for_service_component(s, @meta))
+      end
+
       def meta_configured?
         @iut.meta_for_service(@service['name']) == @meta
       end
@@ -32,6 +39,20 @@ module ServiceRegistry
       def meta_unchanged?
         @iut.meta_for_service(@service['name']) == @pre_meta
       end
+
+      def service_component_has_meta_configured
+        @pre_meta = @original_meta
+        process_result(@iut.configure_meta_for_service_component(@service_component, @original_meta))
+      end
+
+      def service_component_meta_configured?
+        @iut.meta_for_service_component(@service_component) == @meta
+      end
+
+      def service_component_meta_unchanged?
+        @iut.meta_for_service_component(@service_component) == @pre_meta
+      end
+
     end
   end
 end

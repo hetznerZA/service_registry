@@ -37,3 +37,24 @@ end
 Then(/^I receive 'failure configuring service with meta' notification$/) do
   expect(@test.has_received_notification?('failure configuring service with meta')).to eq(true)
 end
+
+When(/^I request configuration of the service component with meta$/) do
+  @test.configure_service_component_meta
+end
+
+Then(/^the service component should know about the meta$/) do
+  expect(@test.service_component_meta_configured?).to eq(true)
+end
+
+Given(/^the service component has meta configured$/) do
+  @test.service_component_has_meta_configured
+end
+
+Then(/^the service component meta should remain unchanged$/) do
+  expect(@test.service_component_meta_unchanged?).to eq(true)
+end
+
+Then(/^I receive 'failure configuring service component with meta' notification$/) do
+  expect(@test.has_received_notification?('failure configuring service component with meta')).to eq(true)
+end
+

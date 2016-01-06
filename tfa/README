@@ -101,7 +101,7 @@ flush privileges;
 
 Make sure conf/CATALINA/localhost/juddiv3.xml does not exist from the tomcat root directory.
 
-Restart the jUDDI GUI from the tomcat manager or from the command line so:
+Restart jUDDI from the tomcat manager or from the command line so:
 
 bin/catalina.sh stop
 bin/catalina.sh start

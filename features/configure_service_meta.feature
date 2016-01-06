@@ -11,7 +11,7 @@ Feature: Configuring meta for a service
     When I request configuration of the service with meta
     Then I receive 'not authorized' notification
 
-  Scenario: Providing meta for a service component
+  Scenario: Providing meta for a service
     Given valid meta
     And a registered service
     When I request configuration of the service with meta
