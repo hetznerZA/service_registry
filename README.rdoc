@@ -96,7 +96,7 @@ Expressed here are common workflows when engaging the service registry. For deta
 
 ==== Helpers
     require 'soar_sr'
-    credentials = { 'username' => 'uddi', 'password' => 'get-me-from-the-configuration-service' }
+    credentials = { 'username' => 'uddi', 'password' => 'get-me-from-the-configuration-service' } # http://www.rubydoc.info/gems/configuration_service
     freshness = 0 # > 0 to enable cache
     @soar_sr = SoarSr::ServiceRegistry.new('http://service-registry.auto-h.net:8080', 'hetzner.co.za', 'hetzner', credentials, freshness)
     ds = @soar_sr.domain_perspectives
