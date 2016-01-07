@@ -96,9 +96,9 @@ Expressed here are common workflows when engaging the service registry. For deta
 
 ==== Helpers
     require 'soar_sr'
-    credentials = { 'username' => 'uddi', 'password' => 'uddi' }
+    credentials = { 'username' => 'uddi', 'password' => 'get-me-from-the-configuration-service' }
     freshness = 0 # > 0 to enable cache
-    @soar_sr = SoarSr::ServiceRegistry.new('http://localhost:8080', 'hetzner.co.za', 'hetzner', credentials, freshness)
+    @soar_sr = SoarSr::ServiceRegistry.new('http://service-registry.auto-h.net:8080', 'hetzner.co.za', 'hetzner', credentials, freshness)
     ds = @soar_sr.domain_perspectives
     sv = @soar_sr.services
     sc = @soar_sr.service_components
@@ -173,4 +173,8 @@ Set ownership for the service component to the team:
 
 Configure meta for the service component:
   First retrieve the existing meta if any:
-    meta = sv.meta_for_service('my-service-component-1.cpt4.host-h.net')
+    meta = sc.meta_for_service_component('my-service-component-1.cpt4.host-h.net')
+
+  Then add meta to it
+    meta['my-key'] = 'my-meta'
+    sc.configure_meta_for_service_component('my service', meta)
