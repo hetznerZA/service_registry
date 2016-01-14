@@ -13,3 +13,4 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Listing endpoints for a service", ServiceRegistry::Test::StubServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Removing URI from a service", ServiceRegistry::Test::StubServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Standardizing names", ServiceRegistry::Test::StubServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "finding services and their URIs for services that has the specified pattern in their URIs", ServiceRegistry::Test::StubServiceOrchestrationProvider)

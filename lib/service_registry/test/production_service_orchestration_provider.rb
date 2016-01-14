@@ -13,6 +13,7 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("producti
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Listing endpoints for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Removing URI from a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "Standardizing names", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("production", "finding services and their URIs for services that has the specified pattern in their URIs", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "De-registering a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Registering services", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
@@ -22,3 +23,4 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "C
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Listing endpoints for a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Removing URI from a service", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "Standardizing names", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("tfa", "finding services and their URIs for services that has the specified pattern in their URIs", ServiceRegistry::Test::ProductionServiceOrchestrationProvider)

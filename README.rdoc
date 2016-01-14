@@ -50,7 +50,7 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/associate_service_with_domain_perspective.feature associating services with domain perspectives} when modelling the domain.
 * {file:features/associate_service_with_domain_perspective.feature changing domain perspective service associations} when modelling the domain.
 * {file:features/remove_service_domain_perspective_association.feature removing domain perspective service associations} when modelling the domain.
-* {file:features/service_endpoints.feature adding service access points} when provisioning serviceses
+* {file:features/service_endpoints.feature adding service access points} when provisioning services
 * {file:features/list_service_endpoints.feature listing services access points} when using services.
 * {file:features/remove_service_endpoints.feature removing service access points} when provisioning services
 
@@ -60,6 +60,7 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/service_search.feature finding a list of service components in a domain perspectives} when exploring provisining of a domain perspective
 * {file:features/service_search.feature finding a list of services  matching service search criteria} when exploring services
 * {file:features/service_service_components.feature finding a URI} for accessing the service on a service component
+* {file:features/finding_services_with_endpoint.feature finding services and their URIs for services that has the specified pattern in their URIs}
 
 == Requirements
 
@@ -178,3 +179,16 @@ Configure meta for the service component:
   Then add meta to it
     meta['my-key'] = 'my-meta'
     sc.configure_meta_for_service_component('my service', meta)
+
+==== My team needs to perform maintenance on a service component and needs to know which services will be affected, and want to contact the owners of those systems
+
+Pending workflows:
+
+==== My team needs to redeploy a service and wants to do so without disrupting service
+==== My team has found an issue occurring in a domain / on a service component / with a service, and wants to contact someone who can help.
+==== My team has a view on multiple service components / services, and wants to tag them meaningfully (e.g. with an iteam tag)
+==== My application has needs it wants fulfilled, and wants to obtain the best service component, given a service that can fulfill the need now, where best means X
+==== My team has deployed an alternative implementation of a service (e.g. debugging, AB testing, etc.) and want to route some traffic there.
+==== My team has noticed that some service components are taking strain and want to add new service components load balanced
+==== We have decided we want to look at our systems differently, and so I want to move services and service components to different domain perspectives
+==== We have decided we want to think about responsibilities for systems differently, and so I want to move services and service components to different teams

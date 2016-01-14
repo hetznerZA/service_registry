@@ -321,6 +321,23 @@ service component has domain perspective associations
         success_data({'services' => search_for_service_in_services(@services, pattern)})
       end
 
+      def search_services_for_uri(pattern)
+        return fail('no pattern provided') if pattern.nil?
+        return fail('invalid pattern provided') if (pattern.size < 4)
+        found = {}
+        @services.each do |name, service|
+          uris = @service_uris[name]
+          uris ||= []
+          uris.each do |uri|
+            found[name] ||= []
+            found[name] << uri if uri.include?(pattern)
+          end
+        end
+        # { '1' => ["http://localhost/1"]}
+        success_data('services' => found)
+      end
+
+
       def search_domain_perspective(domain_perspective, pattern)
         services_list = search_for_service(pattern)['data']['services']
         found = {}

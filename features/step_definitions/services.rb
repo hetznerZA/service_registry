@@ -2,6 +2,10 @@ Given(/^unknown service identifier$/) do
   @test.given_unknown_service
 end
 
+Given(/^valid URI pattern$/) do
+  @test.given_valid_URI_pattern
+end
+
 Given(/^valid service definition$/) do
   @test.given_a_valid_service_definition
 end
@@ -82,6 +86,10 @@ Given(/^no services match$/) do
   @test.no_services_match_need
 end
 
+Given(/^no services match the pattern$/) do
+  @test.no_services_match_pattern
+end
+
 When(/^I request a list of services that can meet my need$/) do
   @test.match_need
 end
@@ -132,6 +140,10 @@ end
 
 Given(/^a pattern$/) do
   @test.given_a_pattern
+end
+
+Given(/^invalid URI pattern$/) do
+  @test.given_invalid_URI_pattern
 end
 
 Given(/^a service with the pattern in the ID$/) do
@@ -324,4 +336,36 @@ end
 
 Then(/^I receive 'invalid pattern provided' notification$/) do
   expect(@test.has_received_notification?('invalid pattern provided')).to eq(true)
+end
+
+Given(/^the service has a matching URI configured$/) do
+  @test.given_service_has_matching_uri_endpoint
+end
+
+When(/^I search for the pattern in service URIs$/) do
+  @test.search_for_pattern_in_endpoints
+end
+
+Then(/^I receive the service and the matching URI$/) do
+  expect(@test.has_received_service_and_matching_uri).to eq(true)
+end
+
+Given(/^the services have matching URIs configured$/) do
+  @test.given_services_have_matching_uri_endpoints
+end
+
+Then(/^I receive the services and the matching URIs$/) do
+  expect(@test.has_received_services_and_matching_uris).to eq(true)
+end
+
+Given(/^the service has multiple matching URIs configured$/) do
+  @test.given_service_has_matching_uri_endpoints
+end
+
+Then(/^I receive the service and the matching URIs$/) do
+  expect(@test.has_received_service_and_matching_uris).to eq(true)
+end
+
+When(/^I request services with URIs matching the pattern$/) do
+  @test.request_services_matching_pattern
 end

@@ -52,7 +52,7 @@ Feature: Searching for a service
     When I request services matching the pattern
     Then I receive 'no pattern provided' notification
     
-  Scenario: No pattern
+  Scenario: Invalid pattern
     Given invalid pattern
     When I request services matching the pattern
     Then I receive 'invalid pattern provided' notification

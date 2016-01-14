@@ -31,6 +31,10 @@ module ServiceRegistry
         @need = 'my'
       end
 
+      def given_invalid_URI_pattern
+        @uri = 'meh'
+      end
+
       def given_service_with_pattern_in_id
         @expected_pattern_service = @service_3
         @iut.register_service(@service_3)
@@ -49,8 +53,26 @@ module ServiceRegistry
         @iut.register_service_definition(@service_5['name'], @service_definition_1)
       end
 
+      def given_service_has_matching_uri_endpoint
+        @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_1)
+      end
+
+      def given_services_have_matching_uri_endpoints
+        @iut.add_service_uri(@service_3['name'], @service_uri_1)
+        @iut.add_service_uri(@service_4['name'], @service_uri_1)
+      end
+
+      def given_service_has_matching_uri_endpoints
+        @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_1)
+        @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_2)
+      end
+
       def no_services_match_need
         @need = 'no services match this'
+      end
+
+      def no_services_match_pattern
+        # nothing to do here, no services registered so none can match
       end
 
       def register_service
@@ -98,11 +120,42 @@ module ServiceRegistry
         process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
       end
 
+      def search_for_pattern_in_endpoints
+        process_result(@iut.search_services_for_uri(@uri))
+      end
+
+      def has_received_service_and_matching_uri
+        data['services'].each do |service, uri|
+          return true if ((service == @service['name']) and (uri[0] == @service_uri_1))
+        end
+        false
+      end
+
+      def has_received_services_and_matching_uris
+        found_first = false
+        found_second = false
+        data['services'].each do |service, uri|
+          found_first  = true if ((service == @service_3['name']) and (uri[0] == @service_uri_1))
+          found_second = true if ((service == @service_4['name']) and (uri[0] == @service_uri_1))
+        end
+        found_first and found_second
+      end
+
+      def has_received_service_and_matching_uris
+        found_first = false
+        found_second = false
+        data['services'].each do |service, uri|
+          found_first  = true if ((service == @service['name']) and (uri.include?(@service_uri_1)))
+          found_second = true if ((service == @service['name']) and (uri.include?(@service_uri_2)))
+        end
+        found_first and found_second
+      end
+
       def has_received_service_uris?
         uris = []
         data['bindings'].each do |binding, detail|
           uris << detail['access_point']
-        end        
+        end  
         arrays_the_same?(@pre_uris, uris)
       end
 
