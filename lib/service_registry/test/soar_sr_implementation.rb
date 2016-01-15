@@ -195,9 +195,17 @@ module ServiceRegistry
         @soar_sr.search.query_service_by_pattern(pattern)
       end
 
+      def search_services_for_uri(pattern)
+        @soar_sr.search.search_services_for_uri(pattern)
+      end
+
       def search_for_service(pattern)
         @soar_sr.search.search_for_service(pattern)
       end     
+
+      def list_services
+        @soar_sr.services.list_services
+      end
 
       def search_domain_perspective(domain_perspective, pattern)
         @soar_sr.search.search_domain_perspective(domain_perspective, pattern)
