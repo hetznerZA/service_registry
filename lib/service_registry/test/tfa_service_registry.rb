@@ -9,6 +9,8 @@ module ServiceRegistry
     class TfaServiceRegistry < ServiceRegistry::Providers::BootstrappedProvider
       include ServiceRegistry::Providers::DssAssociate
       include Jsender
+
+      ALL_SERVICES = nil unless defined? ALL_SERVICES; ALL_SERVICES.freeze
             
       attr_writer :authorized
 
@@ -95,9 +97,9 @@ module ServiceRegistry
         result = validate_field_present(service, 'service'); return result if result
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
-
         return fail('unknown service provided') if not is_registered?(service_registered?(service))
         result = @juddi.add_service_uri(service, uri)
+
         validate_and_succeed(result, 'service')
 
       rescue => ex
@@ -125,9 +127,10 @@ module ServiceRegistry
         result = validate_field_present(service, 'service'); return result if result
         return fail('no URI provided') if uri.nil?
         return fail('invalid URI') if not (uri =~ URI::DEFAULT_PARSER.regexp[:UNSAFE]).nil?
-
         return fail('unknown service provided') if not is_registered?(service_registered?(service))
+
         result = @juddi.remove_service_uri(service, uri)
+
         validate_and_succeed(result, 'service')
 
       rescue => ex
@@ -547,24 +550,15 @@ module ServiceRegistry
         success_data({ 'services' => list })
       end
 
+      def list_services
+        search_for_service_by_pattern(ALL_SERVICES)
+      end
+
       def search_for_service(pattern)
         return fail('no pattern provided') if pattern.nil?
         return fail('invalid pattern provided') if (pattern.size < 4)
 
-        services = @juddi.find_services(pattern)['data']['services']
-        service_components = @juddi.find_service_components(pattern)['data']['services']
-        services ||= {}
-
-        services_detailed = {}
-        services.each do |id, service|
-          service['uris'] = service_uris(service['name'])['data']['bindings']
-        end
-
-        service_components ||= {}
-        found = services.merge!(service_components)
-        # byebug
-
-        success_data({'services' => found})
+        search_for_service_by_pattern(pattern)
       end     
 
       def service_by_name(name)
@@ -597,6 +591,27 @@ module ServiceRegistry
         success_data({'services' => found})
       end
 
+      def search_services_for_uri(pattern)
+        return fail('no pattern provided') if pattern.nil?
+        return fail('invalid pattern provided') if (pattern.size < 4)
+        result = search_for_service_by_pattern(ALL_SERVICES)['data']['services']
+        result ||= {}
+        found = {}
+        result.each do |service, detail|
+          uris = detail['uris']
+          uris ||= {}
+          included = false
+          uris.each do |id, access_details|
+            uri = access_details['access_point']
+            if (not((uri =~ /#{pattern}/i).nil?))
+              found[service] ||= []
+              found[service] << uri
+            end
+          end
+        end
+
+        success_data({'services' => found})       
+      end
       # ---- associations ----
 
       def delete_all_domain_perspective_associations(domain_perspective)
@@ -793,6 +808,27 @@ module ServiceRegistry
       end      
 
       private
+
+      def search_for_service_by_pattern(pattern, include_service_components = true)
+        services = @juddi.find_services(pattern)['data']['services']
+        service_components = @juddi.find_service_components(pattern)['data']['services'] if include_service_components
+        services ||= {}
+        services_detailed = {}
+        services.each do |id, service|
+          service['uris'] = service_uris(service['name'])['data']['bindings'] #evg
+        end      
+
+        services_detailed = {}
+        services.each do |id, service|
+          service['uris'] = service_uris(service['name'])['data']['bindings']
+        end
+
+        service_components ||= {}
+        found = services.merge!(service_components) if include_service_components
+        # byebug
+
+        success_data({'services' => found})
+      end
 
       def ensure_required_contact_details(details)
         details['description'] = 'n/a' if details['description'].nil? or details['description'].strip == ""

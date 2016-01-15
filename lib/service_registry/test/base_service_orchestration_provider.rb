@@ -54,17 +54,27 @@ module ServiceRegistry
       end
 
       def given_service_has_matching_uri_endpoint
-        @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_1)
+        name = @service.is_a?(Hash) ? @service['name'] : @service
+        clear_service_endpoints(name)
+        @iut.add_service_uri(name, @service_uri_1)
       end
 
       def given_services_have_matching_uri_endpoints
+        clear_service_endpoints(@service_3['name'])
         @iut.add_service_uri(@service_3['name'], @service_uri_1)
+
+        clear_service_endpoints(@service_4['name'])
         @iut.add_service_uri(@service_4['name'], @service_uri_1)
       end
 
       def given_service_has_matching_uri_endpoints
-        @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_1)
-        @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_2)
+        name = @service.is_a?(Hash) ? @service['name'] : @service
+        clear_service_endpoints(name)
+        @iut.add_service_uri(name, @service_uri_1)
+
+        name = @service.is_a?(Hash) ? @service['name'] : @service
+        clear_service_endpoints(name)
+        @iut.add_service_uri(name, @service_uri_2)
       end
 
       def no_services_match_need
@@ -72,7 +82,10 @@ module ServiceRegistry
       end
 
       def no_services_match_pattern
-        # nothing to do here, no services registered so none can match
+        process_result(@iut.list_services)
+        data['services'].each do |service, detail|
+          @iut.deregister_service(service)
+        end
       end
 
       def register_service
@@ -126,7 +139,7 @@ module ServiceRegistry
 
       def has_received_service_and_matching_uri
         data['services'].each do |service, uri|
-          return true if ((service == @service['name']) and (uri[0] == @service_uri_1))
+          return true if ((service == @service['name']) and (uri.include?(@service_uri_1)))
         end
         false
       end
@@ -135,8 +148,8 @@ module ServiceRegistry
         found_first = false
         found_second = false
         data['services'].each do |service, uri|
-          found_first  = true if ((service == @service_3['name']) and (uri[0] == @service_uri_1))
-          found_second = true if ((service == @service_4['name']) and (uri[0] == @service_uri_1))
+          found_first  = true if ((service == @service_3['name']) and (uri.include?(@service_uri_1)))
+          found_second = true if ((service == @service_4['name']) and (uri.include?(@service_uri_1)))
         end
         found_first and found_second
       end
@@ -318,6 +331,10 @@ module ServiceRegistry
           uris << detail['access_point']
         end
         uris
+      end
+
+      def clear_service_endpoints(name)
+        @iut.configure_meta_for_service(name, {})
       end
     end
   end

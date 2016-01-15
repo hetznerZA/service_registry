@@ -27,7 +27,7 @@ module ServiceRegistry
         @service_component_1 = 'sc1.dev.auto-h.net'
         @service_component_2 = 'sc2.dev.auto-h.net'
         @service_definition = nil
-        @service_uri_pattern = 'http://localhost'
+        @service_uri_pattern = 'localhost'
         @service_uri_1 = 'http://localhost/1'
         @service_uri_2 = 'http://localhost/2'
         @contact_1 = { 'name' => 'Darren Silke', 'email' => 'darren@smooth-silk.com', 'description' => 'Intern', 'phone' => '0217881445'}; @contact_1.freeze

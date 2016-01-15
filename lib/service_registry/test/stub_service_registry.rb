@@ -306,6 +306,10 @@ service component has domain perspective associations
         success_data({'registered' => (not (@services[service].nil?))})
       end
 
+      def list_services
+        success_data('services' => @services)
+      end
+
       def service_definition_for_service(service)
         return fail('no service provided') if service.nil?
         return fail('invalid service provided') if (service.strip == "")
