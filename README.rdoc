@@ -186,12 +186,16 @@ Find your service component, if needed:
   sc.list_service_components
 
 Ask the service registry which services are associated with the service component by searching for patterns in its name:
-  ss.search_services_for_uri('pattern')
+  ss.search_access_points('hostname-of-service-component')
 
 
-Look up the contacts for the services in the service registry, in order to inform the owners:
+Find the domain perspectives (including teams for ownership) with which the services are associated:
 
+tbd
 
+Look up the contacts for the domain perspectives, in order to query and inform the owners / stakeholders:
+
+tbd
 
 
 
