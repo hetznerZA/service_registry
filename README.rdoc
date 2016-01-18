@@ -182,6 +182,19 @@ Configure meta for the service component:
 
 ==== My team needs to perform maintenance on a service component and needs to know which services will be affected, and want to contact the owners of those systems
 
+Find your service component, if needed:
+  sc.list_service_components
+
+Ask the service registry which services are associated with the service component by searching for patterns in its name:
+  ss.search_services_for_uri('pattern')
+
+
+Look up the contacts for the services in the service registry, in order to inform the owners:
+
+
+
+
+
 Pending workflows:
 
 ==== My team needs to redeploy a service and wants to do so without disrupting service
