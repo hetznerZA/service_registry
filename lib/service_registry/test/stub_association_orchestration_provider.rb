@@ -20,3 +20,4 @@ ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Removing service associations from domain perspectives", ServiceRegistry::Test::StubAssociationOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Associate a service component with a service", ServiceRegistry::Test::StubAssociationOrchestrationProvider)
 ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Removing service component associations from services", ServiceRegistry::Test::StubAssociationOrchestrationProvider)
+ServiceRegistry::Test::OrchestrationProviderRegistry.instance.register("stub", "Listing service associations", ServiceRegistry::Test::StubAssociationOrchestrationProvider)

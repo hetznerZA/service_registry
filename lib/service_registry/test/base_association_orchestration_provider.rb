@@ -16,7 +16,7 @@ module ServiceRegistry
       end
 
       def disassociate_domain_perspective_from_service
-        process_result(@iut.disassociate_service_from_domain_perspective(@domain_perspective, @service.is_a?(Hash) ? @service['name'] : @service))
+        process_result(@iut.disassociate_service_from_domain_perspective(@domain_perspective, service_name))
         process_result(@iut.domain_perspective_associations(@domain_perspective))
         @domain_perspective_associations = data['associations']
       end
@@ -29,6 +29,31 @@ module ServiceRegistry
       def domain_perspective_associations_changed?
         process_result(@iut.domain_perspective_associations(@domain_perspective))
         not arrays_the_same?(data['associations'].to_a, @domain_perspective_associations.to_a)
+      end
+
+      def no_service_associations
+        process_result(@iut.service_associations(service_name))
+        data['associations']['domain_perspectives'].each do |domain_perspective|
+          @iut.disassociate_service_from_domain_perspective(@domain_perspective, service_name)
+        end
+      end
+
+      def request_associations_for_service
+        process_result(@iut.service_associations(service_name))
+      end
+
+      def received_an_empty_dictionary_of_service_associations
+        uris = data['uris']
+        domain_perspectives = data['associations']['domain_perspectives']
+        (uris == []) and (domain_perspectives == {})
+      end
+
+      def received_associations_dictionary_with_domain_perspective_associations
+        data['associations']['domain_perspectives'] == [@domain_perspective_1]
+      end
+
+      def received_associations_dictionary_with_service_component_uris
+        data['uris'] == [@service_uri_1]
       end
     end
   end

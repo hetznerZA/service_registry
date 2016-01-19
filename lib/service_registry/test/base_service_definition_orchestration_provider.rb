@@ -18,7 +18,7 @@ module ServiceRegistry
       end
 
       def request_service_definition
-        process_result(@iut.service_definition_for_service(@service.is_a?(Hash) ? @service['name'] : @service))
+        process_result(@iut.service_definition_for_service(service_name))
       end
 
       def no_service_definition_associated
@@ -26,11 +26,11 @@ module ServiceRegistry
       end
 
       def deregister_service_definition
-        process_result(@iut.deregister_service_definition(@service.is_a?(Hash) ? @service['name'] : @service))
+        process_result(@iut.deregister_service_definition(service_name))
       end
 
       def service_definition_changed?
-        result = @iut.service_definition_for_service(@service.is_a?(Hash) ? @service['name'] : @service)
+        result = @iut.service_definition_for_service(service_name)
         @current_definition = result['status'] == 'fail' ? nil : result['data']['definition']
         not (@current_definition == @pre_service_definition)
       end
@@ -40,7 +40,7 @@ module ServiceRegistry
       end
 
       def is_service_described_by_service_definition?
-        process_result(@iut.service_definition_for_service(@service.is_a?(Hash) ? @service['name'] : @service))
+        process_result(@iut.service_definition_for_service(service_name))
         data['definition'] == @service_definition
       end
     end

@@ -156,13 +156,13 @@ module ServiceRegistry
       end
 
       def associate_domain_perspective_with_service
-        process_result(@iut.associate_service_with_domain_perspective(@service.is_a?(Hash) ? @service['name'] : @service, @domain_perspective))
+        process_result(@iut.associate_service_with_domain_perspective(service_name, @domain_perspective))
         process_result(@iut.domain_perspective_associations(@domain_perspective))
         @domain_perspective_associations = data['associations']
       end
 
       def register_service_definition
-        process_result(@iut.register_service_definition(@service.is_a?(Hash) ? @service['name'] : @service, @service_definition))
+        process_result(@iut.register_service_definition(service_name, @service_definition))
       end
 
       def associate_service_with_two_service_components
@@ -248,6 +248,24 @@ module ServiceRegistry
       def unauthorized
         @iut.authorized = false
       end
+
+      def configure_some_service_uris
+        @iut.add_service_uri(service_name, @service_uri_1)
+        @pre_uris = extract_service_uris
+      end
+
+      def extract_service_uris
+        process_result(@iut.service_uris(service_name))
+        uris = []
+        data['bindings'].each do |binding, detail|
+          uris << detail['access_point']
+        end
+        uris
+      end
+
+      def service_name
+        @service.is_a?(Hash) ? @service['name'] : @service
+      end      
     end
   end
 end

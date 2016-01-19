@@ -134,3 +134,28 @@ end
 Then(/^I receive 'failure disassociating service from domain perspective' notification$/) do
   expect(@test.has_received_notification?('failure disassociating service from domain perspective')).to eq(true)
 end
+
+Given(/^no service associations$/) do
+  @test.no_service_associations
+end
+
+When(/^I request associations for the service$/) do
+  @test.request_associations_for_service
+end
+
+Then(/^I receive an empty association dictionary$/) do
+  expect(@test.received_an_empty_dictionary_of_service_associations).to eq(true)
+end
+
+Then(/^I receive an association dictionary with the domain perspective associations$/) do
+  expect(@test.received_associations_dictionary_with_domain_perspective_associations).to eq(true)
+end
+
+Then(/^I receive an association dictionary with the service component URIs$/) do
+  expect(@test.received_associations_dictionary_with_service_component_uris).to eq(true)
+end
+
+Then(/^I receive 'failure determining associations for service' notification$/) do
+  expect(@test.has_received_notification?('failure determining associations for service')).to eq(true)
+end
+

@@ -54,9 +54,8 @@ module ServiceRegistry
       end
 
       def given_service_has_matching_uri_endpoint
-        name = @service.is_a?(Hash) ? @service['name'] : @service
-        clear_service_endpoints(name)
-        @iut.add_service_uri(name, @service_uri_1)
+        clear_service_endpoints(service_name)
+        @iut.add_service_uri(service_name, @service_uri_1)
       end
 
       def given_services_have_matching_uri_endpoints
@@ -68,13 +67,11 @@ module ServiceRegistry
       end
 
       def given_service_has_matching_uri_endpoints
-        name = @service.is_a?(Hash) ? @service['name'] : @service
-        clear_service_endpoints(name)
-        @iut.add_service_uri(name, @service_uri_1)
+        clear_service_endpoints(service_name)
+        @iut.add_service_uri(service_name, @service_uri_1)
 
-        name = @service.is_a?(Hash) ? @service['name'] : @service
-        clear_service_endpoints(name)
-        @iut.add_service_uri(name, @service_uri_2)
+        clear_service_endpoints(service_name)
+        @iut.add_service_uri(service_name, @service_uri_2)
       end
 
       def no_services_match_need
@@ -94,7 +91,7 @@ module ServiceRegistry
       end
 
       def deregister_service
-        process_result(@iut.deregister_service(@service.is_a?(Hash) ? @service['name'] : @service))
+        process_result(@iut.deregister_service(service_name))
       end
 
       def match_need
@@ -117,20 +114,15 @@ module ServiceRegistry
       end
 
       def configure_service_uri
-        process_result(@iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @uri))
-      end
-
-      def configure_some_service_uris
-        @iut.add_service_uri(@service.is_a?(Hash) ? @service['name'] : @service, @service_uri_1)
-        @pre_uris = extract_service_uris
+        process_result(@iut.add_service_uri(service_name, @uri))
       end
 
       def remove_uri_from_service
-        process_result(@iut.remove_uri_from_service(@service.is_a?(Hash) ? @service['name'] : @service, @uri))
+        process_result(@iut.remove_uri_from_service(service_name, @uri))
       end
 
       def request_service_uris
-        process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
+        process_result(@iut.service_uris(service_name))
       end
 
       def search_for_pattern_in_endpoints
@@ -173,7 +165,7 @@ module ServiceRegistry
       end
 
       def remember_uri?
-        process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
+        process_result(@iut.service_uris(service_name))
         uris = data['bindings']
         uris.each do |binding, detail|
           return true if detail['access_point'] == @uri
@@ -322,15 +314,6 @@ module ServiceRegistry
       def service_uris_changed?
         @iut.fix
         not arrays_the_same?(@pre_uris, extract_service_uris)
-      end
-
-      def extract_service_uris
-        process_result(@iut.service_uris(@service.is_a?(Hash) ? @service['name'] : @service))
-        uris = []
-        data['bindings'].each do |binding, detail|
-          uris << detail['access_point']
-        end
-        uris
       end
 
       def clear_service_endpoints(name)

@@ -53,6 +53,7 @@ The service registry provides a variety of features supporting domain and servic
 * {file:features/service_endpoints.feature adding service access points} when provisioning services
 * {file:features/list_service_endpoints.feature listing services access points} when using services.
 * {file:features/remove_service_endpoints.feature removing service access points} when provisioning services
+* {file:features/service_associations.feature listing service associations} when maintaining services
 
 === search and filters
 
