@@ -228,10 +228,20 @@ service component has domain perspective associations
         return fail('unknown service provided') if @services[service].nil?
         return fail('failure determining associations for service') if @broken
 
-        associations = { 'domain_perspectives' => []}
-        associations['domain_perspectives'] = (@service_associations[service]['domain_perspectives'] || []) if @service_associations[service]
-        uris = []
-        uris = (@service_uris[service] || []) if @service_uris[service]
+        associations = { 'domain_perspectives' => {}}
+
+        if (@service_associations[service] and @service_associations[service]['domain_perspectives'])
+          @service_associations[service]['domain_perspectives'].each do |domain_perspective|
+            associations['domain_perspectives'][domain_perspective] = domain_perspective
+          end
+        end
+
+        uris = {}
+        if (@service_uris[service])
+          @service_uris[service].each do |uri|
+            uris[uri] = uri
+          end
+        end
 
         success_data({'uris' => uris, 'associations' => associations})
       end

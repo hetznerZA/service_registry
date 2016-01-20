@@ -47,6 +47,10 @@ module ServiceRegistry
         @soar_sr.services.deregister_service(service)
       end
 
+      def service_associations(service)
+        @soar_sr.associations.service_associations(service)
+      end
+
       def add_service_uri(service, uri)
         @soar_sr.services.add_service_uri(service, uri)
       end

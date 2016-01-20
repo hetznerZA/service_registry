@@ -145,20 +145,25 @@ module ServiceRegistry
         return success('unknown service provided') if not is_registered?(service_registered?(service))
 
         associations = {}
-        uris = []
-        service_uris(service)['data']['bindings'].each do |id, detail|
-          uris << detail['access_point']
+        uris = {}
+        domain_perspectives = {}
+
+        bindings = service_uris(service)['data']['bindings']
+        bindings ||= {}
+        bindings.each do |id, detail|
+          uris[id] = detail['access_point']
         end
 
-        domain_perspectives = []
-        list_domain_perspectives['data']['domain_perspectives'].each do |domain_perspective, detail|
+        domain_perspectives_list = list_domain_perspectives['data']['domain_perspectives']
+        domain_perspectives_list ||= {}
+        domain_perspectives_list.each do |domain_perspective, detail|
           services = domain_perspective_associations(domain_perspective)['data']['associations']['services']
           services.each do |sv, associated|
             serv = sv.gsub(@urns['services'], "")
-            domain_perspectives << domain_perspective if (serv.downcase == service) and (associated == true)
+            domain_perspectives[detail['id']] = domain_perspective if (serv.downcase == service) and (associated == true)
           end
         end
-        associations['domain_perspectives'] = domain_perspectives.uniq
+        associations['domain_perspectives'] = domain_perspectives
         success_data({'uris' => uris, 'associations' => associations})
       rescue => ex
         fix if @broken
