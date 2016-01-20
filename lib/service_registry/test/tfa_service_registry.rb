@@ -138,6 +138,33 @@ module ServiceRegistry
         fail('failure removing URI from service')        
       end
 
+      def service_associations(service)
+        service = standardize(service)
+        authorize
+        result = validate_field_present(service, 'service'); return result if result
+        return success('unknown service provided') if not is_registered?(service_registered?(service))
+
+        associations = {}
+        uris = []
+        service_uris(service)['data']['bindings'].each do |id, detail|
+          uris << detail['access_point']
+        end
+
+        domain_perspectives = []
+        list_domain_perspectives['data']['domain_perspectives'].each do |domain_perspective, detail|
+          services = domain_perspective_associations(domain_perspective)['data']['associations']['services']
+          services.each do |sv, associated|
+            serv = sv.gsub(@urns['services'], "")
+            domain_perspectives << domain_perspective if (serv.downcase == service) and (associated == true)
+          end
+        end
+        associations['domain_perspectives'] = domain_perspectives.uniq
+        success_data({'uris' => uris, 'associations' => associations})
+      rescue => ex
+        fix if @broken
+        fail('failure determining associations for service')           
+      end
+
       # ---- service definition ----
 
       def register_service_definition(service, definition)

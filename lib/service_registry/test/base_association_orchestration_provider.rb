@@ -34,7 +34,10 @@ module ServiceRegistry
       def no_service_associations
         process_result(@iut.service_associations(service_name))
         data['associations']['domain_perspectives'].each do |domain_perspective|
-          @iut.disassociate_service_from_domain_perspective(@domain_perspective, service_name)
+          @iut.disassociate_service_from_domain_perspective(domain_perspective, service_name)
+        end
+        data['uris'].each do |uri|
+          @iut.remove_uri_from_service(service_name, uri)
         end
       end
 
@@ -45,7 +48,7 @@ module ServiceRegistry
       def received_an_empty_dictionary_of_service_associations
         uris = data['uris']
         domain_perspectives = data['associations']['domain_perspectives']
-        (uris == []) and (domain_perspectives == {})
+        (uris == []) and (domain_perspectives == [])
       end
 
       def received_associations_dictionary_with_domain_perspective_associations
