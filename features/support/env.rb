@@ -1,4 +1,3 @@
-require 'byebug'
 require './features/support/requires'
 
 Requires::require_files

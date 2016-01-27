@@ -1,5 +1,4 @@
 require 'net/http'
-require 'byebug'
 
 module ServiceRegistry
   module Providers

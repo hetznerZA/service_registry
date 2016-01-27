@@ -24,10 +24,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.3"
   spec.add_development_dependency "rspec-expectations", "~> 3.3"
   spec.add_development_dependency 'yard'
-  spec.add_development_dependency 'byebug'
+  #spec.add_development_dependency 'byebug'
   spec.add_dependency 'nokogiri'
   spec.add_dependency 'jsender', "~>0.1.5"
-  spec.add_dependency 'soar_sr', "~>1.1.11"
-  spec.add_dependency 'persistent-cache'
+  spec.add_dependency 'soar_sr', "~>1.1.17"
+  spec.add_dependency 'persistent-cache-ram'
   spec.add_dependency 'connection_pool'
 end
