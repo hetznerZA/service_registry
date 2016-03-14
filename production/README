@@ -39,4 +39,10 @@ jar -cvf ../juddiv3.war *
 cd ../juddi-gui
 jar -cvf ../juddi-gui.war *
 
-Note that there are 2 webapps to deploy to beanstalk... can we do that on the same beanstalk instance?
+Note that there are 2 webapps to deploy to beanstalk.
+
+Once deployed, configure a crontab to restart the juddi service daily. This is to avoid 'Could not send message' errors between juddi-gui and juddiv3 that emerge over time. Increasing the memory footprint on the tomcat did not help to prevent this. At some point we need to debug why this happens:
+
+crontab -e
+37 4 * * * tomcat /home/tomcat/juddi-tomcat-3.3.2/bin/catalina.sh stop
+38 4 * * * tomcat /home/tomcat/juddi-tomcat-3.3.2/bin/catalina.sh start
