@@ -2,7 +2,7 @@
 
 == Features
 
-The service registry provides a variety of features supporting domain and service modelling, discovery and support. For a discussion on the model adopted (minimal SOA architectural without full-blown virtual services, but with domain perspectives as functional view implementations in minimal infrastructural virtual services (web applications)) {file:features/service_domain_perspective_association.readme see here.}
+The service registry provides a variety of features supporting domain and service modelling, discovery and support. The domain analysis for this architectural building block can be found here: https://docs.google.com/presentation/d/1y4iO90fuavK33IQLx-wXDJfBVWz-PD5TwGbOxp3t9bg/edit#slide=id.p For a discussion on the model adopted (minimal SOA architectural without full-blown virtual services, but with domain perspectives as functional view implementations in minimal infrastructural virtual services (web applications)) {file:features/service_domain_perspective_association.readme see here.}
 
 === Non-functional requirements
 
