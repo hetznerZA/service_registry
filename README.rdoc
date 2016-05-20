@@ -199,6 +199,12 @@ Look up the contacts for the domain perspectives, in order to query and inform t
 
 tbd
 
+==== I want to make a backup of the juddi database
+
+Download the UDDI migration tool from https://repo1.maven.org/maven2/org/apache/juddi/uddi-migration-tool/3.3.2/uddi-migration-tool-3.3.2-jar-with-dependencies.jar
+You can also see there whether a newer version of the tool is available.
+Documentation for the tool is available here: https://juddi.apache.org/docs/3.x/devguide/html/ch08.html
+
 
 
 Pending workflows:

@@ -41,7 +41,14 @@ jar -cvf ../juddi-gui.war *
 
 Note that there are 2 webapps to deploy to beanstalk.
 
-Once deployed, configure a crontab to restart the juddi service daily. This is to avoid 'Could not send message' errors between juddi-gui and juddiv3 that emerge over time. Increasing the memory footprint on the tomcat did not help to prevent this. At some point we need to debug why this happens:
+In order to avoid out-of-memory issues (which show up in log/catalina.out) set appropriate memory regions by adding a JAVA_OPTS entry in bin/catalina.sh and ensure the instance has enough RAM. 16 Gb is recommended. If you find the system runs out of memory (e.g. memory leak) configure a crontab to restart the juddi service daily. This is to avoid 'Could not send message' errors between juddi-gui and juddiv3 that emerge over time if a memory leak is present. An example for a 2Gb system below:
+
+# Memory capacity: 2048 M
+# Total: 1536m to leave 512m to the OS
+# Eden: 256m
+# Perm: 256m
+# Heap: 1280m
+JAVA_OPTS="$JAVA_OPTS -Xms1280m -Xmx1280m -Xmn256m -XX:MaxPermSize=256m -XX:PermSize=256m"
 
 crontab -e
 37 4 * * * tomcat /home/tomcat/juddi-tomcat-3.3.2/bin/catalina.sh stop
