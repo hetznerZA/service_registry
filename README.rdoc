@@ -111,6 +111,12 @@ Expressed here are common workflows when engaging the service registry. For deta
     as = @soar_sr.associations
     ss = @soar_sr.search
 
+=== Backups / restore
+
+The service registry itself can be redeployed as per the production README. For fast redeployment, a snapshot of the EC2 instance is stored in Ireland. Launch an EC2 instance with the latest snapshot. The mysql database back-end is in AWS RDS, and is backed up nightly. Previous revisions can be restored if a problem is only detected after a while. Manual databse backups can also be made as below:
+
+mysqldump -u masteruser -h serviceregistry.crkmzcgt2nqj.eu-west-1.rds.amazonaws.com -P 3306 -p serviceregistry > backups/service-registry-database-ccyy-mm-dd.sql
+
 === Workflows
 
 ==== My team has a new suite of services deployed to service components to solve a business need (domain perspective)
