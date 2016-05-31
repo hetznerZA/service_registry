@@ -1,4 +1,4 @@
-= Servicy registry
+= Service registry
 
 == Features
 
