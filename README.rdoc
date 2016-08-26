@@ -207,11 +207,15 @@ tbd
 
 ==== I want to make a backup of the juddi database
 
+Look in 'client/' in this repo, or:
+
 Download the UDDI migration tool from https://repo1.maven.org/maven2/org/apache/juddi/uddi-migration-tool/3.3.2/uddi-migration-tool-3.3.2-jar-with-dependencies.jar
 You can also see there whether a newer version of the tool is available.
 Documentation for the tool is available here: https://juddi.apache.org/docs/3.x/devguide/html/ch08.html
 An example uddi.xml is found in juddiv3/WEB-INF/classes/META-INF/uddi.xml
 
+Perform a backup so:
+java -jar uddi-migration-tool-3.3.2-jar-with-dependencies.jar -user uddi -business export.xml -pass 'password' -export
 
 Pending workflows:
 
