@@ -1,3 +1,6 @@
+require "service_registry/test/base_domain_perspective_orchestration_provider"
+require "service_registry/test/orchestration_provider_registry"
+
 module ServiceRegistry
   module Test
     class ProductionDomainPerspectiveOrchestrationProvider < BaseDomainPerspectiveOrchestrationProvider

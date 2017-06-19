@@ -1,6 +1,9 @@
 require 'uri'
 require 'jsender'
 
+require "service_registry/providers/bootstrapped_provider"
+require "service_registry/providers/dss_associate"
+
 module ServiceRegistry
   module Test
     class StubServiceRegistry < ServiceRegistry::Providers::BootstrappedProvider

@@ -1,3 +1,5 @@
+require "service_registry/test/base_orchestration_provider"
+
 module ServiceRegistry
   module Test
     class ContactsOrchestrationProvider < BaseOrchestrationProvider      

@@ -1,3 +1,6 @@
+require "service_registry/test/base_service_component_orchestration_provider"
+require "service_registry/test/orchestration_provider_registry"
+
 module ServiceRegistry
   module Test
     class ProductionServiceComponentOrchestrationProvider < BaseServiceComponentOrchestrationProvider
