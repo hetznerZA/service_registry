@@ -1,4 +1,4 @@
-require './features/support/requires'
+require_relative "requires"
 
 Requires::require_files
 
