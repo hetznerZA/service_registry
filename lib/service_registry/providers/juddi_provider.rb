@@ -1,4 +1,5 @@
 require 'net/http'
+require 'service_registry/providers/bootstrapped_provider'
 
 module ServiceRegistry
   module Providers

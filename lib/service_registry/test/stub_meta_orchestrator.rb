@@ -1,3 +1,6 @@
+require "service_registry/test/base_meta_orchestrator"
+require "service_registry/test/orchestration_provider_registry"
+
 module ServiceRegistry
   module Test
     class StubMetaOrchestrationProvider < BaseMetaOrchestrationProvider

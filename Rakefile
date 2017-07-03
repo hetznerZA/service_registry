@@ -10,3 +10,14 @@ task :test => :spec do
   ENV["TEST_ORCHESTRATION_PROVIDER"] ||= "stub"
   sh %{bundle exec cucumber}
 end
+
+namespace :test do
+  desc "Test includes"
+  task :includes do
+    Dir.chdir("lib") do
+      Dir["**/*.rb"].map { |x| x.chomp(".rb") }.each do |f|
+        sh %Q{ruby -e '$LOAD_PATH.unshift("."); require "#{f}"; exit 0'}
+      end
+    end
+  end
+end
